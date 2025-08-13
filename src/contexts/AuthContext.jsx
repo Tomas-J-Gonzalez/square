@@ -15,6 +15,8 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+
+
   // Initialize auth state on app load
   useEffect(() => {
     const user = authService.getCurrentUser();
@@ -101,7 +103,8 @@ export const AuthProvider = ({ children }) => {
     changePassword,
     deleteAccount,
     isAuthenticated: !!currentUser,
-    isAdmin
+    isAdmin,
+    setCurrentUser
   };
 
   return (

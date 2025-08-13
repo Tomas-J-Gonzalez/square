@@ -197,16 +197,13 @@ const Register = () => {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 id="password"
                 name="password"
                 value={formData.password}
                 onChange={handlePasswordChange}
-                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                }`}
                 placeholder="Create a password"
+                error={errors.password}
                 aria-describedby={errors.password ? 'password-error' : 'password-strength'}
                 required
               />
@@ -226,16 +223,13 @@ const Register = () => {
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 id="confirmPassword"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-                  errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                }`}
                 placeholder="Confirm your password"
+                error={errors.confirmPassword}
                 aria-describedby={errors.confirmPassword ? 'confirm-password-error' : undefined}
                 required
               />

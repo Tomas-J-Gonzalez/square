@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear ALL Data - Be There or Be Square</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #ec4899;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #db2777;
+        }
+        .danger {
+            background-color: #dc2626;
+        }
+        .danger:hover {
+            background-color: #b91c1c;
+        }
+        .success {
+            color: #059669;
+            background-color: #d1fae5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .warning {
+            color: #d97706;
+            background-color: #fef3c7;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .info {
+            background-color: #dbeafe;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .data-item {
+            background-color: #f3f4f6;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clear ALL User Data</h1>
+        
+        <div class="warning">
+            <h3>⚠️ Warning</h3>
+            <p><strong>This will permanently delete ALL your data:</strong></p>
+            <ul>
+                <li>All user accounts</li>
+                <li>Current user session</li>
+                <li>All email confirmations</li>
+                <li>All events</li>
+                <li>All stored preferences</li>
+            </ul>
+            <p><strong>This action cannot be undone!</strong></p>
+        </div>
+
+        <div class="info">
+            <h3>📋 Current Data Status</h3>
+            <div id="currentData"></div>
+        </div>
+
+        <div>
+            <button onclick="showCurrentData()">Check Current Data</button>
+            <button onclick="clearData()">Clear All Data</button>
+            <button class="danger" onclick="clearEverything()">Nuclear Option - Clear Everything</button>
+        </div>
+        
+        <div id="result"></div>
+        
+        <div class="info">
+            <h3>📋 After Clearing Data:</h3>
+            <ol>
+                <li>Go to: <a href="http://localhost:5173/register" target="_blank">http://localhost:5173/register</a></li>
+                <li>Register with ANY email address (no more whitelist!)</li>
+                <li>Use any valid email domain</li>
+                <li>Start completely fresh</li>
+            </ol>
+        </div>
+
+        <div class="info">
+            <h3>🔧 Troubleshooting</h3>
+            <p>If you still can't register with your email:</p>
+            <ol>
+                <li>Make sure you're on <strong>http://localhost:5173</strong> (not 5175, 5176, etc.)</li>
+                <li>Try the "Nuclear Option" button above</li>
+                <li>Close all browser tabs for this site</li>
+                <li>Clear browser cache and cookies</li>
+                <li>Try in an incognito/private window</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        const keysToCheck = [
+            'be-there-or-be-square-users',
+            'be-there-or-be-square-current-user',
+            'be-there-or-be-square-email-confirmations',
+            'be-there-or-be-square-events'
+        ];
+
+        function showCurrentData() {
+            const resultDiv = document.getElementById('currentData');
+            let html = '';
+            
+            keysToCheck.forEach(key => {
+                try {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        const parsed = JSON.parse(data);
+                        html += `<div class="data-item"><strong>${key}:</strong> ${JSON.stringify(parsed, null, 2)}</div>`;
+                    } else {
+                        html += `<div class="data-item"><strong>${key}:</strong> <em>No data</em></div>`;
+                    }
+                } catch (error) {
+                    html += `<div class="data-item"><strong>${key}:</strong> <em>Error reading data</em></div>`;
+                }
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+
+        function clearData() {
+            let clearedCount = 0;
+            
+            keysToCheck.forEach(key => {
+                try {
+                    localStorage.removeItem(key);
+                    clearedCount++;
+                } catch (error) {
+                    console.error(`Error removing ${key}:`, error);
+                }
+            });
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <h3>✅ Data Cleared Successfully!</h3>
+                    <p>Removed ${clearedCount} data entries from localStorage.</p>
+                    <p>You can now register with any email address.</p>
+                </div>
+            `;
+            
+            showCurrentData();
+        }
+
+        function clearEverything() {
+            try {
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h3>💥 Nuclear Option Executed!</h3>
+                        <p>ALL localStorage and sessionStorage has been cleared.</p>
+                        <p>This includes data from other websites too.</p>
+                        <p>You can now register with any email address.</p>
+                    </div>
+                `;
+                
+                showCurrentData();
+            } catch (error) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = `
+                    <div class="warning">
+                        <h3>❌ Error</h3>
+                        <p>Failed to clear all data: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Show current data on page load
+        showCurrentData();
+    </script>
+</body>
+</html>

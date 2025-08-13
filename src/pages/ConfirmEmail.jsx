@@ -17,13 +17,17 @@ const ConfirmEmail = () => {
 
   useEffect(() => {
     const token = searchParams.get('token');
+    console.log('🔍 ConfirmEmail: Token from URL:', token);
+    
     if (!token) {
       setError('No confirmation token provided');
       setLoading(false);
       return;
     }
 
+    console.log('🔍 ConfirmEmail: Calling authService.confirmEmail with token:', token);
     const result = authService.confirmEmail(token);
+    console.log('🔍 ConfirmEmail: Result:', result);
     
     if (result.success) {
       setConfirmed(true);

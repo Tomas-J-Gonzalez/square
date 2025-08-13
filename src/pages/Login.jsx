@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
+import { authService } from '../services/authService';
 import Button from '../components/Button';
 import Icon from '../components/Icon';
 import Modal from '../components/Modal';
+import PasswordInput from '../components/PasswordInput';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +16,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
   
-  const { login } = useAuth();
+  const { login, setCurrentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { modal, showErrorModal } = useModal();
@@ -61,8 +63,8 @@ const Login = () => {
           isAdmin: true
         };
         
-        // Set admin as current user
-        localStorage.setItem('be-there-or-be-square-current-user', JSON.stringify(adminUser));
+        // Set admin as current user in AuthContext
+        setCurrentUser(adminUser);
         
         // Redirect to the page they were trying to access
         navigate(from, { replace: true });
@@ -145,16 +147,13 @@ const Login = () => {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent ${
-                  errors.password ? 'border-red-300' : 'border-gray-300'
-                }`}
                 placeholder="Enter your password"
+                error={errors.password}
                 aria-describedby={errors.password ? 'password-error' : undefined}
                 required
               />

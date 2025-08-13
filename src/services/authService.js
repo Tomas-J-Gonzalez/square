@@ -4,24 +4,7 @@
 const USERS_STORAGE_KEY = 'be-there-or-be-square-users';
 const CURRENT_USER_KEY = 'be-there-or-be-square-current-user';
 
-// Approved email domains whitelist
-const APPROVED_EMAIL_DOMAINS = [
-  'gmail.com',
-  'yahoo.com',
-  'hotmail.com',
-  'outlook.com',
-  'icloud.com',
-  'me.com',
-  'mac.com',
-  'aol.com',
-  'protonmail.com',
-  'tutanota.com',
-  'zoho.com',
-  'yandex.com',
-  'mail.com',
-  'live.com',
-  'msn.com'
-];
+// Email validation - now allows any valid email domain
 
 // Admin credentials (in production, this should be in environment variables)
 const ADMIN_CREDENTIALS = {
@@ -214,7 +197,7 @@ const sendConfirmationEmail = async (email, token, name, userId) => {
 };
 
 /**
- * Validates email format and checks if domain is whitelisted
+ * Validates email format (allows any valid email domain)
  * @param {string} email - Email to validate
  * @returns {Object} Validation result with isValid and message
  */
@@ -222,14 +205,6 @@ const isValidEmail = (email) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return { isValid: false, message: 'Please enter a valid email address' };
-  }
-
-  const domain = email.split('@')[1].toLowerCase();
-  if (!APPROVED_EMAIL_DOMAINS.includes(domain)) {
-    return { 
-      isValid: false, 
-      message: `Email domain not allowed. Please use one of: ${APPROVED_EMAIL_DOMAINS.join(', ')}` 
-    };
   }
 
   return { isValid: true, message: 'Email is valid' };
@@ -576,14 +551,21 @@ const getUserById = (userId) => {
  * @returns {Object} Result with success status and message
  */
 const confirmEmail = (token) => {
+  console.log('🔍 confirmEmail: Called with token:', token);
+  
   if (!token) {
+    console.log('❌ confirmEmail: No token provided');
     return { success: false, message: 'Invalid confirmation token' };
   }
 
   const confirmations = getEmailConfirmations();
+  console.log('🔍 confirmEmail: All confirmations:', confirmations);
+  
   const confirmation = confirmations.find(c => c.token === token && !c.used);
+  console.log('🔍 confirmEmail: Found confirmation:', confirmation);
 
   if (!confirmation) {
+    console.log('❌ confirmEmail: No valid confirmation found');
     return { success: false, message: 'Invalid or expired confirmation token' };
   }
 
@@ -716,12 +698,12 @@ export const authService = {
   changePassword,
   deleteAccount,
   getCurrentUser,
+  setCurrentUser,
   isAuthenticated,
   getUserById,
   validatePassword,
   isValidEmail,
   confirmEmail,
   resendConfirmationEmail,
-  isAdminCredentials,
-  APPROVED_EMAIL_DOMAINS
+  isAdminCredentials
 };

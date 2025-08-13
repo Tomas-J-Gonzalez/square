@@ -13,7 +13,7 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_iEkiEEsX_8FsnbQ7idPk
 
 // Middleware
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5175',
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());
@@ -30,7 +30,7 @@ app.post('/api/send-confirmation-email', async (req, res) => {
       });
     }
 
-    const confirmationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5175'}/confirm-email?token=${token}`;
+    const confirmationUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/confirm-email?token=${token}`;
 
     const { data, error } = await resend.emails.send({
       from: 'Be There or Be Square <onboarding@resend.dev>',
@@ -100,5 +100,5 @@ app.get('/api/health', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Email server running on port ${PORT}`);
   console.log(`📧 Resend API configured`);
-  console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5175'}`);
+  console.log(`🌐 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
 });
