@@ -3,7 +3,8 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
-import logo from '../../assets/logo.png';
+// Use public asset path so static hosting (Netlify/Vercel) can serve without bundling
+const logoPath = '/assets/logo.png';
 import Modal from '../components/Modal';
 
 const MainLayout = () => {
@@ -77,7 +78,7 @@ const MainLayout = () => {
           <div className="header-content">
             {/* Logo */}
             <Link to="/" className="logo" aria-label="Go to home page">
-              <img src={logo} alt="Logo" className="h-6 w-6 md:h-8 md:w-8 mr-8" />
+              <img src={logoPath} alt="Logo" className="h-6 w-6 md:h-8 md:w-8 mr-8" />
             </Link>
 
             {/* Desktop Navigation */}
