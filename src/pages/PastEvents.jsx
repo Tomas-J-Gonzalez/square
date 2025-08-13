@@ -120,7 +120,7 @@ const PastEvents = () => {
                 >
                   <Icon name={tab.icon} style="solid" size="sm" />
                   <span>{tab.label}</span>
-                  <span className={`px-8 py-4 rounded-full text-xs font-medium ${
+                  <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-medium ${
                     activeTab === tab.id
                       ? 'bg-pink-100 text-pink-600'
                       : 'bg-gray-100 text-gray-600'

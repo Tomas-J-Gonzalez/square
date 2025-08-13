@@ -26,7 +26,7 @@ const CreateEvent = () => {
     {
       id: 'vote',
       title: 'Vote',
-      description: 'Everyone votes on who flaked',
+      description: 'Everyone gets to vote on the event',
       icon: 'vote-yea'
     },
     {
@@ -185,6 +185,8 @@ const CreateEvent = () => {
                     value={formData.date}
                     onChange={handleInputChange}
                     className="form-input"
+                    min={new Date().toISOString().split('T')[0]}
+                    max={`${new Date().getFullYear()}-12-31`}
                     required
                   />
                 </div>

@@ -7,6 +7,9 @@ const CURRENT_USER_KEY = 'be-there-or-be-square-current-user';
 // Email validation - now allows any valid email domain
 
 // Admin credentials (in production, this should be in environment variables)
+// Note: We deliberately do not use a real password for the admin helper account
+// to avoid browser password breach nags. Admin login is handled via a dedicated
+// button and session bootstrap in the UI.
 const ADMIN_CREDENTIALS = {
   username: 'admin',
   password: 'admin'
@@ -334,7 +337,7 @@ const registerUser = (userData) => {
  * @returns {boolean} True if admin credentials
  */
 const isAdminCredentials = (username, password) => {
-  // Allow either plain "admin" or an email-shaped admin for UI validation
+  // Keep for backwards compatibility but discourage using password inputs for admin
   const isAdminUser = username === ADMIN_CREDENTIALS.username || username === 'admin@example.com';
   return isAdminUser && password === ADMIN_CREDENTIALS.password;
 };
@@ -357,6 +360,9 @@ const loginUser = (email, password) => {
   const emailLower = email.trim().toLowerCase();
 
   // Admin bypass: allow login without an existing account or confirmation
+  // For admin, prefer using the dedicated button (no password submission).
+  // If someone still submits admin/admin, allow it for dev parity but this may
+  // trigger browser breach warnings.
   if (isAdminCredentials(emailLower, password)) {
     const adminUser = {
       id: 'admin',

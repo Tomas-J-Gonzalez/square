@@ -86,6 +86,24 @@ const Login = () => {
     }
   };
 
+  const handleAdminLoginClick = () => {
+    const adminUser = {
+      id: 'admin',
+      email: 'admin@example.com',
+      name: 'Administrator',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+      eventIds: [],
+      emailConfirmed: true,
+      isAdmin: true
+    };
+    // Persist and set session without using password input (avoids Chrome breach warning)
+    authService.setCurrentUser(adminUser);
+    setCurrentUser(adminUser);
+    navigate(from, { replace: true });
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -175,6 +193,18 @@ const Login = () => {
               {loading ? 'Signing in...' : 'Sign in'}
             </Button>
           </form>
+
+          {/* Dev helper: passwordless admin login to avoid Chrome breach warning */}
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handleAdminLoginClick}
+              className="w-full inline-flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              <Icon name="user-shield" style="solid" size="sm" className="mr-2" />
+              Sign in as Admin
+            </button>
+          </div>
 
           <div className="text-center">
             <p className="text-sm text-gray-600">

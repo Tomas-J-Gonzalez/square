@@ -66,6 +66,8 @@ const MainLayout = () => {
     );
   };
 
+  const isAdminUserDisplay = isAdmin || currentUser?.id === 'admin' || currentUser?.email === 'admin@example.com' || currentUser?.name === 'Administrator';
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--background-default)' }}>
       {/* Header */}
@@ -74,8 +76,7 @@ const MainLayout = () => {
           <div className="header-content">
             {/* Logo */}
             <Link to="/" className="logo" aria-label="Go to home page">
-              <div className="w-16 h-16 bg-pink-500 rounded-sm mr-8" aria-hidden="true"></div>
-              <span className="logo-text">Be there or be square</span>
+              <img src="/assets/logo.png" alt="Logo" className="h-16 w-auto mr-8" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -112,23 +113,25 @@ const MainLayout = () => {
             </nav>
 
             {/* User Menu */}
-            <div className="relative">
+            <div className="user-menu">
               <button
                 onClick={toggleUserMenu}
-                className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors"
+                className="user-menu-button"
                 aria-expanded={isUserMenuOpen}
                 aria-haspopup="true"
                 aria-label="User menu"
                 type="button"
               >
-                <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm font-medium">
-                    {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
-                  </span>
-                </div>
+                {!isAdminUserDisplay && (
+                  <div className="user-avatar">
+                    <span>
+                      {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                )}
                 <span className="hidden md:block text-sm font-medium text-gray-700">
                   {currentUser?.name || 'User'}
-                  {isAdmin && <span className="ml-1 text-xs text-pink-600">(Admin)</span>}
+                  {(isAdminUserDisplay) && <span className="ml-1 text-xs text-pink-600">(Admin)</span>}
                 </span>
                 <Icon 
                   name="chevron-down" 
@@ -141,24 +144,30 @@ const MainLayout = () => {
 
               {/* User Dropdown Menu */}
               {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-medium text-gray-900">{currentUser?.name}</p>
-                    <p className="text-sm text-gray-500">{currentUser?.email}</p>
+                <div className="user-dropdown">
+                  <div className="user-info">
+                    <p className="user-name">{currentUser?.name}</p>
+                    <p className="user-email">{currentUser?.email}</p>
                   </div>
-                  
                   <Link
                     to="/profile"
-                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="user-menu-item"
                     onClick={() => setIsUserMenuOpen(false)}
                   >
                     <Icon name="user" style="solid" size="sm" />
-                    Profile Settings
+                    Profile
                   </Link>
-                  
+                  <Link
+                    to="/profile"
+                    className="user-menu-item"
+                    onClick={() => setIsUserMenuOpen(false)}
+                  >
+                    <Icon name="cog" style="solid" size="sm" />
+                    Settings
+                  </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="user-menu-item danger"
                     type="button"
                   >
                     <Icon name="sign-out-alt" style="solid" size="sm" />
