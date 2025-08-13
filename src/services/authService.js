@@ -268,7 +268,34 @@ const registerUser = (userData) => {
   const users = getUsers();
   const existingUser = users.find(user => user.email === email);
   if (existingUser) {
-    throw new Error('An account with this email already exists');
+    // If the account is already confirmed, block duplicate registration
+    if (existingUser.emailConfirmed) {
+      throw new Error('An account with this email already exists');
+    }
+
+    // Allow re-registration for unconfirmed accounts: refresh credentials and token
+    const refreshedToken = generateConfirmationToken();
+    const existingUserIndex = users.findIndex(u => u.id === existingUser.id);
+
+    const updatedUnconfirmedUser = {
+      ...existingUser,
+      name,
+      passwordHash: hashPassword(userData.password),
+      updatedAt: new Date().toISOString(),
+      emailConfirmed: false,
+      emailConfirmationToken: refreshedToken
+    };
+
+    users[existingUserIndex] = updatedUnconfirmedUser;
+    saveUsers(users);
+
+    // Resend confirmation email (async)
+    sendConfirmationEmail(email, refreshedToken, name, updatedUnconfirmedUser.id).catch(error => {
+      console.error('Failed to send confirmation email:', error);
+    });
+
+    const { passwordHash, ...userWithoutPassword } = updatedUnconfirmedUser;
+    return userWithoutPassword;
   }
 
   // Create new user (unconfirmed)
