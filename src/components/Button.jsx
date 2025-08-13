@@ -24,7 +24,7 @@ const Button = ({
     'font-semibold',
     'text-decoration-none',
     'border',
-    'border-radius-50',
+    'rounded-full',
     'cursor-pointer',
     'transition-all',
     'duration-200',

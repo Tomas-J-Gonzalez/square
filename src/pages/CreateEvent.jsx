@@ -54,6 +54,8 @@ const CreateEvent = () => {
     'Make dinner for everyone'
   ];
 
+  const isCustomPunishment = formData.punishment === '__custom__';
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -66,8 +68,9 @@ const CreateEvent = () => {
     e.preventDefault();
     setError('');
     
-    // Validate required fields
-    if (!formData.title || !formData.date || !formData.time || !formData.decisionMode) {
+    // Validate required fields (including custom punishment)
+    const punishmentValid = formData.punishment && (formData.punishment !== '__custom__' ? true : (formData.customPunishment && formData.customPunishment.trim().length > 0));
+    if (!formData.title || !formData.date || !formData.time || !formData.decisionMode || !punishmentValid) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -77,6 +80,7 @@ const CreateEvent = () => {
     try {
       const eventData = {
         ...formData,
+        punishment: formData.punishment === '__custom__' ? (formData.customPunishment || '').trim() : formData.punishment,
         dateTime: `${formData.date}T${formData.time}`,
         participants: [],
         status: 'active',
@@ -209,30 +213,37 @@ const CreateEvent = () => {
             <div className="form-section">
               <h2 className="form-section-title">How to Decide on Event</h2>
               <p className="form-section-description">
-                Choose how the group will decide who gets punished for flaking
+                Choose how you will decide on the event
               </p>
               <div className="decision-grid">
-                {decisionModes.map((mode) => (
-                  <label 
-                    key={mode.id} 
-                    className={`decision-option ${formData.decisionMode === mode.id ? 'selected' : ''}`}
-                  >
-                    <input
-                      type="radio"
-                      name="decisionMode"
-                      value={mode.id}
-                      checked={formData.decisionMode === mode.id}
-                      onChange={handleInputChange}
-                    />
-                    <div className="decision-content">
-                      <div className="decision-icon">
-                        <Icon name={mode.icon} style="solid" size="lg" />
+                {decisionModes.map((mode) => {
+                  const isDisabled = mode.id !== 'none';
+                  return (
+                    <label 
+                      key={mode.id} 
+                      className={`decision-option ${formData.decisionMode === mode.id ? 'selected' : ''} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      title={isDisabled ? 'Currently unavailable' : undefined}
+                      aria-disabled={isDisabled}
+                    >
+                      <input
+                        type="radio"
+                        name="decisionMode"
+                        value={mode.id}
+                        checked={formData.decisionMode === mode.id}
+                        onChange={handleInputChange}
+                        disabled={isDisabled}
+                        tabIndex={isDisabled ? -1 : 0}
+                      />
+                      <div className="decision-content">
+                        <div className="decision-icon">
+                          <Icon name={mode.icon} style="solid" size="lg" />
+                        </div>
+                        <div className="decision-title">{mode.title}</div>
+                        <div className="decision-description">{mode.description}</div>
                       </div>
-                      <div className="decision-title">{mode.title}</div>
-                      <div className="decision-description">{mode.description}</div>
-                    </div>
-                  </label>
-                ))}
+                    </label>
+                  );
+                })}
               </div>
             </div>
 
@@ -258,7 +269,36 @@ const CreateEvent = () => {
                     <div className="punishment-text">{punishment}</div>
                   </label>
                 ))}
+
+                {/* Custom punishment option */}
+                <label 
+                  className={`punishment-option ${isCustomPunishment ? 'selected' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="punishment"
+                    value="__custom__"
+                    checked={isCustomPunishment}
+                    onChange={handleInputChange}
+                  />
+                  <div className="punishment-text">Custom punishment</div>
+                </label>
               </div>
+
+              {isCustomPunishment && (
+                <div className="mt-16">
+                  <label htmlFor="customPunishment" className="form-label">Enter custom punishment *</label>
+                  <input
+                    id="customPunishment"
+                    type="text"
+                    className="form-input"
+                    placeholder="Describe the punishment"
+                    value={formData.customPunishment || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, customPunishment: e.target.value }))}
+                    required
+                  />
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}

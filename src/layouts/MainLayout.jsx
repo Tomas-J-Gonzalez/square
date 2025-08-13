@@ -81,9 +81,9 @@ const MainLayout = () => {
               <img src={logoPath} alt="Logo" className="h-8 w-8 mr-8" />
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="nav-desktop" role="navigation" aria-label="Main navigation">
-              <ul className="flex items-center gap-32 list-none m-0 p-0">
+            {/* Desktop Navigation (centered) */}
+            <nav className="nav-desktop flex-1" role="navigation" aria-label="Main navigation">
+              <ul className="flex items-center justify-center gap-32 list-none m-0 p-0">
                 <li>
                   <Link
                     to="/"

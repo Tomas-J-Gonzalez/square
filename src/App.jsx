@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import CreateEvent from './pages/CreateEvent';
 import ViewEvent from './pages/ViewEvent';
 import PastEvents from './pages/PastEvents';
+import Invite from './pages/Invite';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
               <Route index element={<Home />} />
               <Route path="create" element={<CreateEvent />} />
               <Route path="event/:eventId" element={<ViewEvent />} />
+              <Route path="invite/:eventId" element={<Invite />} />
               <Route path="past" element={<PastEvents />} />
               <Route path="profile" element={<Profile />} />
             </Route>

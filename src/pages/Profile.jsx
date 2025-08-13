@@ -370,6 +370,11 @@ const Profile = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Admin Tools</h2>
             <div className="space-y-6">
+              {/* Users List */}
+              <div className="p-4 border border-gray-200 rounded-md">
+                <h3 className="text-md font-medium text-gray-900 mb-4">All Users</h3>
+                <UsersTable />
+              </div>
               {/* Runtime environment info */}
               <div className="p-4 border border-gray-200 rounded-md">
                 <h3 className="text-md font-medium text-gray-900 mb-2">Environment</h3>
@@ -540,3 +545,49 @@ const Profile = () => {
 };
 
 export default Profile;
+
+// UsersTable subcomponent
+const UsersTable = () => {
+  const [users, setUsers] = React.useState([]);
+  React.useEffect(() => {
+    try {
+      const all = authService.listUsers();
+      setUsers(all);
+    } catch (_) {
+      setUsers([]);
+    }
+  }, []);
+
+  if (!users.length) {
+    return <p className="text-sm text-gray-600">No users found.</p>;
+  }
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="min-w-full text-sm">
+        <thead>
+          <tr className="text-left text-gray-600">
+            <th className="py-2 pr-4">Name</th>
+            <th className="py-2 pr-4">Email</th>
+            <th className="py-2 pr-4">Created</th>
+            <th className="py-2 pr-4">Updated</th>
+            <th className="py-2 pr-4">Last Login</th>
+            <th className="py-2 pr-4">Email Confirmed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((u) => (
+            <tr key={u.id} className="border-t border-gray-100">
+              <td className="py-2 pr-4 whitespace-nowrap">{u.name}</td>
+              <td className="py-2 pr-4 whitespace-nowrap">{u.email}</td>
+              <td className="py-2 pr-4 whitespace-nowrap">{u.createdAt ? new Date(u.createdAt).toLocaleString() : '-'}</td>
+              <td className="py-2 pr-4 whitespace-nowrap">{u.updatedAt ? new Date(u.updatedAt).toLocaleString() : '-'}</td>
+              <td className="py-2 pr-4 whitespace-nowrap">{u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : '-'}</td>
+              <td className="py-2 pr-4 whitespace-nowrap">{u.emailConfirmed ? 'Yes' : 'No'}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};

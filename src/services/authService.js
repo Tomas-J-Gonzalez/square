@@ -80,6 +80,15 @@ const getUsers = () => {
 };
 
 /**
+ * Returns all users without sensitive fields
+ * @returns {Array<User>} Users without passwordHash
+ */
+const listUsers = () => {
+  const users = getUsers();
+  return users.map(({ passwordHash, ...userWithoutPassword }) => userWithoutPassword);
+};
+
+/**
  * Saves users to localStorage
  * @param {Array<User>} users - Users to save
  */
@@ -756,5 +765,6 @@ export const authService = {
   isValidEmail,
   confirmEmail,
   resendConfirmationEmail,
-  isAdminCredentials
+  isAdminCredentials,
+  listUsers
 };

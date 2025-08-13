@@ -288,11 +288,11 @@ const ViewEvent = () => {
   };
 
   const handleCopyInvitationLink = () => {
-    const eventUrl = `${window.location.origin}/event/${eventId}`;
+    const eventUrl = `${window.location.origin}/invite/${eventId}`;
     navigator.clipboard.writeText(eventUrl);
     showModal({
       title: 'Link Copied',
-      message: 'Invitation link copied to clipboard!',
+      message: 'Invitation link copied to clipboard! Share it with your friends so they can RSVP.',
       type: 'success'
     });
   };
@@ -429,7 +429,7 @@ const ViewEvent = () => {
               className="btn btn-secondary btn-sm flex items-center"
             >
               <Icon name="link" style="solid" size="sm" className="mr-4" />
-              Copy Link
+              Share Invitation Link
             </button>
           </div>
         </div>
