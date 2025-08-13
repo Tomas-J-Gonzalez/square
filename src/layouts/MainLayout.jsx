@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
+import logo from '../../assets/logo.png';
 import Modal from '../components/Modal';
 
 const MainLayout = () => {
@@ -76,7 +77,7 @@ const MainLayout = () => {
           <div className="header-content">
             {/* Logo */}
             <Link to="/" className="logo" aria-label="Go to home page">
-              <img src="/assets/logo.png" alt="Logo" className="h-16 w-auto mr-8" />
+              <img src={logo} alt="Logo" className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto mr-8" />
             </Link>
 
             {/* Desktop Navigation */}
