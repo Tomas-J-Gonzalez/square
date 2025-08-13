@@ -95,13 +95,18 @@ const Invite = () => {
     }
     setSubmitting(true);
     try {
-      // insert RSVP to server table
-      const { error } = await supabase.from('event_rsvps').insert({
-        event_id: eventId,
-        name: form.name.trim(),
-        will_attend: form.willAttend === 'yes'
-      });
-      if (error) throw error;
+      // insert RSVP to server table (best-effort, dynamic import)
+      try {
+        const { supabase } = await import('../../lib/supabaseClient');
+        const { error } = await supabase.from('event_rsvps').insert({
+          event_id: eventId,
+          name: form.name.trim(),
+          will_attend: form.willAttend === 'yes'
+        });
+        if (error) throw error;
+      } catch (_) {
+        // ignore if supabase not configured
+      }
       navigate(`/event/${eventId}`);
     } catch (err) {
       setError(err.message || 'Failed to submit response');
