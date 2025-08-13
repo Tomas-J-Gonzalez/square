@@ -334,7 +334,9 @@ const registerUser = (userData) => {
  * @returns {boolean} True if admin credentials
  */
 const isAdminCredentials = (username, password) => {
-  return username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password;
+  // Allow either plain "admin" or an email-shaped admin for UI validation
+  const isAdminUser = username === ADMIN_CREDENTIALS.username || username === 'admin@example.com';
+  return isAdminUser && password === ADMIN_CREDENTIALS.password;
 };
 
 /**
@@ -358,7 +360,7 @@ const loginUser = (email, password) => {
   if (isAdminCredentials(emailLower, password)) {
     const adminUser = {
       id: 'admin',
-      email: 'admin@local',
+      email: 'admin@example.com',
       name: 'Administrator',
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
