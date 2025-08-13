@@ -15,11 +15,22 @@ const Login = () => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [showAdminButton, setShowAdminButton] = useState(false);
   
   const { login, setCurrentUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { modal, showErrorModal } = useModal();
+  // Only show admin sign-in for the site owner: enabled locally or via a private localStorage flag
+  useEffect(() => {
+    try {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const enabledFlag = localStorage.getItem('enable-admin-login') === '1';
+      setShowAdminButton(isLocal || enabledFlag);
+    } catch (_) {
+      setShowAdminButton(false);
+    }
+  }, []);
 
   // Get the page user was trying to access
   const from = location.state?.from?.pathname || '/';
@@ -194,17 +205,19 @@ const Login = () => {
             </Button>
           </form>
 
-          {/* Dev helper: passwordless admin login to avoid Chrome breach warning */}
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={handleAdminLoginClick}
-              className="w-full inline-flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-            >
-              <Icon name="user-shield" style="solid" size="sm" className="mr-2" />
-              Sign in as Admin
-            </button>
-          </div>
+          {/* Private helper: Admin login button (only shows locally or if you set localStorage flag) */}
+          {showAdminButton && (
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={handleAdminLoginClick}
+                className="w-full inline-flex items-center justify-center px-4 py-3 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+              >
+                <Icon name="user-shield" style="solid" size="sm" className="mr-2" />
+                Sign in as Admin
+              </button>
+            </div>
+          )}
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
