@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { eventService } from '../services/eventService';
-import { supabase } from '../../lib/supabaseClient';
 import Icon from '../components/Icon';
 
 const Invite = () => {
@@ -16,15 +15,18 @@ const Invite = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        // Try server first
-        const { data, error } = await supabase
-          .from('events')
-          .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
-          .eq('id', eventId)
-          .single();
-
-        if (error && error.code !== 'PGRST116') {
-          throw error;
+        // Try server first (lazy import so missing env doesn't crash app)
+        let data = null;
+        try {
+          const { supabase } = await import('../../lib/supabaseClient');
+          const resp = await supabase
+            .from('events')
+            .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
+            .eq('id', eventId)
+            .single();
+          if (!resp.error) data = resp.data;
+        } catch (_) {
+          // ignore if supabase not configured
         }
 
         if (data) {
