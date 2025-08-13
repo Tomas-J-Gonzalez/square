@@ -1,0 +1,11 @@
+*
+!api
+!api/**
+!lib
+!lib/**
+!dist
+!dist/**
+!vercel.json
+!package.json
+!env.example
+!BACKEND_README.md

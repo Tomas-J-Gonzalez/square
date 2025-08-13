@@ -102,3 +102,4 @@ fontawesome-pro-plus-7.0.0-desktop/
 *.zip
 *.tar.gz
 *.rar
+.vercel

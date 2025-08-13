@@ -1,6 +1,5 @@
 {
-  "name": "be-there-or-be-square",
-  "private": true,
+  "name": "be-there-or-be-square-backend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -14,6 +13,7 @@
     "accessibility": "axe-core --help"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
     "express": "^5.1.0",

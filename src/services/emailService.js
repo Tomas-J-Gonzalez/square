@@ -1,4 +1,7 @@
-const EMAIL_API_BASE_URL = 'http://localhost:3001/api';
+// Use Netlify function in production, localhost in development
+const EMAIL_API_BASE_URL = import.meta.env.PROD 
+  ? '/.netlify/functions/send-confirmation-email'
+  : 'http://localhost:3001/api/send-confirmation-email';
 
 /**
  * Sends a confirmation email via the backend API
@@ -10,7 +13,7 @@ const EMAIL_API_BASE_URL = 'http://localhost:3001/api';
  */
 export const sendConfirmationEmail = async (emailData) => {
   try {
-    const response = await fetch(`${EMAIL_API_BASE_URL}/send-confirmation-email`, {
+    const response = await fetch(EMAIL_API_BASE_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -35,7 +38,13 @@ export const sendConfirmationEmail = async (emailData) => {
  */
 export const checkEmailService = async () => {
   try {
-    const response = await fetch(`${EMAIL_API_BASE_URL}/health`);
+    // In production, we assume the service is available since it's a Netlify function
+    if (import.meta.env.PROD) {
+      return true;
+    }
+    
+    // In development, check the local server
+    const response = await fetch('http://localhost:3001/api/health');
     const result = await response.json();
     return result.success;
   } catch (error) {
