@@ -1,113 +1,228 @@
-# Be there or be square
+# Be There or Be Square
 
-A fun, social web app that helps prevent flaking on plans by creating consequences for flakes. Create events and let your group decide who gets punished when someone flakes!
+A fun, social "anti-flake" web app built with React, Vite, and Tailwind CSS. Never get flaked on again! Create events and let fate decide the punishment for flakes.
 
-## Features
+## 🚀 Features
 
-### Core Functionality
-- **Create Events**: Set up events with custom punishments for flakes
-- **Group Decision Making**: Choose between Vote, Random Chance, or Mini Game to decide on flakes
-- **Track Flakes**: See who flaked and what happened to them
-- **Event History**: View past events and flake statistics
+- **Event Management**: Create, view, and manage events
+- **Attendance Tracking**: Mark friends as attended or flaked
+- **Decision Modes**: Vote, chance, game, or no group decision
+- **Punishment System**: Predefined punishments for flakes
+- **Social Sharing**: Share events on Twitter, Facebook, Instagram
+- **Mobile-First Design**: Responsive design with 8px grid system
+- **Accessibility**: WCAG 2.1 AA compliant
 
-### MVP Features
-- **Event Creation**: Title, date, time, location, decision mode, and punishment selection
-- **Decision Methods**:
-  - **Vote**: Everyone votes on who flaked
-  - **Chance**: Random selection decides
-  - **Game**: Play a quick mini-game to decide
-- **Punishment Options**: Buy coffee, pay for dinner, clean up, plan next event, or complete embarrassing tasks
-- **Event Management**: View active events and join with invite links
-- **History Tracking**: See past events with flake counts and outcomes
+## 🛠️ Tech Stack
 
-## Tech Stack
-
-- **Frontend**: React + Vite
+- **Frontend**: React 18 + Vite
 - **Styling**: Tailwind CSS with custom design tokens
 - **Routing**: React Router DOM
-- **Icons**: Font Awesome 6
+- **Icons**: Font Awesome 7 Pro
+- **State Management**: React Hooks + localStorage
 - **Code Quality**: ESLint + Prettier
+- **Accessibility**: jsx-a11y ESLint plugin
 
-## Design System
+## 📦 Installation
 
-The app uses a comprehensive design system with:
-- **8px Grid System**: Consistent spacing throughout the UI
-- **Design Tokens**: Colors, typography, spacing, and shadows defined in `src/tokens.json`
-- **Responsive Breakpoints**: 
-  - `xs`: 320-479px (4 columns, 16px margins)
-  - `sm`: 480-767px (6 columns, 40px margins)
-  - `md`: 768-1023px (12 columns, 80px margins)
-  - `lg`: 1024-1199px (12 columns, 80px margins)
-  - `xl`: 1200-1599px (12 columns, 80px margins)
-  - `xxl`: 1600px+ (12 columns, 128px margins)
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd be-there-or-be-square
+   ```
 
-## Project Structure
-
-```
-src/
-├── components/          # Reusable UI components
-│   ├── Button.jsx      # Button component with variants
-│   ├── Card.jsx        # Card container component
-│   ├── Section.jsx     # Page section wrapper
-│   └── Icon.jsx        # Font Awesome icon wrapper
-├── pages/              # Page components
-│   ├── Home.jsx        # Landing page with event cards
-│   ├── CreateEvent.jsx # Event creation form
-│   ├── ViewEvent.jsx   # Event details and interaction
-│   └── PastEvents.jsx  # Event history and statistics
-├── layouts/            # Layout components
-│   └── MainLayout.jsx  # Global layout with navigation
-├── utils/              # Utility functions
-│   └── tokenParser.js  # Design token parser for Tailwind
-├── assets/             # Static assets
-└── tokens.json         # Design tokens source of truth
-```
-
-## Getting Started
-
-1. **Install dependencies**:
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. **Start development server**:
+3. **Start development server**
    ```bash
    npm run dev
    ```
 
-3. **Open your browser**:
+4. **Open your browser**
    Navigate to `http://localhost:5173`
 
-## Available Scripts
+## 🏗️ Project Structure
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run format` - Format code with Prettier
+```
+src/
+├── components/          # Reusable UI components
+│   ├── Button.jsx      # Accessible button component
+│   ├── Icon.jsx        # Font Awesome icon wrapper
+│   ├── Modal.jsx       # Custom modal with focus management
+│   └── ErrorBoundary.jsx # Error handling component
+├── hooks/              # Custom React hooks
+│   ├── useLocalStorage.js # localStorage hook
+│   └── useModal.js     # Modal state management
+├── layouts/            # Layout components
+│   └── MainLayout.jsx  # Main app layout
+├── pages/              # Page components
+│   ├── Home.jsx        # Landing page
+│   ├── CreateEvent.jsx # Event creation form
+│   ├── ViewEvent.jsx   # Event details and management
+│   └── PastEvents.jsx  # Event history
+├── services/           # Business logic
+│   └── eventService.js # Event CRUD operations
+├── utils/              # Utility functions
+│   └── tokenParser.js  # Design token parser
+├── styles/             # Additional styles
+├── tokens.json         # Design tokens
+└── index.css           # Global styles
+```
 
-## Customization
+## 🎨 Design System
 
-### Design Tokens
-All design values are defined in `src/tokens.json`. Update this file to change colors, spacing, typography, and other design elements throughout the app.
+The app uses a custom design system with:
 
-### Styling
-The app uses Tailwind CSS with custom design tokens. All styling comes from the tokenized theme, ensuring consistency and easy updates.
+- **8px Grid System**: Consistent spacing throughout
+- **Custom Breakpoints**: Mobile-first responsive design
+- **Design Tokens**: Colors, spacing, typography, radius, shadows
+- **Component Library**: Reusable, accessible components
 
-## Development
+### Breakpoints
+- `screen-xs`: 320-479px (4 columns, 16px margins)
+- `screen-sm`: 480-767px (6 columns, 40px margins)
+- `screen-md`: 768-1023px (12 columns, 80px margins)
+- `screen-lg`: 1024-1199px (12 columns, 80px margins)
+- `screen-xl`: 1200-1599px (12 columns, 80px margins)
+- `screen-xxl`: 1600px+ (12 columns, 128px margins)
 
-### Adding New Components
-1. Create component in `src/components/`
-2. Use design tokens via Tailwind classes
-3. Follow the 8px grid system for spacing
-4. Ensure mobile-first responsive design
+## ♿ Accessibility Features
 
-### Adding New Pages
-1. Create page component in `src/pages/`
-2. Add route in `src/App.jsx`
-3. Use `MainLayout` for consistent navigation
-4. Follow the established design patterns
+- **Semantic HTML**: Proper heading hierarchy and landmarks
+- **Keyboard Navigation**: Full keyboard support
+- **Screen Reader Support**: ARIA labels and roles
+- **Focus Management**: Visible focus indicators
+- **Color Contrast**: WCAG AA compliant color ratios
+- **Error Handling**: Clear error messages and recovery
+- **Loading States**: Proper loading indicators
 
-## License
+### Accessibility Checklist
 
-MIT License - feel free to use this project for your own anti-flake initiatives!
+- [x] Semantic HTML structure
+- [x] Proper heading hierarchy (h1-h6)
+- [x] ARIA labels and roles
+- [x] Keyboard navigation support
+- [x] Focus management
+- [x] Screen reader compatibility
+- [x] Color contrast compliance
+- [x] Error message accessibility
+- [x] Loading state indicators
+- [x] Mobile accessibility
+
+## 🔧 Development
+
+### Available Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run format       # Format code with Prettier
+```
+
+### Code Quality
+
+The project uses ESLint with the following configurations:
+
+- **React Best Practices**: React hooks rules and JSX guidelines
+- **Accessibility**: jsx-a11y plugin for accessibility rules
+- **Code Style**: Consistent code formatting and patterns
+- **Error Prevention**: Common JavaScript pitfalls
+
+### Best Practices
+
+1. **Component Structure**
+   - Use functional components with hooks
+   - Implement proper prop validation
+   - Follow single responsibility principle
+
+2. **State Management**
+   - Use React hooks for local state
+   - Implement custom hooks for reusable logic
+   - Use localStorage for persistence
+
+3. **Error Handling**
+   - Implement error boundaries
+   - Provide user-friendly error messages
+   - Log errors for debugging
+
+4. **Performance**
+   - Use React.memo for expensive components
+   - Implement proper dependency arrays
+   - Optimize re-renders
+
+5. **Accessibility**
+   - Use semantic HTML elements
+   - Provide ARIA labels and roles
+   - Ensure keyboard navigation
+   - Test with screen readers
+
+## 🧪 Testing
+
+### Manual Testing Checklist
+
+- [ ] Create new event
+- [ ] Add participants
+- [ ] Mark attendance
+- [ ] Complete event
+- [ ] Cancel event
+- [ ] View past events
+- [ ] Share event
+- [ ] Mobile responsiveness
+- [ ] Keyboard navigation
+- [ ] Screen reader compatibility
+
+### Browser Support
+
+- Chrome (latest)
+- Firefox (latest)
+- Safari (latest)
+- Edge (latest)
+
+## 🚀 Deployment
+
+1. **Build the project**
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy the `dist` folder**
+   The built files are in the `dist` directory and can be deployed to any static hosting service.
+
+## 📝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Ensure accessibility compliance
+6. Submit a pull request
+
+### Commit Message Format
+
+```
+type(scope): description
+
+feat: add new feature
+fix: bug fix
+docs: documentation changes
+style: formatting changes
+refactor: code refactoring
+test: add tests
+chore: maintenance tasks
+```
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🤝 Support
+
+For support, please open an issue in the GitHub repository or contact the development team.
+
+---
+
+**Built with ❤️ and accessibility in mind**
