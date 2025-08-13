@@ -370,6 +370,34 @@ const Profile = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">Admin Tools</h2>
             <div className="space-y-6">
+              {/* Runtime environment info */}
+              <div className="p-4 border border-gray-200 rounded-md">
+                <h3 className="text-md font-medium text-gray-900 mb-2">Environment</h3>
+                <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                  <li>Frontend URL: {import.meta.env.VITE_FRONTEND_URL || window.location.origin}</li>
+                  <li>Environment: {import.meta.env.MODE}</li>
+                  <li>Node (build): 18.x (Netlify config)</li>
+                  <li>Email Provider: Resend</li>
+                </ul>
+              </div>
+
+              {/* Connected APIs */}
+              <div className="p-4 border border-gray-200 rounded-md">
+                <h3 className="text-md font-medium text-gray-900 mb-2">Connected APIs</h3>
+                <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                  <li>Resend Email API: {import.meta.env.VITE_RESEND_ENABLED === 'false' ? 'Disabled' : 'Enabled'}</li>
+                  <li>Email endpoint: <code className="bg-gray-100 px-1 py-0.5 rounded">/api/send-confirmation-email</code></li>
+                </ul>
+              </div>
+
+              {/* Backends/services */}
+              <div className="p-4 border border-gray-200 rounded-md">
+                <h3 className="text-md font-medium text-gray-900 mb-2">Services</h3>
+                <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                  <li>LocalStorage: Users, Events, Email Confirmations</li>
+                  <li>Netlify Functions: <code className="bg-gray-100 px-1 py-0.5 rounded">netlify/functions/send-confirmation-email.js</code></li>
+                </ul>
+              </div>
               <div className="p-4 border border-gray-200 rounded-md">
                 <h3 className="text-md font-medium text-gray-900 mb-2">Clear Local Data</h3>
                 <p className="text-gray-600 mb-4">Removes users, sessions, confirmations and events from this browser.</p>
