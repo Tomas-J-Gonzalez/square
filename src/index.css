@@ -101,6 +101,13 @@ body {
   color: #111827;
 }
 
+/* Mobile logo text size */
+@media (max-width: 767px) {
+  .logo-text {
+    font-size: 14px;
+  }
+}
+
 /* Navigation */
 .nav-desktop {
   display: none;
@@ -155,6 +162,117 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+/* ==========================================================================
+   Custom Modal Styles
+   ========================================================================== */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 24px;
+  max-width: 400px;
+  width: 100%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #374151;
+}
+
+.modal-body {
+  margin-bottom: 24px;
+}
+
+.modal-message {
+  color: #374151;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.modal-btn-primary {
+  background-color: #ec4899;
+  color: #ffffff;
+}
+
+.modal-btn-primary:hover {
+  background-color: #db2777;
+}
+
+.modal-btn-secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.modal-btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+
+.modal-btn-danger {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.modal-btn-danger:hover {
+  background-color: #b91c1c;
 }
 
 /* ==========================================================================

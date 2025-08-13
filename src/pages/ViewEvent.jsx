@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
+import Modal from '../components/Modal';
 
 const ViewEvent = () => {
   const { eventId } = useParams();
@@ -16,8 +17,30 @@ const ViewEvent = () => {
   });
   const [isAddingParticipant, setIsAddingParticipant] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [showShareModal, setShowShareModal] = useState(false);
+  
+  // Modal states
+  const [modal, setModal] = useState({
+    isOpen: false,
+    title: '',
+    message: '',
+    type: 'info',
+    onConfirm: null,
+    onCancel: null,
+    confirmText: 'OK',
+    cancelText: 'Cancel',
+    showCancel: false
+  });
+
+  const showModal = (config) => {
+    setModal({ ...config, isOpen: true });
+  };
+
+  const hideModal = () => {
+    setModal(prev => ({ ...prev, isOpen: false }));
+  };
 
   useEffect(() => {
     const loadEvent = () => {
@@ -56,7 +79,11 @@ const ViewEvent = () => {
     
     // Validate required fields
     if (!newParticipant.name.trim() || !newParticipant.email.trim() || !newParticipant.message.trim()) {
-      alert('Please fill in all required fields: name, email, and message.');
+      showModal({
+        title: 'Missing Information',
+        message: 'Please fill in all required fields: name, email, and message.',
+        type: 'error'
+      });
       return;
     }
 
@@ -73,28 +100,46 @@ const ViewEvent = () => {
       setNewParticipant({ name: '', email: '', message: '' });
     } catch (error) {
       console.error('Error adding participant:', error);
-      alert('Error adding participant: ' + error.message);
+      showModal({
+        title: 'Error',
+        message: 'Error adding participant: ' + error.message,
+        type: 'error'
+      });
     } finally {
       setIsAddingParticipant(false);
     }
   };
 
   const handleRemoveParticipant = (participantId) => {
-    if (window.confirm('Are you sure you want to remove this friend?')) {
-      try {
-        const updatedEvent = eventService.removeParticipant(eventId, participantId);
-        setEvent(updatedEvent);
-        // Remove from attendance status
-        setAttendanceStatus(prev => {
-          const newStatus = { ...prev };
-          delete newStatus[participantId];
-          return newStatus;
-        });
-      } catch (error) {
-        console.error('Error removing participant:', error);
-        alert('Error removing participant: ' + error.message);
-      }
-    }
+    showModal({
+      title: 'Remove Friend',
+      message: 'Are you sure you want to remove this friend?',
+      type: 'confirm',
+      showCancel: true,
+      confirmText: 'Remove',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        try {
+          const updatedEvent = eventService.removeParticipant(eventId, participantId);
+          setEvent(updatedEvent);
+          // Remove from attendance status
+          setAttendanceStatus(prev => {
+            const newStatus = { ...prev };
+            delete newStatus[participantId];
+            return newStatus;
+          });
+          hideModal();
+        } catch (error) {
+          console.error('Error removing participant:', error);
+          showModal({
+            title: 'Error',
+            message: 'Error removing participant: ' + error.message,
+            type: 'error'
+          });
+        }
+      },
+      onCancel: hideModal
+    });
   };
 
   const handleAttendanceChange = (participantId, status) => {
@@ -104,9 +149,49 @@ const ViewEvent = () => {
     }));
   };
 
+  const handleCancelEvent = async () => {
+    showModal({
+      title: 'Cancel Event',
+      message: 'Are you sure you want to cancel this event? It will be marked as cancelled.',
+      type: 'confirm',
+      showCancel: true,
+      confirmText: 'Cancel Event',
+      cancelText: 'Keep Event',
+      onConfirm: async () => {
+        setIsCancelling(true);
+        try {
+          eventService.cancelEvent(eventId);
+          showModal({
+            title: 'Event Cancelled',
+            message: 'Event cancelled successfully!',
+            type: 'success',
+            onConfirm: () => {
+              hideModal();
+              navigate('/');
+            }
+          });
+        } catch (error) {
+          console.error('Error cancelling event:', error);
+          showModal({
+            title: 'Error',
+            message: 'Error cancelling event. Please try again.',
+            type: 'error'
+          });
+        } finally {
+          setIsCancelling(false);
+        }
+      },
+      onCancel: hideModal
+    });
+  };
+
   const handleCompleteEvent = async () => {
     if (event.participants.length === 0) {
-      alert('You need at least one friend to complete the event.');
+      showModal({
+        title: 'No Friends Added',
+        message: 'You need at least one friend to complete the event.',
+        type: 'error'
+      });
       return;
     }
 
@@ -116,7 +201,11 @@ const ViewEvent = () => {
     );
 
     if (pendingParticipants.length > 0) {
-      alert('Please mark attendance for all friends before completing the event.');
+      showModal({
+        title: 'Pending Attendance',
+        message: 'Please mark attendance for all friends before completing the event.',
+        type: 'error'
+      });
       return;
     }
 
@@ -149,11 +238,22 @@ const ViewEvent = () => {
       });
       
       setEvent(completedEvent);
-      alert('Event completed! Check Past Events to see the results.');
-      navigate('/');
+      showModal({
+        title: 'Event Completed',
+        message: 'Event completed! Check Past Events to see the results.',
+        type: 'success',
+        onConfirm: () => {
+          hideModal();
+          navigate('/');
+        }
+      });
     } catch (error) {
       console.error('Error completing event:', error);
-      alert('Error completing event: ' + error.message);
+      showModal({
+        title: 'Error',
+        message: 'Error completing event: ' + error.message,
+        type: 'error'
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -174,13 +274,27 @@ const ViewEvent = () => {
       case 'instagram':
         // Instagram doesn't support direct sharing via URL, so we'll copy to clipboard
         navigator.clipboard.writeText(`${text} ${eventUrl}`);
-        alert('Event link copied to clipboard! You can paste it in your Instagram story or post.');
+        showModal({
+          title: 'Link Copied',
+          message: 'Event link copied to clipboard! You can paste it in your Instagram story or post.',
+          type: 'success'
+        });
         return;
       default:
         return;
     }
     
     window.open(shareUrl, '_blank', 'width=600,height=400');
+  };
+
+  const handleCopyInvitationLink = () => {
+    const eventUrl = `${window.location.origin}/event/${eventId}`;
+    navigator.clipboard.writeText(eventUrl);
+    showModal({
+      title: 'Link Copied',
+      message: 'Invitation link copied to clipboard!',
+      type: 'success'
+    });
   };
 
   const getAttendanceStatusIcon = (status) => {
@@ -287,55 +401,38 @@ const ViewEvent = () => {
             )}
           </div>
           
-          {/* Share Button */}
-          <button
-            onClick={() => setShowShareModal(true)}
-            className="btn btn-secondary btn-sm"
-          >
-            <Icon name="share" style="solid" size="sm" className="mr-4" />
-            Share Event
-          </button>
-        </div>
-
-        {/* Share Modal */}
-        {showShareModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-32 max-w-md w-full mx-16">
-              <div className="flex justify-between items-center mb-24">
-                <h3 className="text-lg font-semibold">Share Event</h3>
-                <button
-                  onClick={() => setShowShareModal(false)}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  <Icon name="times" style="solid" size="md" />
-                </button>
-              </div>
-              <div className="space-y-16">
-                <button
-                  onClick={() => handleShare('twitter')}
-                  className="w-full btn btn-secondary flex items-center justify-center"
-                >
-                  <Icon name="twitter" style="brands" size="md" className="mr-8" />
-                  Share on Twitter
-                </button>
-                <button
-                  onClick={() => handleShare('facebook')}
-                  className="w-full btn btn-secondary flex items-center justify-center"
-                >
-                  <Icon name="facebook" style="brands" size="md" className="mr-8" />
-                  Share on Facebook
-                </button>
-                <button
-                  onClick={() => handleShare('instagram')}
-                  className="w-full btn btn-secondary flex items-center justify-center"
-                >
-                  <Icon name="instagram" style="brands" size="md" className="mr-8" />
-                  Copy Link for Instagram
-                </button>
-              </div>
-            </div>
+          {/* Share Options - Individual Buttons */}
+          <div className="flex items-center justify-center space-x-12 mb-24">
+            <button
+              onClick={() => handleShare('twitter')}
+              className="btn btn-secondary btn-sm flex items-center"
+            >
+              <Icon name="twitter" style="brands" size="sm" className="mr-4" />
+              Twitter
+            </button>
+            <button
+              onClick={() => handleShare('facebook')}
+              className="btn btn-secondary btn-sm flex items-center"
+            >
+              <Icon name="facebook" style="brands" size="sm" className="mr-4" />
+              Facebook
+            </button>
+            <button
+              onClick={() => handleShare('instagram')}
+              className="btn btn-secondary btn-sm flex items-center"
+            >
+              <Icon name="instagram" style="brands" size="sm" className="mr-4" />
+              Instagram
+            </button>
+            <button
+              onClick={handleCopyInvitationLink}
+              className="btn btn-secondary btn-sm flex items-center"
+            >
+              <Icon name="link" style="solid" size="sm" className="mr-4" />
+              Copy Link
+            </button>
           </div>
-        )}
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-32">
           {/* Friends Section */}
@@ -477,21 +574,38 @@ const ViewEvent = () => {
                 </div>
               </div>
 
-              {/* Complete Event Button */}
-              <button
-                onClick={handleCompleteEvent}
-                disabled={isProcessing || pendingCount > 0}
-                className="btn btn-primary btn-lg w-full"
-              >
-                {isProcessing ? (
-                  <>
-                    <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
-                    Completing Event...
-                  </>
-                ) : (
-                  'Complete Event'
-                )}
-              </button>
+              {/* Action Buttons */}
+              <div className="space-y-16">
+                <button
+                  onClick={handleCompleteEvent}
+                  disabled={isProcessing || pendingCount > 0}
+                  className="btn btn-primary btn-lg w-full"
+                >
+                  {isProcessing ? (
+                    <>
+                      <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
+                      Completing Event...
+                    </>
+                  ) : (
+                    'Complete Event'
+                  )}
+                </button>
+                
+                <button
+                  onClick={handleCancelEvent}
+                  disabled={isCancelling}
+                  className="btn btn-danger btn-lg w-full"
+                >
+                  {isCancelling ? (
+                    <>
+                      <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
+                      Cancelling Event...
+                    </>
+                  ) : (
+                    'Cancel Event'
+                  )}
+                </button>
+              </div>
               
               {pendingCount > 0 && (
                 <p className="text-sm text-gray-500 text-center">
@@ -502,6 +616,20 @@ const ViewEvent = () => {
           </div>
         </div>
       </div>
+
+      {/* Custom Modal */}
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={hideModal}
+        title={modal.title}
+        message={modal.message}
+        type={modal.type}
+        onConfirm={modal.onConfirm}
+        onCancel={modal.onCancel}
+        confirmText={modal.confirmText}
+        cancelText={modal.cancelText}
+        showCancel={modal.showCancel}
+      />
     </div>
   );
 };

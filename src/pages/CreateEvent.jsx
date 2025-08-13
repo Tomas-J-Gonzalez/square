@@ -10,13 +10,19 @@ const CreateEvent = () => {
     date: '',
     time: '',
     location: '',
-    decisionMode: '',
+    decisionMode: 'none',
     punishment: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
   const decisionModes = [
+    {
+      id: 'none',
+      title: 'No Group Decision',
+      description: 'You decide yourself',
+      icon: 'user'
+    },
     {
       id: 'vote',
       title: 'Vote',
@@ -34,12 +40,6 @@ const CreateEvent = () => {
       title: 'Game',
       description: 'Play a game to decide',
       icon: 'gamepad'
-    },
-    {
-      id: 'none',
-      title: 'No Group Decision',
-      description: 'You decide yourself',
-      icon: 'user'
     }
   ];
 

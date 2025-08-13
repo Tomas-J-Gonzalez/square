@@ -1,45 +1,53 @@
 import React from 'react';
 
-/**
- * Font Awesome Icon component
- * @param {Object} props - Component props
- * @param {string} props.name - Icon name (e.g., 'home', 'user', 'envelope')
- * @param {string} props.style - Icon style: 'solid', 'regular', 'light', 'thin', 'duotone', 'brands'
- * @param {string} props.className - Additional CSS classes
- * @param {string} props.size - Icon size: 'xs', 'sm', 'md', 'lg', 'xl', '2xl'
- * @param {Object} props...rest - Additional props
- */
 const Icon = ({ 
   name, 
   style = 'solid', 
+  size = 'md', 
   className = '', 
-  size = 'md',
-  ...rest 
+  'aria-label': ariaLabel,
+  'aria-hidden': ariaHidden = true,
+  ...props 
 }) => {
-  const sizeClasses = {
-    'xs': 'w-12 h-12',
-    'sm': 'w-16 h-16',
-    'md': 'w-20 h-20',
-    'lg': 'w-24 h-24',
-    'xl': 'w-32 h-32',
-    '2xl': 'w-40 h-40',
+  // Validate props
+  if (!name) {
+    console.warn('Icon component requires a name prop');
+    return null;
+  }
+
+  // Size mapping
+  const sizeMap = {
+    xs: 'text-xs',
+    sm: 'text-sm', 
+    md: 'text-base',
+    lg: 'text-lg',
+    xl: 'text-xl',
+    '2xl': 'text-2xl',
+    '3xl': 'text-3xl'
   };
 
-  const baseClasses = [
-    'inline-block',
-    'flex',
-    'items-center',
-    'justify-center',
-    sizeClasses[size] || sizeClasses.md,
-    className
-  ].join(' ');
+  // Style mapping
+  const styleMap = {
+    solid: 'fas',
+    regular: 'far',
+    light: 'fal',
+    brands: 'fab'
+  };
 
-  // For now, we'll use a simple approach with Font Awesome classes
-  // In a production app, you'd want to import the actual SVG files
-  const iconClass = `fa-${style} fa-${name}`;
+  const iconClass = styleMap[style] || 'fas';
+  const sizeClass = sizeMap[size] || 'text-base';
+
+  // Generate aria-label if not provided but name is available
+  const label = ariaLabel || `${name} icon`;
 
   return (
-    <i className={`${iconClass} ${baseClasses}`} {...rest}></i>
+    <i
+      className={`${iconClass} fa-${name} ${sizeClass} ${className}`}
+      aria-label={ariaHidden ? undefined : label}
+      aria-hidden={ariaHidden}
+      role={ariaHidden ? 'presentation' : 'img'}
+      {...props}
+    />
   );
 };
 

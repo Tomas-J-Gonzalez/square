@@ -1,111 +1,150 @@
 import React from 'react';
+import Icon from './Icon';
 
-/**
- * Button component that uses design tokens via Tailwind classes
- * @param {Object} props - Component props
- * @param {string} props.variant - Button variant: 'primary', 'secondary', 'disabled'
- * @param {string} props.size - Button size: 'sm', 'md', 'lg'
- * @param {boolean} props.disabled - Whether the button is disabled
- * @param {React.ReactNode} props.children - Button content
- * @param {string} props.className - Additional CSS classes
- * @param {React.ElementType} props.as - Element type to render (default: 'button')
- * @param {Object} props...rest - Additional props to pass to the button element
- */
-const Button = ({ 
-  variant = 'primary', 
-  size = 'md', 
-  disabled = false, 
-  children, 
-  className = '', 
-  as: Component = 'button',
-  ...rest 
+const Button = ({
+  children,
+  variant = 'primary',
+  size = 'md',
+  disabled = false,
+  loading = false,
+  icon,
+  iconPosition = 'left',
+  fullWidth = false,
+  type = 'button',
+  onClick,
+  className = '',
+  'aria-label': ariaLabel,
+  ...props
 }) => {
-  // Base button classes
+  // Base classes
   const baseClasses = [
     'inline-flex',
     'items-center',
     'justify-center',
     'font-semibold',
+    'text-decoration-none',
+    'border',
+    'border-radius-50',
+    'cursor-pointer',
     'transition-all',
     'duration-200',
-    'ease-in-out',
     'focus:outline-none',
     'focus:ring-2',
     'focus:ring-offset-2',
     'disabled:cursor-not-allowed',
-    'disabled:opacity-50'
-  ];
-
-  // Size classes
-  const sizeClasses = {
-    sm: [
-      'px-16',
-      'py-8',
-      'text-body-sm',
-      'rounded-full'
-    ],
-    md: [
-      'px-24',
-      'py-12',
-      'text-body-md',
-      'rounded-full'
-    ],
-    lg: [
-      'px-32',
-      'py-16',
-      'text-body-lg',
-      'rounded-full'
-    ]
-  };
+    'disabled:opacity-50',
+    fullWidth ? 'w-full' : '',
+    className
+  ].filter(Boolean).join(' ');
 
   // Variant classes
   const variantClasses = {
     primary: [
-      'bg-background-brand-brand-primary',
-      'text-content-knockout',
-      'hover:bg-background-brand-brand-primary-hover',
-      'active:bg-background-brand-brand-primary-active',
-      'focus:ring-background-brand-brand-primary-focus',
-      'shadow-sm'
+      'bg-pink-500',
+      'text-white',
+      'border-pink-500',
+      'hover:bg-pink-600',
+      'hover:border-pink-600',
+      'focus:ring-pink-500',
+      'disabled:bg-pink-300',
+      'disabled:border-pink-300'
     ],
     secondary: [
-      'bg-background-surface',
-      'text-content-default',
-      'border',
-      'border-border-default',
-      'hover:bg-background-surface-hover',
-      'hover:border-border-strong',
-      'focus:ring-border-focus',
-      'shadow-xs'
+      'bg-gray-100',
+      'text-gray-900',
+      'border-gray-300',
+      'hover:bg-gray-200',
+      'hover:border-gray-400',
+      'focus:ring-gray-500',
+      'disabled:bg-gray-50',
+      'disabled:border-gray-200'
     ],
-    disabled: [
-      'bg-background-surface-disabled',
+    danger: [
+      'bg-red-600',
       'text-white',
-      'border',
-      'border-border-utility-deactivated',
-      'cursor-not-allowed'
+      'border-red-600',
+      'hover:bg-red-700',
+      'hover:border-red-700',
+      'focus:ring-red-500',
+      'disabled:bg-red-300',
+      'disabled:border-red-300'
+    ],
+    outline: [
+      'bg-transparent',
+      'text-pink-600',
+      'border-pink-600',
+      'hover:bg-pink-50',
+      'focus:ring-pink-500',
+      'disabled:bg-transparent',
+      'disabled:text-pink-300',
+      'disabled:border-pink-300'
     ]
   };
 
-  // Determine which variant to use
-  const effectiveVariant = disabled ? 'disabled' : variant;
+  // Size classes
+  const sizeClasses = {
+    sm: ['px-3', 'py-1.5', 'text-sm'],
+    md: ['px-4', 'py-2', 'text-sm'],
+    lg: ['px-6', 'py-3', 'text-base'],
+    xl: ['px-8', 'py-4', 'text-lg']
+  };
 
-  // Combine all classes
-  const combinedClasses = [
-    ...baseClasses,
-    ...sizeClasses[size],
-    ...variantClasses[effectiveVariant],
-    className
+  const allClasses = [
+    baseClasses,
+    ...variantClasses[variant] || variantClasses.primary,
+    ...sizeClasses[size] || sizeClasses.md
   ].join(' ');
 
+  // Handle loading state
+  const isDisabled = disabled || loading;
+
+  // Generate aria-label for better accessibility
+  const buttonAriaLabel = ariaLabel || (typeof children === 'string' ? children : undefined);
+
   return (
-    <Component
-      className={combinedClasses}
-      disabled={disabled}
-      {...rest}
+    <button
+      type={type}
+      className={allClasses}
+      disabled={isDisabled}
+      onClick={onClick}
+      aria-label={buttonAriaLabel}
+      aria-busy={loading}
+      {...props}
     >
-      {children}
-    </Component>
+      {loading && (
+        <Icon 
+          name="spinner" 
+          style="solid" 
+          size="sm" 
+          className="animate-spin mr-2" 
+          aria-hidden="true"
+        />
+      )}
+      
+      {!loading && icon && iconPosition === 'left' && (
+        <Icon 
+          name={icon} 
+          style="solid" 
+          size="sm" 
+          className="mr-2" 
+          aria-hidden="true"
+        />
+      )}
+      
+      <span className={loading ? 'opacity-0' : ''}>
+        {children}
+      </span>
+      
+      {!loading && icon && iconPosition === 'right' && (
+        <Icon 
+          name={icon} 
+          style="solid" 
+          size="sm" 
+          className="ml-2" 
+          aria-hidden="true"
+        />
+      )}
+    </button>
   );
 };
 

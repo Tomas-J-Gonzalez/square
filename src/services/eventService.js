@@ -1,27 +1,84 @@
 // Event Service for managing events with localStorage persistence
+// Provides CRUD operations for events with proper error handling and validation
 
 const STORAGE_KEY = 'be-there-or-be-square-events';
 
-// Event structure
-const createEvent = (eventData) => ({
-  id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-  title: eventData.title,
-  date: eventData.date,
-  time: eventData.time,
-  dateTime: eventData.dateTime,
-  location: eventData.location || '',
-  decisionMode: eventData.decisionMode,
-  punishment: eventData.punishment,
-  participants: [],
-  status: 'active', // 'active', 'completed', 'cancelled'
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  flakes: [],
-  winner: null,
-  loser: null
-});
+/**
+ * Event structure
+ * @typedef {Object} Event
+ * @property {string} id - Unique event identifier
+ * @property {string} title - Event title
+ * @property {string} date - Event date (YYYY-MM-DD)
+ * @property {string} time - Event time (HH:MM)
+ * @property {string} dateTime - Combined date and time (ISO string)
+ * @property {string} location - Event location (optional)
+ * @property {string} decisionMode - How to decide on flakes: 'vote', 'chance', 'game', 'none'
+ * @property {string} punishment - Punishment for flakes
+ * @property {Array} participants - List of participants
+ * @property {string} status - Event status: 'active', 'completed', 'cancelled'
+ * @property {string} createdAt - Creation timestamp (ISO string)
+ * @property {string} updatedAt - Last update timestamp (ISO string)
+ * @property {Array} flakes - List of flake names
+ * @property {Object|null} winner - Winner participant object
+ * @property {Object|null} loser - Loser participant object
+ */
 
-// Get all events from localStorage
+/**
+ * Participant structure
+ * @typedef {Object} Participant
+ * @property {string} id - Unique participant identifier
+ * @property {string} name - Participant name
+ * @property {string} email - Participant email
+ * @property {string} message - Participant message
+ * @property {string} joinedAt - Join timestamp (ISO string)
+ */
+
+/**
+ * Creates a new event object
+ * @param {Object} eventData - Event data
+ * @returns {Event} New event object
+ */
+const createEvent = (eventData) => {
+  // Validate required fields
+  if (!eventData.title?.trim()) {
+    throw new Error('Event title is required');
+  }
+  if (!eventData.date) {
+    throw new Error('Event date is required');
+  }
+  if (!eventData.time) {
+    throw new Error('Event time is required');
+  }
+  if (!eventData.decisionMode) {
+    throw new Error('Decision mode is required');
+  }
+  if (!eventData.punishment?.trim()) {
+    throw new Error('Punishment is required');
+  }
+
+  return {
+    id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    title: eventData.title.trim(),
+    date: eventData.date,
+    time: eventData.time,
+    dateTime: eventData.dateTime,
+    location: eventData.location?.trim() || '',
+    decisionMode: eventData.decisionMode,
+    punishment: eventData.punishment.trim(),
+    participants: [],
+    status: 'active',
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    flakes: [],
+    winner: null,
+    loser: null
+  };
+};
+
+/**
+ * Gets all events from localStorage
+ * @returns {Array<Event>} Array of events
+ */
 const getEvents = () => {
   try {
     const events = localStorage.getItem(STORAGE_KEY);
@@ -32,22 +89,37 @@ const getEvents = () => {
   }
 };
 
-// Save events to localStorage
+/**
+ * Saves events to localStorage
+ * @param {Array<Event>} events - Events to save
+ */
 const saveEvents = (events) => {
   try {
+    if (!Array.isArray(events)) {
+      throw new Error('Events must be an array');
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
   } catch (error) {
     console.error('Error saving events to localStorage:', error);
+    throw new Error('Failed to save events');
   }
 };
 
-// Get active event (only one can be active at a time)
+/**
+ * Gets the active event (only one can be active at a time)
+ * @returns {Event|null} Active event or null
+ */
 const getActiveEvent = () => {
   const events = getEvents();
   return events.find(event => event.status === 'active') || null;
 };
 
-// Create a new event
+/**
+ * Creates a new event
+ * @param {Object} eventData - Event data
+ * @returns {Event} Created event
+ * @throws {Error} If there's already an active event
+ */
 const createNewEvent = (eventData) => {
   const events = getEvents();
   
@@ -64,8 +136,18 @@ const createNewEvent = (eventData) => {
   return newEvent;
 };
 
-// Update an event
+/**
+ * Updates an event
+ * @param {string} eventId - Event ID
+ * @param {Object} updates - Updates to apply
+ * @returns {Event} Updated event
+ * @throws {Error} If event not found
+ */
 const updateEvent = (eventId, updates) => {
+  if (!eventId) {
+    throw new Error('Event ID is required');
+  }
+
   const events = getEvents();
   const eventIndex = events.findIndex(event => event.id === eventId);
   
@@ -83,8 +165,17 @@ const updateEvent = (eventId, updates) => {
   return events[eventIndex];
 };
 
-// Delete/cancel an event
+/**
+ * Deletes an event completely
+ * @param {string} eventId - Event ID
+ * @returns {boolean} Success status
+ * @throws {Error} If event not found
+ */
 const deleteEvent = (eventId) => {
+  if (!eventId) {
+    throw new Error('Event ID is required');
+  }
+
   const events = getEvents();
   const eventIndex = events.findIndex(event => event.id === eventId);
   
@@ -92,19 +183,27 @@ const deleteEvent = (eventId) => {
     throw new Error('Event not found');
   }
   
-  // Remove the event completely
   events.splice(eventIndex, 1);
   saveEvents(events);
   
   return true;
 };
 
-// Cancel an active event (mark as cancelled instead of deleting)
+/**
+ * Cancels an active event (marks as cancelled)
+ * @param {string} eventId - Event ID
+ * @returns {Event} Cancelled event
+ */
 const cancelEvent = (eventId) => {
   return updateEvent(eventId, { status: 'cancelled' });
 };
 
-// Complete an event
+/**
+ * Completes an event
+ * @param {string} eventId - Event ID
+ * @param {Object} result - Event result
+ * @returns {Event} Completed event
+ */
 const completeEvent = (eventId, result) => {
   return updateEvent(eventId, {
     status: 'completed',
@@ -114,8 +213,27 @@ const completeEvent = (eventId, result) => {
   });
 };
 
-// Add participant to event
+/**
+ * Adds a participant to an event
+ * @param {string} eventId - Event ID
+ * @param {Object} participantData - Participant data
+ * @returns {Event} Updated event
+ * @throws {Error} If event not found or invalid participant data
+ */
 const addParticipant = (eventId, participantData) => {
+  if (!eventId) {
+    throw new Error('Event ID is required');
+  }
+  if (!participantData?.name?.trim()) {
+    throw new Error('Participant name is required');
+  }
+  if (!participantData?.email?.trim()) {
+    throw new Error('Participant email is required');
+  }
+  if (!participantData?.message?.trim()) {
+    throw new Error('Participant message is required');
+  }
+
   const events = getEvents();
   const eventIndex = events.findIndex(event => event.id === eventId);
   
@@ -125,9 +243,9 @@ const addParticipant = (eventId, participantData) => {
   
   const participant = {
     id: `participant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: participantData.name,
-    email: participantData.email,
-    message: participantData.message,
+    name: participantData.name.trim(),
+    email: participantData.email.trim(),
+    message: participantData.message.trim(),
     joinedAt: new Date().toISOString()
   };
   
@@ -138,8 +256,21 @@ const addParticipant = (eventId, participantData) => {
   return events[eventIndex];
 };
 
-// Remove participant from event
+/**
+ * Removes a participant from an event
+ * @param {string} eventId - Event ID
+ * @param {string} participantId - Participant ID
+ * @returns {Event} Updated event
+ * @throws {Error} If event or participant not found
+ */
 const removeParticipant = (eventId, participantId) => {
+  if (!eventId) {
+    throw new Error('Event ID is required');
+  }
+  if (!participantId) {
+    throw new Error('Participant ID is required');
+  }
+
   const events = getEvents();
   const eventIndex = events.findIndex(event => event.id === eventId);
   
@@ -147,24 +278,74 @@ const removeParticipant = (eventId, participantId) => {
     throw new Error('Event not found');
   }
   
-  events[eventIndex].participants = events[eventIndex].participants.filter(
-    p => p.id !== participantId
+  const participantIndex = events[eventIndex].participants.findIndex(
+    p => p.id === participantId
   );
+  
+  if (participantIndex === -1) {
+    throw new Error('Participant not found');
+  }
+  
+  events[eventIndex].participants.splice(participantIndex, 1);
   events[eventIndex].updatedAt = new Date().toISOString();
   
   saveEvents(events);
   return events[eventIndex];
 };
 
-// Get past events (completed or cancelled)
+/**
+ * Gets past events (completed or cancelled)
+ * @returns {Array<Event>} Array of past events
+ */
 const getPastEvents = () => {
   const events = getEvents();
   return events.filter(event => event.status === 'completed' || event.status === 'cancelled');
 };
 
-// Clear all events (for testing/reset)
+/**
+ * Clears all events (for testing/reset)
+ */
 const clearAllEvents = () => {
-  localStorage.removeItem(STORAGE_KEY);
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.error('Error clearing events:', error);
+    throw new Error('Failed to clear events');
+  }
+};
+
+/**
+ * Validates event data
+ * @param {Object} eventData - Event data to validate
+ * @returns {boolean} True if valid
+ * @throws {Error} If validation fails
+ */
+const validateEventData = (eventData) => {
+  if (!eventData) {
+    throw new Error('Event data is required');
+  }
+  
+  if (!eventData.title?.trim()) {
+    throw new Error('Event title is required');
+  }
+  
+  if (!eventData.date) {
+    throw new Error('Event date is required');
+  }
+  
+  if (!eventData.time) {
+    throw new Error('Event time is required');
+  }
+  
+  if (!eventData.decisionMode) {
+    throw new Error('Decision mode is required');
+  }
+  
+  if (!eventData.punishment?.trim()) {
+    throw new Error('Punishment is required');
+  }
+  
+  return true;
 };
 
 export const eventService = {
@@ -178,5 +359,6 @@ export const eventService = {
   addParticipant,
   removeParticipant,
   getPastEvents,
-  clearAllEvents
+  clearAllEvents,
+  validateEventData
 };
