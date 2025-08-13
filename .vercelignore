@@ -5,6 +5,8 @@
 !lib/**
 !dist
 !dist/**
+!public
+!public/**
 !vercel.json
 !package.json
 !env.example
