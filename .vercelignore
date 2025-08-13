@@ -1,14 +1,6 @@
-*
-!index.html
-!src/**
-!assets/**
-!public/**
-!api/**
-!lib/**
-!vercel.json
-!package.json
-!package-lock.json
-!postcss.config.js
-!tailwind.config.js
-!vite.config.js
-!README.md
+# Ignore nothing critical to the build; only ignore common junk
+.DS_Store
+node_modules
+dist
+*.log
+coverage

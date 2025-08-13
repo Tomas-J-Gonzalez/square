@@ -3,8 +3,8 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
-// Use public asset path (Vite publicDir is set to 'assets', which serves files at root)
-const logoPath = '/logo.png';
+// Use public asset path in /assets (Vite publicDir points to 'assets')
+const logoPath = '/assets/logo.png';
 import Modal from '../components/Modal';
 
 const MainLayout = () => {
