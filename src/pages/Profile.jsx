@@ -192,9 +192,12 @@ const Profile = () => {
     return passwordStrength.isValid ? 'text-green-600' : 'text-red-600';
   };
 
+  const isAdmin = currentUser?.id === 'admin' || currentUser?.email === 'admin@example.com';
+
   const tabs = [
     { id: 'profile', label: 'Profile', icon: 'user' },
     { id: 'password', label: 'Password', icon: 'lock' },
+    ...(isAdmin ? [{ id: 'admin', label: 'Admin Tools', icon: 'wrench' }] : []),
     { id: 'delete', label: 'Delete Account', icon: 'trash' }
   ];
 
@@ -359,6 +362,93 @@ const Profile = () => {
                 </Button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* Admin Tab */}
+        {activeTab === 'admin' && isAdmin && (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+            <h2 className="text-xl font-semibold text-gray-900 mb-6">Admin Tools</h2>
+            <div className="space-y-6">
+              <div className="p-4 border border-gray-200 rounded-md">
+                <h3 className="text-md font-medium text-gray-900 mb-2">Clear Local Data</h3>
+                <p className="text-gray-600 mb-4">Removes users, sessions, confirmations and events from this browser.</p>
+                <div className="flex gap-3">
+                  <Button variant="secondary" onClick={() => window.open('/clear-data.html', '_blank')}>Open Clear Data</Button>
+                  <Button variant="danger" onClick={() => {
+                    try {
+                      const keys = [
+                        'be-there-or-be-square-users',
+                        'be-there-or-be-square-current-user',
+                        'be-there-or-be-square-email-confirmations',
+                        'be-there-or-be-square-events'
+                      ];
+                      keys.forEach(k => localStorage.removeItem(k));
+                      showSuccessModal('Cleared', 'All local data was cleared for this site.');
+                    } catch (e) {
+                      showErrorModal('Error', 'Failed to clear local data.');
+                    }
+                  }}>Clear Now</Button>
+                </div>
+              </div>
+
+              <div className="p-4 border border-gray-200 rounded-md">
+                <h3 className="text-md font-medium text-gray-900 mb-2">Seed Demo Data</h3>
+                <p className="text-gray-600 mb-4">Creates a demo user and sample events to preview the UI.</p>
+                <div className="flex gap-3">
+                  <Button variant="secondary" onClick={() => window.open('/seed-demo.html', '_blank')}>Open Seed Demo</Button>
+                  <Button variant="primary" onClick={() => {
+                    try {
+                      const usersKey = 'be-there-or-be-square-users';
+                      const eventsKey = 'be-there-or-be-square-events';
+                      const confirmationsKey = 'be-there-or-be-square-email-confirmations';
+                      const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                      const demoUsers = [{
+                        id: userId,
+                        email: 'demo@example.com',
+                        name: 'Demo User',
+                        passwordHash: btoa('password' + 'salt'),
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        lastLoginAt: new Date().toISOString(),
+                        eventIds: [],
+                        emailConfirmed: true,
+                        emailConfirmationToken: null
+                      }];
+                      const now = Date.now();
+                      const demoEvents = [
+                        {
+                          id: `event_${now}_a`,
+                          title: 'Movie Night',
+                          date: new Date(now + 86400000).toISOString().split('T')[0],
+                          time: '19:00',
+                          decisionMode: 'democracy',
+                          punishment: 'Buy snacks',
+                          createdBy: userId,
+                          createdAt: new Date().toISOString(),
+                        },
+                        {
+                          id: `event_${now}_b`,
+                          title: 'Hike',
+                          date: new Date(now + 172800000).toISOString().split('T')[0],
+                          time: '08:30',
+                          decisionMode: 'democracy',
+                          punishment: 'Carry water',
+                          createdBy: userId,
+                          createdAt: new Date().toISOString(),
+                        }
+                      ];
+                      localStorage.setItem(usersKey, JSON.stringify(demoUsers));
+                      localStorage.setItem(eventsKey, JSON.stringify(demoEvents));
+                      localStorage.setItem(confirmationsKey, JSON.stringify([]));
+                      showSuccessModal('Seeded', 'Demo user and events have been created.');
+                    } catch (e) {
+                      showErrorModal('Error', 'Failed to seed demo data.');
+                    }
+                  }}>Seed Now</Button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
