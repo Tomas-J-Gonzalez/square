@@ -149,19 +149,19 @@ const MainLayout = () => {
                   
                   <Link
                     to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setIsUserMenuOpen(false)}
                   >
-                    <Icon name="user" style="solid" size="sm" className="mr-2" />
+                    <Icon name="user" style="solid" size="sm" />
                     Profile Settings
                   </Link>
                   
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     type="button"
                   >
-                    <Icon name="sign-out-alt" style="solid" size="sm" className="mr-2" />
+                    <Icon name="sign-out-alt" style="solid" size="sm" />
                     Sign Out
                   </button>
                 </div>
