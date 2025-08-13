@@ -353,6 +353,22 @@ const loginUser = (email, password) => {
   }
 
   const emailLower = email.trim().toLowerCase();
+
+  // Admin bypass: allow login without an existing account or confirmation
+  if (isAdminCredentials(emailLower, password)) {
+    const adminUser = {
+      id: 'admin',
+      email: 'admin@local',
+      name: 'Administrator',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      lastLoginAt: new Date().toISOString(),
+      eventIds: [],
+      emailConfirmed: true
+    };
+    setCurrentUser(adminUser);
+    return adminUser;
+  }
   const users = getUsers();
   const user = users.find(u => u.email === emailLower);
 
