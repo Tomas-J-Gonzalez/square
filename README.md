@@ -1,33 +1,38 @@
-# Be There or Be Square
+# Be There or Be Square - Anti-Flake App
 
-A fun, social "anti-flake" web app built with React, Vite, and Tailwind CSS. Never get flaked on again! Create events and let fate decide the punishment for flakes.
+A fun, social web application designed to prevent people from flaking on events. Built with React, Vite, Tailwind CSS, and Resend for email handling.
 
 ## 🚀 Features
 
-- **Event Management**: Create, view, and manage events
-- **Attendance Tracking**: Mark friends as attended or flaked
-- **Decision Modes**: Vote, chance, game, or no group decision
-- **Punishment System**: Predefined punishments for flakes
-- **Social Sharing**: Share events on Twitter, Facebook, Instagram
-- **Mobile-First Design**: Responsive design with 8px grid system
+- **User Authentication**: Secure registration and login with email confirmation
+- **Event Management**: Create, manage, and track events
+- **Anti-Flake System**: Multiple decision modes (Vote, Chance, Game, No Group Decision)
+- **Email Integration**: Real email sending via Resend
+- **Admin Access**: Admin bypass for testing (admin/admin)
+- **Responsive Design**: Mobile-first design with 8px grid system
 - **Accessibility**: WCAG 2.1 AA compliant
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: React 18 + Vite
-- **Styling**: Tailwind CSS with custom design tokens
+- **Frontend**: React 18, Vite, Tailwind CSS
+- **Backend**: Express.js (for email handling)
+- **Email Service**: Resend
 - **Routing**: React Router DOM
-- **Icons**: Font Awesome 7 Pro
-- **State Management**: React Hooks + localStorage
-- **Code Quality**: ESLint + Prettier
-- **Accessibility**: jsx-a11y ESLint plugin
+- **State Management**: React Context + Local Storage
+- **Code Quality**: ESLint, Prettier
 
-## 📦 Installation
+## 📋 Prerequisites
+
+- Node.js 18+ 
+- npm or yarn
+- Resend API key (free at [resend.com](https://resend.com))
+
+## 🔧 Installation
 
 1. **Clone the repository**
    ```bash
    git clone <repository-url>
-   cd be-there-or-be-square
+   cd square
    ```
 
 2. **Install dependencies**
@@ -35,194 +40,203 @@ A fun, social "anti-flake" web app built with React, Vite, and Tailwind CSS. Nev
    npm install
    ```
 
-3. **Start development server**
+3. **Set up environment variables**
    ```bash
+   # Create .env file
+   echo "RESEND_API_KEY=your_resend_api_key_here" > .env
+   echo "FRONTEND_URL=http://localhost:5175" >> .env
+   echo "PORT=3001" >> .env
+   ```
+
+4. **Start the development servers**
+   ```bash
+   # Start both frontend and backend
+   npm run dev:full
+   
+   # Or start them separately:
+   # Terminal 1: Backend server
+   npm run server
+   
+   # Terminal 2: Frontend development server
    npm run dev
    ```
 
-4. **Open your browser**
-   Navigate to `http://localhost:5173`
+## 🌐 Access the Application
 
-## 🏗️ Project Structure
+- **Frontend**: http://localhost:5175
+- **Backend API**: http://localhost:3001
+- **Health Check**: http://localhost:3001/api/health
 
-```
-src/
-├── components/          # Reusable UI components
-│   ├── Button.jsx      # Accessible button component
-│   ├── Icon.jsx        # Font Awesome icon wrapper
-│   ├── Modal.jsx       # Custom modal with focus management
-│   └── ErrorBoundary.jsx # Error handling component
-├── hooks/              # Custom React hooks
-│   ├── useLocalStorage.js # localStorage hook
-│   └── useModal.js     # Modal state management
-├── layouts/            # Layout components
-│   └── MainLayout.jsx  # Main app layout
-├── pages/              # Page components
-│   ├── Home.jsx        # Landing page
-│   ├── CreateEvent.jsx # Event creation form
-│   ├── ViewEvent.jsx   # Event details and management
-│   └── PastEvents.jsx  # Event history
-├── services/           # Business logic
-│   └── eventService.js # Event CRUD operations
-├── utils/              # Utility functions
-│   └── tokenParser.js  # Design token parser
-├── styles/             # Additional styles
-├── tokens.json         # Design tokens
-└── index.css           # Global styles
-```
+## 👤 User Flows
+
+### Regular User Registration
+1. Visit http://localhost:5175/register
+2. Enter name, email (whitelisted domain), and password
+3. Check email for confirmation link
+4. Click confirmation link to activate account
+5. Login and start using the app
+
+### Admin Access
+- **Username**: `admin`
+- **Password**: `admin`
+- **Bypass**: No email confirmation required
+
+### Email Whitelist
+Only these email domains are allowed:
+- gmail.com, yahoo.com, hotmail.com, outlook.com
+- icloud.com, me.com, mac.com, aol.com
+- protonmail.com, tutanota.com, zoho.com
+- yandex.com, mail.com, live.com, msn.com
+
+## 📧 Email Configuration
+
+### Resend Setup
+1. Sign up at [resend.com](https://resend.com)
+2. Get your API key from the dashboard
+3. Add it to your `.env` file:
+   ```
+   RESEND_API_KEY=re_your_api_key_here
+   ```
+
+### Email Templates
+The app sends beautifully formatted HTML emails with:
+- Branded styling matching the app design
+- Clear call-to-action buttons
+- Fallback text links
+- Professional layout
+
+## 🎯 Core Features
+
+### Event Creation
+- **Title & Description**: Clear event details
+- **Date & Time**: Flexible scheduling
+- **Location**: Event venue information
+- **Decision Mode**: Choose how to handle flakes
+  - **Vote**: Group decides on punishment
+  - **Chance**: Random selection
+  - **Game**: Interactive decision
+  - **No Group Decision**: Manual handling
+
+### Event Management
+- **Active Events**: Only one active event at a time
+- **Participant Management**: Add friends with required info
+- **Attendance Tracking**: Mark who attended vs flaked
+- **Event Completion**: Archive completed events
+- **History**: View past events with statistics
+
+### Social Features
+- **Event Sharing**: Multiple sharing options
+- **Invitation Links**: Direct event access
+- **Social Media Integration**: Facebook, Instagram, Twitter
+- **Friend Management**: Track participant relationships
+
+## 🔒 Security Features
+
+- **Password Hashing**: Secure password storage
+- **Email Validation**: Domain whitelist protection
+- **Token-based Confirmation**: Secure email verification
+- **Protected Routes**: Authentication required for app access
+- **Admin Protection**: Secure admin credential validation
 
 ## 🎨 Design System
 
-The app uses a custom design system with:
+### Design Tokens
+- **Colors**: Pink primary (#ec4899), semantic color palette
+- **Spacing**: 8px grid system throughout
+- **Typography**: Consistent font hierarchy
+- **Components**: Reusable Button, Card, Modal components
 
-- **8px Grid System**: Consistent spacing throughout
-- **Custom Breakpoints**: Mobile-first responsive design
-- **Design Tokens**: Colors, spacing, typography, radius, shadows
-- **Component Library**: Reusable, accessible components
-
-### Breakpoints
-- `screen-xs`: 320-479px (4 columns, 16px margins)
-- `screen-sm`: 480-767px (6 columns, 40px margins)
-- `screen-md`: 768-1023px (12 columns, 80px margins)
-- `screen-lg`: 1024-1199px (12 columns, 80px margins)
-- `screen-xl`: 1200-1599px (12 columns, 80px margins)
-- `screen-xxl`: 1600px+ (12 columns, 128px margins)
-
-## ♿ Accessibility Features
-
-- **Semantic HTML**: Proper heading hierarchy and landmarks
-- **Keyboard Navigation**: Full keyboard support
-- **Screen Reader Support**: ARIA labels and roles
-- **Focus Management**: Visible focus indicators
-- **Color Contrast**: WCAG AA compliant color ratios
-- **Error Handling**: Clear error messages and recovery
-- **Loading States**: Proper loading indicators
-
-### Accessibility Checklist
-
-- [x] Semantic HTML structure
-- [x] Proper heading hierarchy (h1-h6)
-- [x] ARIA labels and roles
-- [x] Keyboard navigation support
-- [x] Focus management
-- [x] Screen reader compatibility
-- [x] Color contrast compliance
-- [x] Error message accessibility
-- [x] Loading state indicators
-- [x] Mobile accessibility
-
-## 🔧 Development
-
-### Available Scripts
-
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
-npm run format       # Format code with Prettier
-```
-
-### Code Quality
-
-The project uses ESLint with the following configurations:
-
-- **React Best Practices**: React hooks rules and JSX guidelines
-- **Accessibility**: jsx-a11y plugin for accessibility rules
-- **Code Style**: Consistent code formatting and patterns
-- **Error Prevention**: Common JavaScript pitfalls
-
-### Best Practices
-
-1. **Component Structure**
-   - Use functional components with hooks
-   - Implement proper prop validation
-   - Follow single responsibility principle
-
-2. **State Management**
-   - Use React hooks for local state
-   - Implement custom hooks for reusable logic
-   - Use localStorage for persistence
-
-3. **Error Handling**
-   - Implement error boundaries
-   - Provide user-friendly error messages
-   - Log errors for debugging
-
-4. **Performance**
-   - Use React.memo for expensive components
-   - Implement proper dependency arrays
-   - Optimize re-renders
-
-5. **Accessibility**
-   - Use semantic HTML elements
-   - Provide ARIA labels and roles
-   - Ensure keyboard navigation
-   - Test with screen readers
+### Responsive Breakpoints
+- **Mobile**: 320px+ (16px margins)
+- **Tablet**: 768px+
+- **Desktop**: 1024px+
+- **Large**: 1280px+
 
 ## 🧪 Testing
 
 ### Manual Testing Checklist
-
-- [ ] Create new event
-- [ ] Add participants
-- [ ] Mark attendance
-- [ ] Complete event
-- [ ] Cancel event
-- [ ] View past events
-- [ ] Share event
+- [ ] User registration with email confirmation
+- [ ] Admin login bypass
+- [ ] Event creation and management
+- [ ] Email sending (check Resend dashboard)
 - [ ] Mobile responsiveness
-- [ ] Keyboard navigation
-- [ ] Screen reader compatibility
+- [ ] Accessibility (keyboard navigation, screen readers)
 
-### Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
+### Email Testing
+1. Register with a real email address
+2. Check your inbox for confirmation email
+3. Verify email styling and links work
+4. Test confirmation flow
 
 ## 🚀 Deployment
 
-1. **Build the project**
-   ```bash
-   npm run build
-   ```
+### Frontend (Vercel/Netlify)
+```bash
+npm run build
+# Deploy dist/ folder
+```
 
-2. **Deploy the `dist` folder**
-   The built files are in the `dist` directory and can be deployed to any static hosting service.
+### Backend (Railway/Render)
+```bash
+# Deploy server.js with environment variables
+```
 
-## 📝 Contributing
+### Environment Variables for Production
+```
+RESEND_API_KEY=your_production_api_key
+FRONTEND_URL=https://your-domain.com
+PORT=3001
+```
+
+## 📝 API Endpoints
+
+### Email Service
+- `POST /api/send-confirmation-email` - Send confirmation email
+- `GET /api/health` - Health check
+
+### Request Format
+```json
+{
+  "email": "user@example.com",
+  "name": "User Name",
+  "token": "confirmation-token"
+}
+```
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests if applicable
-5. Ensure accessibility compliance
-6. Submit a pull request
-
-### Commit Message Format
-
-```
-type(scope): description
-
-feat: add new feature
-fix: bug fix
-docs: documentation changes
-style: formatting changes
-refactor: code refactoring
-test: add tests
-chore: maintenance tasks
-```
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📄 License
 
 This project is licensed under the MIT License.
 
-## 🤝 Support
+## 🆘 Troubleshooting
 
-For support, please open an issue in the GitHub repository or contact the development team.
+### Common Issues
+
+**Email not sending:**
+- Check Resend API key in .env
+- Verify email domain is whitelisted
+- Check server logs for errors
+
+**Server not starting:**
+- Ensure port 3001 is available
+- Check .env file exists
+- Verify all dependencies installed
+
+**Frontend not loading:**
+- Check if backend is running
+- Verify Vite is serving on correct port
+- Clear browser cache
+
+### Debug Mode
+Enable detailed logging by checking browser console and server logs for error messages.
 
 ---
 
-**Built with ❤️ and accessibility in mind**
+**Built with ❤️ for preventing flakes everywhere!**
