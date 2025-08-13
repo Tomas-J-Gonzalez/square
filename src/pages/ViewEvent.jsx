@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
 import Modal from '../components/Modal';
+import { useAuth } from '../contexts/AuthContext';
 
 const ViewEvent = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -298,8 +300,18 @@ const ViewEvent = () => {
   };
 
   const handleCopyInvitationLink = () => {
-    const eventUrl = `${window.location.origin}/invite/${eventId}`;
-    navigator.clipboard.writeText(eventUrl);
+    const url = new URL(`${window.location.origin}/invite/${eventId}`);
+    // Embed minimal event summary for fallback rendering
+    url.searchParams.set('title', event.title);
+    const dt = new Date(event.dateTime || `${event.date}T${event.time}`);
+    // Preserve existing structure
+    url.searchParams.set('date', (event.dateTime ? new Date(event.dateTime) : dt).toISOString().slice(0,10));
+    url.searchParams.set('time', (event.dateTime ? new Date(event.dateTime) : dt).toTimeString().slice(0,5));
+    if (event.location) url.searchParams.set('location', event.location);
+    if (event.decisionMode) url.searchParams.set('decision_mode', event.decisionMode);
+    if (event.punishment) url.searchParams.set('punishment', event.punishment);
+    if (currentUser?.name) url.searchParams.set('invited_by', currentUser.name);
+    navigator.clipboard.writeText(url.toString());
     showModal({
       title: 'Link Copied',
       message: 'Invitation link copied to clipboard! Share it with your friends so they can RSVP.',

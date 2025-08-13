@@ -42,13 +42,35 @@ const Invite = () => {
             invitedBy: data.invited_by || 'A friend'
           });
         } else {
-          // Fallback to local (for dev)
-          const events = eventService.getEvents();
-          const e = events.find(ev => ev.id === eventId);
-          if (!e) {
-            setError('Event not found');
+          // Fallback to URL params then local (so public RSVP works without server)
+          const params = new URLSearchParams(window.location.search);
+          const title = params.get('title');
+          const date = params.get('date');
+          const time = params.get('time');
+          const location = params.get('location');
+          const decision_mode = params.get('decision_mode');
+          const punishment = params.get('punishment');
+          const invited_by = params.get('invited_by');
+          if (title && date && time && punishment) {
+            setEvent({
+              id: eventId,
+              title,
+              date,
+              time,
+              location,
+              decisionMode: decision_mode || 'none',
+              punishment,
+              dateTime: `${date}T${time}`,
+              invitedBy: invited_by || 'A friend'
+            });
           } else {
-            setEvent(e);
+            const events = eventService.getEvents();
+            const e = events.find(ev => ev.id === eventId);
+            if (!e) {
+              setError('Event not found');
+            } else {
+              setEvent(e);
+            }
           }
         }
       } catch (err) {
