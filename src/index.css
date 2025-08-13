@@ -80,6 +80,13 @@ body {
   font-size: 18px;
 }
 
+/* Ensure nav logo image honors explicit size */
+.logo img {
+  width: 32px;
+  height: 32px;
+  display: block;
+}
+
 .logo-text {
   color: #111827;
 }
