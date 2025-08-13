@@ -92,6 +92,47 @@ const CreateEvent = () => {
     }
   };
 
+  const handleErrorLinkClick = (errorMessage) => {
+    // Extract the link from the error message
+    const linkMatch = errorMessage.match(/\[View Current Event\]\(([^)]+)\)/);
+    if (linkMatch) {
+      const eventPath = linkMatch[1];
+      navigate(eventPath);
+    }
+  };
+
+  const renderErrorMessage = (errorMessage) => {
+    // Check if the error message contains a link
+    const linkMatch = errorMessage.match(/\[View Current Event\]\(([^)]+)\)/);
+    
+    if (linkMatch) {
+      const beforeLink = errorMessage.split('[')[0];
+      const afterLink = errorMessage.split(']')[1].split('(')[0];
+      
+      return (
+        <div className="mt-16 p-16 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-red-600 text-sm">
+            {beforeLink}
+            <button
+              onClick={() => handleErrorLinkClick(errorMessage)}
+              className="text-blue-600 hover:text-blue-800 underline font-medium"
+            >
+              current event
+            </button>
+            {afterLink}
+          </p>
+        </div>
+      );
+    }
+    
+    // Regular error message without link
+    return (
+      <div className="mt-16 p-16 bg-red-50 border border-red-200 rounded-md">
+        <p className="text-red-600 text-sm">{errorMessage}</p>
+      </div>
+    );
+  };
+
   return (
     <div className="section">
       <div className="section-container">
@@ -170,7 +211,10 @@ const CreateEvent = () => {
               </p>
               <div className="decision-grid">
                 {decisionModes.map((mode) => (
-                  <label key={mode.id} className="decision-option">
+                  <label 
+                    key={mode.id} 
+                    className={`decision-option ${formData.decisionMode === mode.id ? 'selected' : ''}`}
+                  >
                     <input
                       type="radio"
                       name="decisionMode"
@@ -198,7 +242,10 @@ const CreateEvent = () => {
               </p>
               <div className="punishment-grid">
                 {punishments.map((punishment, index) => (
-                  <label key={index} className="punishment-option">
+                  <label 
+                    key={index} 
+                    className={`punishment-option ${formData.punishment === punishment ? 'selected' : ''}`}
+                  >
                     <input
                       type="radio"
                       name="punishment"
@@ -222,12 +269,8 @@ const CreateEvent = () => {
                 {isSubmitting ? 'Creating Event...' : 'Create Event'}
               </button>
               
-              {/* Error Message - Now at bottom */}
-              {error && (
-                <div className="mt-16 p-16 bg-red-50 border border-red-200 rounded-md">
-                  <p className="text-red-600 text-sm">{error}</p>
-                </div>
-              )}
+              {/* Error Message - Now at bottom with link support */}
+              {error && renderErrorMessage(error)}
             </div>
           </form>
         </div>

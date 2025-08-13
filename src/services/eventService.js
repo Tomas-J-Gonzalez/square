@@ -8,6 +8,7 @@ const createEvent = (eventData) => ({
   title: eventData.title,
   date: eventData.date,
   time: eventData.time,
+  dateTime: eventData.dateTime,
   location: eventData.location || '',
   decisionMode: eventData.decisionMode,
   punishment: eventData.punishment,
@@ -53,7 +54,7 @@ const createNewEvent = (eventData) => {
   // Check if there's already an active event
   const activeEvent = events.find(event => event.status === 'active');
   if (activeEvent) {
-    throw new Error('There is already an active event. Please cancel or complete the current event first.');
+    throw new Error(`There is already an active event. Please cancel or complete the current event first. [View Current Event](/event/${activeEvent.id})`);
   }
   
   const newEvent = createEvent(eventData);
@@ -114,7 +115,7 @@ const completeEvent = (eventId, result) => {
 };
 
 // Add participant to event
-const addParticipant = (eventId, participantName) => {
+const addParticipant = (eventId, participantData) => {
   const events = getEvents();
   const eventIndex = events.findIndex(event => event.id === eventId);
   
@@ -124,7 +125,9 @@ const addParticipant = (eventId, participantName) => {
   
   const participant = {
     id: `participant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: participantName,
+    name: participantData.name,
+    email: participantData.email,
+    message: participantData.message,
     joinedAt: new Date().toISOString()
   };
   
