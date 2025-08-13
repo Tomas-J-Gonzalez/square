@@ -77,7 +77,7 @@ const MainLayout = () => {
           <div className="header-content">
             {/* Logo */}
             <Link to="/" className="logo" aria-label="Go to home page">
-              <img src={logo} alt="Logo" className="h-10 sm:h-12 md:h-14 lg:h-16 w-auto mr-8" />
+              <img src={logo} alt="Logo" className="h-6 w-6 md:h-8 md:w-8 mr-8" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -113,87 +113,90 @@ const MainLayout = () => {
               </ul>
             </nav>
 
-            {/* User Menu */}
-            <div className="user-menu">
-              <button
-                onClick={toggleUserMenu}
-                className="user-menu-button"
-                aria-expanded={isUserMenuOpen}
-                aria-haspopup="true"
-                aria-label="User menu"
-                type="button"
-              >
-                {!isAdminUserDisplay && (
-                  <div className="user-avatar">
-                    <span>
-                      {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
-                    </span>
+            {/* Right controls (user menu + mobile toggle) aligned right and close together */}
+            <div className="ml-auto flex items-center gap-8">
+              {/* User Menu */}
+              <div className="user-menu">
+                <button
+                  onClick={toggleUserMenu}
+                  className="user-menu-button"
+                  aria-expanded={isUserMenuOpen}
+                  aria-haspopup="true"
+                  aria-label="User menu"
+                  type="button"
+                >
+                  {!isAdminUserDisplay && (
+                    <div className="user-avatar">
+                      <span>
+                        {currentUser?.name?.charAt(0).toUpperCase() || 'U'}
+                      </span>
+                    </div>
+                  )}
+                  <span className="hidden md:block text-sm font-medium text-gray-700">
+                    {currentUser?.name || 'User'}
+                    {(isAdminUserDisplay) && <span className="ml-1 text-xs text-pink-600">(Admin)</span>}
+                  </span>
+                  <Icon 
+                    name="chevron-down" 
+                    style="solid" 
+                    size="sm" 
+                    className={`transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`}
+                    aria-hidden="true"
+                  />
+                </button>
+
+                {/* User Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="user-dropdown">
+                    <div className="user-info">
+                      <p className="user-name">{currentUser?.name}</p>
+                      <p className="user-email">{currentUser?.email}</p>
+                    </div>
+                    <Link
+                      to="/profile"
+                      className="user-menu-item"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <Icon name="user" style="solid" size="sm" />
+                      Profile
+                    </Link>
+                    <Link
+                      to="/profile"
+                      className="user-menu-item"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      <Icon name="cog" style="solid" size="sm" />
+                      Settings
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="user-menu-item danger"
+                      type="button"
+                    >
+                      <Icon name="sign-out-alt" style="solid" size="sm" />
+                      Sign Out
+                    </button>
                   </div>
                 )}
-                <span className="hidden md:block text-sm font-medium text-gray-700">
-                  {currentUser?.name || 'User'}
-                  {(isAdminUserDisplay) && <span className="ml-1 text-xs text-pink-600">(Admin)</span>}
-                </span>
+              </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                className="nav-mobile-toggle"
+                onClick={toggleMobileMenu}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
+                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                type="button"
+              >
                 <Icon 
-                  name="chevron-down" 
+                  name={isMobileMenuOpen ? 'times' : 'bars'} 
                   style="solid" 
-                  size="sm" 
-                  className={`transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`}
+                  size="md" 
                   aria-hidden="true"
                 />
               </button>
-
-              {/* User Dropdown Menu */}
-              {isUserMenuOpen && (
-                <div className="user-dropdown">
-                  <div className="user-info">
-                    <p className="user-name">{currentUser?.name}</p>
-                    <p className="user-email">{currentUser?.email}</p>
-                  </div>
-                  <Link
-                    to="/profile"
-                    className="user-menu-item"
-                    onClick={() => setIsUserMenuOpen(false)}
-                  >
-                    <Icon name="user" style="solid" size="sm" />
-                    Profile
-                  </Link>
-                  <Link
-                    to="/profile"
-                    className="user-menu-item"
-                    onClick={() => setIsUserMenuOpen(false)}
-                  >
-                    <Icon name="cog" style="solid" size="sm" />
-                    Settings
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    className="user-menu-item danger"
-                    type="button"
-                  >
-                    <Icon name="sign-out-alt" style="solid" size="sm" />
-                    Sign Out
-                  </button>
-                </div>
-              )}
             </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              className="nav-mobile-toggle"
-              onClick={toggleMobileMenu}
-              aria-expanded={isMobileMenuOpen}
-              aria-controls="mobile-menu"
-              aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
-              type="button"
-            >
-              <Icon 
-                name={isMobileMenuOpen ? 'times' : 'bars'} 
-                style="solid" 
-                size="md" 
-                aria-hidden="true"
-              />
-            </button>
           </div>
 
           {/* Mobile Navigation */}
