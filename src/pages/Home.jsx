@@ -1,123 +1,139 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Section from '../components/Section';
-import Card from '../components/Card';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
 
 const Home = () => {
-  // Mock data for active event
-  const activeEvent = {
-    id: 'abc123',
-    title: 'Friday Night Dinner',
-    date: '2024-01-20',
-    time: '19:00',
-    participants: 4
+  const [activeEvent, setActiveEvent] = useState(null);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load active event on component mount
+    const event = eventService.getActiveEvent();
+    setActiveEvent(event);
+  }, []);
+
+  const handleCancelEvent = async () => {
+    if (!activeEvent) return;
+    
+    if (window.confirm('Are you sure you want to cancel this event? It will be marked as cancelled.')) {
+      setIsCancelling(true);
+      try {
+        eventService.cancelEvent(activeEvent.id);
+        setActiveEvent(null);
+        alert('Event cancelled successfully!');
+      } catch (error) {
+        console.error('Error cancelling event:', error);
+        alert('Error cancelling event. Please try again.');
+      } finally {
+        setIsCancelling(false);
+      }
+    }
   };
 
   return (
-    <Section>
-      <div className="text-center mb-64">
-        <h1 className="text-heading-1 text-content-default mb-16">
-          Anti-Flake
-        </h1>
-        <p className="text-body-lg text-content-subtle">
-          Never get flaked on again! Create events and let fate decide the punishment.
-        </p>
-      </div>
+    <div className="section">
+      <div className="section-container">
+        <div className="section-header">
+          <h1 className="section-title">Be there or be square</h1>
+          <p className="section-subtitle">
+            Never get flaked on again! Create events and let fate decide the punishment for flakes.
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-32">
-        {/* Create Event Card */}
-        <Card className="hover:shadow-lg transition-shadow duration-200">
-          <Link to="/create" className="block">
-            <div className="text-center">
-              <div className="w-64 h-64 bg-background-brand-brand-primary rounded-full flex items-center justify-center mx-auto mb-24">
-                <Icon name="plus" style="solid" size="xl" className="text-content-knockout" />
-              </div>
-              <h3 className="text-heading-4 text-content-default mb-16">
-                Create Event
-              </h3>
-              <p className="text-body-md text-content-subtle mb-24">
-                Set up a new event and choose how to decide who gets punished.
-              </p>
-              <div className="inline-flex items-center text-background-brand-brand-primary font-medium">
-                Get Started
-                <Icon name="arrow-right" style="solid" size="sm" className="ml-8" />
-              </div>
-            </div>
-          </Link>
-        </Card>
-
-        {/* View/Join Event Card */}
-        <Card className="hover:shadow-lg transition-shadow duration-200">
-          {activeEvent ? (
-            <Link to={`/event/${activeEvent.id}`} className="block">
-              <div className="text-center">
-                <div className="w-64 h-64 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-24">
-                  <Icon name="calendar-check" style="solid" size="xl" className="text-content-knockout" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-32">
+          {/* Create Event Card */}
+          <div className="card">
+            <Link to="/create" className="card-link">
+              <div className="card-content">
+                <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
+                  <Icon name="plus" style="solid" size="xl" />
                 </div>
-                <h3 className="text-heading-4 text-content-default mb-16">
-                  Active Event
-                </h3>
-                <p className="text-body-md text-content-subtle mb-16">
-                  {activeEvent.title}
+                <h3 className="card-title">Create Event</h3>
+                <p className="card-description">
+                  Set up a new event and choose how to decide who gets punished for flaking.
                 </p>
-                <div className="flex items-center justify-center space-x-16 text-body-sm text-content-subtle mb-24">
-                  <span className="flex items-center">
-                    <Icon name="calendar" style="solid" size="sm" className="mr-4" />
-                    {new Date(activeEvent.date).toLocaleDateString()}
-                  </span>
-                  <span className="flex items-center">
-                    <Icon name="users" style="solid" size="sm" className="mr-4" />
-                    {activeEvent.participants} participants
-                  </span>
-                </div>
-                <div className="inline-flex items-center text-green-600 font-medium">
-                  Join Event
-                  <Icon name="arrow-right" style="solid" size="sm" className="ml-8" />
+                <div className="card-action">
+                  Get Started
+                  <Icon name="arrow-right" style="solid" size="sm" className="card-action-icon" />
                 </div>
               </div>
             </Link>
-          ) : (
-            <div className="text-center">
-              <div className="w-64 h-64 bg-background-subtle rounded-full flex items-center justify-center mx-auto mb-24">
-                <Icon name="calendar-times" style="solid" size="xl" className="text-content-subtle" />
-              </div>
-              <h3 className="text-heading-4 text-content-default mb-16">
-                No Active Event
-              </h3>
-              <p className="text-body-md text-content-subtle mb-24">
-                Create an event or join one with an invite link.
-              </p>
-              <div className="inline-flex items-center text-content-subtle font-medium">
-                Create One
-                <Icon name="arrow-right" style="solid" size="sm" className="ml-8" />
-              </div>
-            </div>
-          )}
-        </Card>
+          </div>
 
-        {/* Past Events Card */}
-        <Card className="hover:shadow-lg transition-shadow duration-200">
-          <Link to="/past" className="block">
-            <div className="text-center">
-              <div className="w-64 h-64 bg-background-brand-brand-primary rounded-full flex items-center justify-center mx-auto mb-24">
-                <Icon name="history" style="solid" size="xl" className="text-content-knockout" />
+          {/* View/Join Event Card */}
+          <div className="card">
+            {activeEvent ? (
+              <div>
+                <div className="card-content">
+                  <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
+                    <Icon name="calendar-check" style="solid" size="xl" />
+                  </div>
+                  <h3 className="card-title">Active Event</h3>
+                  <p className="card-description">{activeEvent.title}</p>
+                  <div className="flex items-center justify-center space-x-16 mb-24">
+                    <span className="flex items-center text-sm text-subtle">
+                      <Icon name="calendar" style="solid" size="sm" className="mr-4" />
+                      {new Date(activeEvent.date).toLocaleDateString()}
+                    </span>
+                    <span className="flex items-center text-sm text-subtle">
+                      <Icon name="users" style="solid" size="sm" className="mr-4" />
+                      {activeEvent.participants.length} participants
+                    </span>
+                  </div>
+                  <div className="flex justify-center gap-16">
+                    <Link to={`/event/${activeEvent.id}`} className="btn btn-primary btn-sm">
+                      View Event
+                    </Link>
+                    <button 
+                      onClick={handleCancelEvent}
+                      disabled={isCancelling}
+                      className="btn btn-secondary btn-sm"
+                    >
+                      {isCancelling ? 'Cancelling...' : 'Cancel Event'}
+                    </button>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-heading-4 text-content-default mb-16">
-                Past Events
-              </h3>
-              <p className="text-body-md text-content-subtle mb-24">
-                See who got punished and track the flake count over time.
-              </p>
-              <div className="inline-flex items-center text-background-brand-brand-primary font-medium">
-                View History
-                <Icon name="arrow-right" style="solid" size="sm" className="ml-8" />
+            ) : (
+              <div className="card-content">
+                <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
+                  <Icon name="calendar-times" style="solid" size="xl" />
+                </div>
+                <h3 className="card-title">No Active Event</h3>
+                <p className="card-description">
+                  Create an event or join one with an invite link.
+                </p>
+                <div className="card-action">
+                  Create One
+                  <Icon name="arrow-right" style="solid" size="sm" className="card-action-icon" />
+                </div>
               </div>
-            </div>
-          </Link>
-        </Card>
+            )}
+          </div>
+
+          {/* Past Events Card */}
+          <div className="card">
+            <Link to="/past" className="card-link">
+              <div className="card-content">
+                <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
+                  <Icon name="history" style="solid" size="xl" />
+                </div>
+                <h3 className="card-title">Past Events</h3>
+                <p className="card-description">
+                  See who flaked and what happened to them.
+                </p>
+                <div className="card-action">
+                  View History
+                  <Icon name="arrow-right" style="solid" size="sm" className="card-action-icon" />
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
       </div>
-    </Section>
+    </div>
   );
 };
 

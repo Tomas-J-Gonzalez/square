@@ -1,221 +1,285 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import Section from '../components/Section';
-import Card from '../components/Card';
+import React, { useState, useEffect } from 'react';
+import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
 
 const PastEvents = () => {
-  const [filter, setFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('all');
+  const [pastEvents, setPastEvents] = useState([]);
 
-  // Mock data for past events
-  const pastEvents = [
-    {
-      id: 'abc123',
-      title: 'Friday Night Dinner',
-      date: '2024-01-15',
-      time: '19:00',
-      location: 'Joe\'s Pizza',
-      decisionMode: 'vote',
-      punishment: 'Buy Coffee',
-      winner: 'Sarah',
-      loser: 'Mike',
-      flakeCount: 2
-    },
-    {
-      id: 'def456',
-      title: 'Movie Night',
-      date: '2024-01-10',
-      time: '20:00',
-      location: 'Cinema Center',
-      decisionMode: 'chance',
-      punishment: 'Clean House',
-      winner: 'Alex',
-      loser: 'Emma',
-      flakeCount: 1
-    },
-    {
-      id: 'ghi789',
-      title: 'Board Game Night',
-      date: '2024-01-05',
-      time: '18:00',
-      location: 'Tom\'s House',
-      decisionMode: 'game',
-      punishment: 'Cook Dinner',
-      winner: 'David',
-      loser: 'Lisa',
-      flakeCount: 3
-    }
-  ];
+  useEffect(() => {
+    // Load past events from event service
+    const events = eventService.getPastEvents();
+    setPastEvents(events);
+  }, []);
 
   const getDecisionModeIcon = (mode) => {
     switch (mode) {
       case 'vote': return 'vote-yea';
       case 'chance': return 'dice';
       case 'game': return 'gamepad';
+      case 'none': return 'user';
       default: return 'question';
     }
   };
 
-  const getDecisionModeColor = (mode) => {
+  const getDecisionModeLabel = (mode) => {
     switch (mode) {
-      case 'vote': return 'text-blue-500';
-      case 'chance': return 'text-purple-500';
-      case 'game': return 'text-green-500';
-      default: return 'text-gray-500';
+      case 'vote': return 'Group Vote';
+      case 'chance': return 'Random Chance';
+      case 'game': return 'Mini Game';
+      case 'none': return 'No Group Decision';
+      default: return 'Unknown';
     }
   };
 
-  const filteredEvents = filter === 'all' 
-    ? pastEvents 
-    : pastEvents.filter(event => event.decisionMode === filter);
+  const getEventStatus = (event) => {
+    if (event.status === 'cancelled') {
+      return { text: 'Cancelled', icon: 'times-circle', color: 'text-red-500', bgColor: 'bg-red-50' };
+    }
+    if (event.flakes && event.flakes.length > 0) {
+      return { 
+        text: `${event.flakes.length} flake${event.flakes.length > 1 ? 's' : ''}`, 
+        icon: 'user-times', 
+        color: 'text-red-500',
+        bgColor: 'bg-red-50'
+      };
+    }
+    return { 
+      text: 'No flakes!', 
+      icon: 'user-check', 
+      color: 'text-green-500',
+      bgColor: 'bg-green-50'
+    };
+  };
+
+  const getFilteredEvents = () => {
+    switch (activeTab) {
+      case 'cancelled':
+        return pastEvents.filter(event => event.status === 'cancelled');
+      case 'flakes':
+        return pastEvents.filter(event => event.flakes && event.flakes.length > 0);
+      case 'no-flakes':
+        return pastEvents.filter(event => event.status !== 'cancelled' && (!event.flakes || event.flakes.length === 0));
+      default:
+        return pastEvents;
+    }
+  };
+
+  const tabs = [
+    {
+      id: 'all',
+      label: 'All Past Events',
+      icon: 'calendar-check',
+      count: pastEvents.length
+    },
+    {
+      id: 'cancelled',
+      label: 'Events Cancelled',
+      icon: 'times-circle',
+      count: pastEvents.filter(event => event.status === 'cancelled').length
+    },
+    {
+      id: 'flakes',
+      label: 'Events with Flakes',
+      icon: 'user-times',
+      count: pastEvents.filter(event => event.flakes && event.flakes.length > 0).length
+    },
+    {
+      id: 'no-flakes',
+      label: 'Events with No Flakes',
+      icon: 'user-check',
+      count: pastEvents.filter(event => event.status !== 'cancelled' && (!event.flakes || event.flakes.length === 0)).length
+    }
+  ];
+
+  const filteredEvents = getFilteredEvents();
 
   return (
-    <Section>
-      <div className="text-center mb-64">
-        <h1 className="text-heading-1 text-content-default mb-16">
-          Past Events
-        </h1>
-        <p className="text-body-lg text-content-subtle">
-          See who got punished and track the flake count!
-        </p>
-      </div>
-
-      {/* Filter Controls */}
-      <div className="flex justify-center mb-48">
-        <div className="flex space-x-8 bg-background-surface rounded-full p-8">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-16 py-8 rounded-full text-body-sm font-medium transition-colors duration-200 ${
-              filter === 'all'
-                ? 'bg-background-brand-brand-primary text-content-knockout'
-                : 'text-content-subtle hover:text-content-default'
-            }`}
-          >
-            All Events
-          </button>
-          <button
-            onClick={() => setFilter('vote')}
-            className={`px-16 py-8 rounded-full text-body-sm font-medium transition-colors duration-200 ${
-              filter === 'vote'
-                ? 'bg-background-brand-brand-primary text-content-knockout'
-                : 'text-content-subtle hover:text-content-default'
-            }`}
-          >
-            Vote
-          </button>
-          <button
-            onClick={() => setFilter('chance')}
-            className={`px-16 py-8 rounded-full text-body-sm font-medium transition-colors duration-200 ${
-              filter === 'chance'
-                ? 'bg-background-brand-brand-primary text-content-knockout'
-                : 'text-content-subtle hover:text-content-default'
-            }`}
-          >
-            Chance
-          </button>
-          <button
-            onClick={() => setFilter('game')}
-            className={`px-16 py-8 rounded-full text-body-sm font-medium transition-colors duration-200 ${
-              filter === 'game'
-                ? 'bg-background-brand-brand-primary text-content-knockout'
-                : 'text-content-subtle hover:text-content-default'
-            }`}
-          >
-            Game
-          </button>
+    <div className="section">
+      <div className="section-container">
+        <div className="section-header">
+          <h1 className="section-title">Past Events</h1>
+          <p className="section-subtitle">
+            See who flaked and what happened to them
+          </p>
         </div>
-      </div>
 
-      {/* Events List */}
-      <div className="space-y-24">
-        {filteredEvents.map(event => (
-          <Card key={event.id} className="p-24">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              {/* Event Info */}
-              <div className="flex-1">
-                <div className="flex items-center mb-16">
-                  <Icon 
-                    name={getDecisionModeIcon(event.decisionMode)} 
-                    style="solid" 
-                    size="sm" 
-                    className={`mr-12 ${getDecisionModeColor(event.decisionMode)}`} 
-                  />
-                  <h3 className="text-heading-4 text-content-default">
-                    {event.title}
-                  </h3>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
-                  <div className="flex items-center">
-                    <Icon name="calendar" style="solid" size="sm" className="text-content-subtle mr-8" />
-                    <span className="text-body-sm text-content-subtle">
-                      {new Date(event.date).toLocaleDateString()} at {event.time}
+        {/* Enhanced Tab Design */}
+        <div className="mb-48">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 overflow-x-auto">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-8 py-16 px-24 border-b-2 font-medium text-sm whitespace-nowrap transition-colors ${
+                    activeTab === tab.id
+                      ? 'border-pink-500 text-pink-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon name={tab.icon} style="solid" size="sm" />
+                  <span>{tab.label}</span>
+                  <span className={`px-8 py-4 rounded-full text-xs font-medium ${
+                    activeTab === tab.id
+                      ? 'bg-pink-100 text-pink-600'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {tab.count}
+                  </span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {/* Events Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-32">
+          {filteredEvents.map((event) => {
+            const status = getEventStatus(event);
+            return (
+              <div key={event.id} className="card hover:shadow-lg transition-shadow duration-200">
+                <div className="space-y-24">
+                  {/* Event Header */}
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <h3 className="card-title mb-8">
+                        {event.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        {new Date(event.dateTime || event.date).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center space-x-8">
+                      <Icon name="users" style="solid" size="sm" className="text-gray-500" />
+                      <span className="text-sm text-gray-600">
+                        {event.participants.length}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Event Status */}
+                  <div className={`flex items-center justify-between p-16 rounded-md ${status.bgColor}`}>
+                    <div className="flex items-center space-x-8">
+                      <Icon 
+                        name={status.icon} 
+                        style="solid" 
+                        size="sm" 
+                        className={status.color} 
+                      />
+                      <span className="text-sm font-medium text-gray-900">
+                        {status.text}
+                      </span>
+                    </div>
+                    {event.status === 'cancelled' && (
+                      <div className="text-sm text-red-600 font-medium">
+                        Cancelled
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Decision Method */}
+                  <div className="flex items-center space-x-12">
+                    <Icon 
+                      name={getDecisionModeIcon(event.decisionMode)} 
+                      style="solid" 
+                      size="sm" 
+                      className="text-pink-500" 
+                    />
+                    <span className="text-sm text-gray-600">
+                      {getDecisionModeLabel(event.decisionMode)}
                     </span>
                   </div>
-                  {event.location && (
-                    <div className="flex items-center">
-                      <Icon name="map-marker-alt" style="solid" size="sm" className="text-content-subtle mr-8" />
-                      <span className="text-body-sm text-content-subtle">{event.location}</span>
+
+                  {/* Event Details */}
+                  {event.status !== 'cancelled' && (
+                    <div className="space-y-16">
+                      {event.flakes && event.flakes.length > 0 && (
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-8">
+                            Flakes:
+                          </h4>
+                          <div className="flex flex-wrap gap-8">
+                            {event.flakes.map((flake, index) => (
+                              <span
+                                key={index}
+                                className="px-12 py-4 bg-red-100 text-red-800 text-xs rounded-full font-medium"
+                              >
+                                {flake}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-900 mb-8">
+                          Punishment:
+                        </h4>
+                        <p className="text-sm text-gray-600">
+                          {event.punishment}
+                        </p>
+                      </div>
+
+                      {event.winner && (
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-8">
+                            Winner (got to decide):
+                          </h4>
+                          <span className="px-12 py-4 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                            {event.winner.name}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
-                  <div className="flex items-center">
-                    <Icon name="exclamation-triangle" style="solid" size="sm" className="text-content-subtle mr-8" />
-                    <span className="text-body-sm text-content-subtle">
-                      {event.flakeCount} flake{event.flakeCount !== 1 ? 's' : ''}
-                    </span>
-                  </div>
-                </div>
 
-                {/* Result */}
-                <div className="bg-background-subtle rounded-md p-16">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <span className="text-body-sm text-content-subtle">Winner: </span>
-                      <span className="text-body-sm font-medium text-content-default">{event.winner}</span>
+                  {/* No Flakes Message */}
+                  {event.status !== 'cancelled' && (!event.flakes || event.flakes.length === 0) && (
+                    <div className="text-center py-24">
+                      <Icon name="trophy" style="solid" size="lg" className="text-yellow-500 mx-auto mb-16" />
+                      <p className="text-sm text-gray-600">
+                        Everyone showed up! 🎉
+                      </p>
                     </div>
-                    <div>
-                      <span className="text-body-sm text-content-subtle">Loser: </span>
-                      <span className="text-body-sm font-medium text-content-default">{event.loser}</span>
+                  )}
+
+                  {/* Cancelled Message */}
+                  {event.status === 'cancelled' && (
+                    <div className="text-center py-24">
+                      <Icon name="times-circle" style="solid" size="lg" className="text-red-500 mx-auto mb-16" />
+                      <p className="text-sm text-gray-600">
+                        Event was cancelled
+                      </p>
                     </div>
-                    <div>
-                      <span className="text-body-sm text-content-subtle">Punishment: </span>
-                      <span className="text-body-sm font-medium text-content-default">{event.punishment}</span>
-                    </div>
-                  </div>
+                  )}
                 </div>
               </div>
+            );
+          })}
+        </div>
 
-              {/* Action Button */}
-              <div className="mt-16 md:mt-0 md:ml-24">
-                <Link
-                  to={`/event/${event.id}`}
-                  className="inline-flex items-center px-16 py-8 bg-background-brand-brand-primary text-content-knockout rounded-full text-body-sm font-medium hover:bg-background-brand-brand-primary-hover transition-colors duration-200"
-                >
-                  <Icon name="eye" style="solid" size="sm" className="mr-8" />
-                  View Details
-                </Link>
-              </div>
-            </div>
-          </Card>
-        ))}
+        {/* Empty State */}
+        {filteredEvents.length === 0 && (
+          <div className="text-center py-64">
+            <Icon name="calendar-times" style="solid" size="xl" className="text-gray-400 mx-auto mb-24" />
+            <h3 className="text-xl font-semibold text-gray-900 mb-16">
+              No events found
+            </h3>
+            <p className="text-gray-600">
+              {activeTab === 'all' 
+                ? "You haven't completed any events yet."
+                : activeTab === 'cancelled'
+                ? "No cancelled events found."
+                : activeTab === 'flakes'
+                ? "No events with flakes found."
+                : "No events without flakes found."
+              }
+            </p>
+          </div>
+        )}
       </div>
-
-      {/* Empty State */}
-      {filteredEvents.length === 0 && (
-        <Card className="text-center p-64">
-          <Icon name="calendar-times" style="solid" size="2xl" className="text-content-subtle mb-24" />
-          <h3 className="text-heading-4 text-content-default mb-16">
-            No {filter === 'all' ? '' : filter} events found
-          </h3>
-          <p className="text-body-md text-content-subtle">
-            {filter === 'all' 
-              ? 'No past events yet. Create your first event to get started!'
-              : `No past events with ${filter} decision mode. Try creating one!`
-            }
-          </p>
-        </Card>
-      )}
-    </Section>
+    </div>
   );
 };
 

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Section from '../components/Section';
-import Card from '../components/Card';
-import Button from '../components/Button';
+import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
 
 const CreateEvent = () => {
@@ -12,22 +10,51 @@ const CreateEvent = () => {
     date: '',
     time: '',
     location: '',
-    decisionMode: 'vote',
-    punishment: 'buy-coffee'
+    decisionMode: '',
+    punishment: ''
   });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
-  const punishments = [
-    { id: 'buy-coffee', name: 'Buy Coffee', description: 'Buy everyone coffee' },
-    { id: 'clean-house', name: 'Clean House', description: 'Clean the host\'s house' },
-    { id: 'cook-dinner', name: 'Cook Dinner', description: 'Cook dinner for everyone' },
-    { id: 'pay-bill', name: 'Pay Bill', description: 'Pay the restaurant bill' },
-    { id: 'wear-costume', name: 'Wear Costume', description: 'Wear a silly costume next time' },
-    { id: 'dance-performance', name: 'Dance Performance', description: 'Perform a dance for everyone' }
+  const decisionModes = [
+    {
+      id: 'vote',
+      title: 'Vote',
+      description: 'Everyone votes on who flaked',
+      icon: 'vote-yea'
+    },
+    {
+      id: 'chance',
+      title: 'Chance',
+      description: 'Random selection decides',
+      icon: 'dice'
+    },
+    {
+      id: 'game',
+      title: 'Game',
+      description: 'Play a game to decide',
+      icon: 'gamepad'
+    },
+    {
+      id: 'none',
+      title: 'No Group Decision',
+      description: 'You decide yourself',
+      icon: 'user'
+    }
   ];
 
-  const handleChange = (e) => {
+  const punishments = [
+    'Buy everyone coffee',
+    'Pay for the next event',
+    'Do the dishes for a week',
+    'Write an apology letter',
+    'Wear a silly hat for a day',
+    'Sing karaoke in public',
+    'Clean everyone\'s car',
+    'Make dinner for everyone'
+  ];
+
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -37,190 +64,175 @@ const CreateEvent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    
+    // Validate required fields
+    if (!formData.title || !formData.date || !formData.time || !formData.decisionMode) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Generate a mock event ID and redirect
-    const eventId = Math.random().toString(36).substr(2, 9);
-    navigate(`/event/${eventId}`);
+    try {
+      const eventData = {
+        ...formData,
+        dateTime: `${formData.date}T${formData.time}`,
+        participants: [],
+        status: 'active',
+        createdAt: new Date().toISOString()
+      };
+      
+      const newEvent = eventService.createNewEvent(eventData);
+      navigate(`/event/${newEvent.id}`);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <Section>
-      <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-64">
-          <h1 className="text-heading-1 text-content-default mb-16">
-            Create New Event
-          </h1>
-          <p className="text-body-lg text-content-subtle">
-            Set up an event and let fate decide who gets the punishment!
-          </p>
-        </div>
+    <div className="section">
+      <div className="section-container">
+        <div className="form-container">
+          <div className="section-header">
+            <h1 className="section-title">Create New Event</h1>
+            <p className="section-subtitle">
+              Set up your event and choose how to handle flakes
+            </p>
+          </div>
 
-        <Card className="p-32">
-          <form onSubmit={handleSubmit} className="space-y-32">
-            {/* Event Title */}
-            <div>
-              <label htmlFor="title" className="block text-body-md font-medium text-content-default mb-8">
-                Event Title *
-              </label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                required
-                className="w-full px-16 py-8 border border-border-default rounded-md bg-background-default text-content-default placeholder-content-subtle focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent transition-colors duration-200"
-                placeholder="e.g., Friday Night Dinner"
-              />
-            </div>
-
-            {/* Date and Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-              <div>
-                <label htmlFor="date" className="block text-body-md font-medium text-content-default mb-8">
-                  Date *
-                </label>
-                <input
-                  type="date"
-                  id="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-16 py-8 border border-border-default rounded-md bg-background-default text-content-default focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent transition-colors duration-200"
-                />
+          <form onSubmit={handleSubmit}>
+            {/* Event Details */}
+            <div className="form-section">
+              <h2 className="form-section-title">Event Details</h2>
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="title" className="form-label">Event Title *</label>
+                  <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="Friday night dinner"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="location" className="form-label">Location</label>
+                  <input
+                    type="text"
+                    id="location"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="Joe's Restaurant"
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="time" className="block text-body-md font-medium text-content-default mb-8">
-                  Time *
-                </label>
-                <input
-                  type="time"
-                  id="time"
-                  name="time"
-                  value={formData.time}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-16 py-8 border border-border-default rounded-md bg-background-default text-content-default focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent transition-colors duration-200"
-                />
+              <div className="form-grid">
+                <div className="form-group">
+                  <label htmlFor="date" className="form-label">Date *</label>
+                  <input
+                    type="date"
+                    id="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="time" className="form-label">Time *</label>
+                  <input
+                    type="time"
+                    id="time"
+                    name="time"
+                    value={formData.time}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    required
+                  />
+                </div>
               </div>
-            </div>
-
-            {/* Location */}
-            <div>
-              <label htmlFor="location" className="block text-body-md font-medium text-content-default mb-8">
-                Location (Optional)
-              </label>
-              <input
-                type="text"
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleChange}
-                className="w-full px-16 py-8 border border-border-default rounded-md bg-background-default text-content-default placeholder-content-subtle focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent transition-colors duration-200"
-                placeholder="e.g., Joe's Pizza, 123 Main St"
-              />
             </div>
 
             {/* Decision Mode */}
-            <div>
-              <label className="block text-body-md font-medium text-content-default mb-16">
-                How to Decide the Flake?
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-16">
-                <label className="flex items-center p-16 border border-border-default rounded-md cursor-pointer hover:border-border-strong transition-colors duration-200">
-                  <input
-                    type="radio"
-                    name="decisionMode"
-                    value="vote"
-                    checked={formData.decisionMode === 'vote'}
-                    onChange={handleChange}
-                    className="mr-12"
-                  />
-                  <div className="flex items-center">
-                    <Icon name="vote-yea" style="solid" size="sm" className="text-background-brand-brand-primary mr-8" />
-                    <span className="text-body-md">Vote</span>
-                  </div>
-                </label>
-                <label className="flex items-center p-16 border border-border-default rounded-md cursor-pointer hover:border-border-strong transition-colors duration-200">
-                  <input
-                    type="radio"
-                    name="decisionMode"
-                    value="chance"
-                    checked={formData.decisionMode === 'chance'}
-                    onChange={handleChange}
-                    className="mr-12"
-                  />
-                  <div className="flex items-center">
-                    <Icon name="dice" style="solid" size="sm" className="text-background-brand-brand-primary mr-8" />
-                    <span className="text-body-md">Chance</span>
-                  </div>
-                </label>
-                <label className="flex items-center p-16 border border-border-default rounded-md cursor-pointer hover:border-border-strong transition-colors duration-200">
-                  <input
-                    type="radio"
-                    name="decisionMode"
-                    value="game"
-                    checked={formData.decisionMode === 'game'}
-                    onChange={handleChange}
-                    className="mr-12"
-                  />
-                  <div className="flex items-center">
-                    <Icon name="gamepad" style="solid" size="sm" className="text-background-brand-brand-primary mr-8" />
-                    <span className="text-body-md">Game</span>
-                  </div>
-                </label>
+            <div className="form-section">
+              <h2 className="form-section-title">How to Decide on Event</h2>
+              <p className="form-section-description">
+                Choose how the group will decide who gets punished for flaking
+              </p>
+              <div className="decision-grid">
+                {decisionModes.map((mode) => (
+                  <label key={mode.id} className="decision-option">
+                    <input
+                      type="radio"
+                      name="decisionMode"
+                      value={mode.id}
+                      checked={formData.decisionMode === mode.id}
+                      onChange={handleInputChange}
+                    />
+                    <div className="decision-content">
+                      <div className="decision-icon">
+                        <Icon name={mode.icon} style="solid" size="lg" />
+                      </div>
+                      <div className="decision-title">{mode.title}</div>
+                      <div className="decision-description">{mode.description}</div>
+                    </div>
+                  </label>
+                ))}
               </div>
             </div>
 
-            {/* Punishment */}
-            <div>
-              <label htmlFor="punishment" className="block text-body-md font-medium text-content-default mb-8">
-                Punishment for the Flake
-              </label>
-              <select
-                id="punishment"
-                name="punishment"
-                value={formData.punishment}
-                onChange={handleChange}
-                className="w-full px-16 py-8 border border-border-default rounded-md bg-background-default text-content-default focus:outline-none focus:ring-2 focus:ring-border-focus focus:border-transparent transition-colors duration-200"
-              >
-                {punishments.map(punishment => (
-                  <option key={punishment.id} value={punishment.id}>
-                    {punishment.name} - {punishment.description}
-                  </option>
+            {/* Punishment Selection */}
+            <div className="form-section">
+              <h2 className="form-section-title">Punishment for Flakes</h2>
+              <p className="form-section-description">
+                Select what happens to the person who flakes
+              </p>
+              <div className="punishment-grid">
+                {punishments.map((punishment, index) => (
+                  <label key={index} className="punishment-option">
+                    <input
+                      type="radio"
+                      name="punishment"
+                      value={punishment}
+                      checked={formData.punishment === punishment}
+                      onChange={handleInputChange}
+                    />
+                    <div className="punishment-text">{punishment}</div>
+                  </label>
                 ))}
-              </select>
+              </div>
             </div>
 
             {/* Submit Button */}
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              disabled={isSubmitting}
-              className="w-full"
-            >
-              {isSubmitting ? (
-                <>
-                  <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
-                  Creating Event...
-                </>
-              ) : (
-                <>
-                  <Icon name="plus" style="solid" size="sm" className="mr-8" />
-                  Create Event
-                </>
+            <div className="form-section">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="btn btn-primary btn-lg w-full"
+              >
+                {isSubmitting ? 'Creating Event...' : 'Create Event'}
+              </button>
+              
+              {/* Error Message - Now at bottom */}
+              {error && (
+                <div className="mt-16 p-16 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-red-600 text-sm">{error}</p>
+                </div>
               )}
-            </Button>
+            </div>
           </form>
-        </Card>
+        </div>
       </div>
-    </Section>
+    </div>
   );
 };
 

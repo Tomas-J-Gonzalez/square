@@ -80,7 +80,7 @@ const Button = ({
     ],
     disabled: [
       'bg-background-surface-disabled',
-      'text-content-disabled',
+      'text-white',
       'border',
       'border-border-utility-deactivated',
       'cursor-not-allowed'
