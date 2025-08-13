@@ -3,8 +3,8 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
-// Use public asset path in /assets (Vite publicDir points to 'assets')
-const logoPath = '/assets/logo.png';
+// Cloud-hosted logo (high-res)
+const logoPath = 'https://res.cloudinary.com/tomasgo/image/upload/v1755124460/square/logo-new_lrgqgm.png';
 import Modal from '../components/Modal';
 
 const MainLayout = () => {
