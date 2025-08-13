@@ -87,8 +87,27 @@ const CreateEvent = () => {
         createdAt: new Date().toISOString()
       };
       
-      const newEvent = eventService.createNewEvent(eventData);
-      navigate(`/event/${newEvent.id}`);
+      // Persist server-side for invite workflows
+      try {
+        const { supabase } = await import('../../lib/supabaseClient');
+        await supabase.from('events').upsert({
+          id: eventData.id || `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          title: eventData.title,
+          date: formData.date,
+          time: formData.time,
+          location: formData.location || null,
+          decision_mode: formData.decisionMode,
+          punishment: eventData.punishment,
+          invited_by: (JSON.parse(localStorage.getItem('be-there-or-be-square-current-user')||'{}').name) || 'Organizer'
+        });
+        const serverId = eventData.id || formData.id || (await supabase.from('events').select('id').eq('title', eventData.title).order('created_at', { ascending: false }).limit(1)).data?.[0]?.id;
+        const newEvent = eventService.createNewEvent({ ...eventData, id: serverId || eventData.id });
+        navigate(`/event/${newEvent.id}`);
+      } catch (_) {
+        // Fallback to local only if supabase not configured
+        const newEvent = eventService.createNewEvent(eventData);
+        navigate(`/event/${newEvent.id}`);
+      }
     } catch (error) {
       setError(error.message);
     } finally {

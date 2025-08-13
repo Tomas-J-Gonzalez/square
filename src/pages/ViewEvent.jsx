@@ -89,6 +89,16 @@ const ViewEvent = () => {
 
     setIsAddingParticipant(true);
     try {
+      // Try server write
+      try {
+        const { supabase } = await import('../../lib/supabaseClient');
+        await supabase.from('event_rsvps').insert({
+          event_id: eventId,
+          name: newParticipant.name.trim(),
+          will_attend: true
+        });
+      } catch (_) {}
+
       const updatedEvent = eventService.addParticipant(eventId, newParticipant);
       setEvent(updatedEvent);
       // Add new participant to attendance status

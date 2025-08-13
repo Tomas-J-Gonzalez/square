@@ -12,6 +12,8 @@ import Profile from './pages/Profile';
 import CreateEvent from './pages/CreateEvent';
 import ViewEvent from './pages/ViewEvent';
 import PastEvents from './pages/PastEvents';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 import Invite from './pages/Invite';
 
 function App() {
@@ -34,6 +36,9 @@ function App() {
               <Route path="past" element={<PastEvents />} />
               <Route path="profile" element={<Profile />} />
             </Route>
+            {/* Public legal pages */}
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
           </Routes>
         </Router>
       </AuthProvider>

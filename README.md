@@ -169,6 +169,56 @@ The app sends beautifully formatted HTML emails with:
 4. Test confirmation flow
 
 ## 🚀 Deployment
+## 📦 Supabase Schema (Server-backed RSVP)
+
+Run these SQL snippets in your Supabase project (SQL editor):
+
+```sql
+-- Events table (minimal fields needed for invites)
+create table if not exists public.events (
+  id text primary key,
+  title text not null,
+  date text not null,
+  time text not null,
+  location text,
+  decision_mode text not null,
+  punishment text not null,
+  invited_by text,
+  created_at timestamptz default now()
+);
+
+-- RSVPs table
+create table if not exists public.event_rsvps (
+  id uuid primary key default gen_random_uuid(),
+  event_id text not null references public.events(id) on delete cascade,
+  name text not null,
+  will_attend boolean not null,
+  created_at timestamptz default now()
+);
+
+-- RLS policies (public read/write for RSVP without account; tighten later as needed)
+alter table public.events enable row level security;
+alter table public.event_rsvps enable row level security;
+
+-- Allow read of events for anyone (to render invite page)
+create policy if not exists "Events are readable" on public.events
+for select using (true);
+
+-- Allow inserting RSVPs for anyone (no auth)
+create policy if not exists "Anyone can RSVP" on public.event_rsvps
+for insert with check (true);
+
+-- Allow reading RSVPs per event (optional; useful for organizer views)
+create policy if not exists "RSVPs readable" on public.event_rsvps
+for select using (true);
+```
+
+Environment variables required:
+
+```
+SUPABASE_URL=...your supabase URL...
+SUPABASE_ANON_KEY=...your supabase anon key...
+```
 
 ### Frontend (Vercel/Netlify)
 ```bash

@@ -57,7 +57,7 @@ const createEvent = (eventData) => {
   }
 
   return {
-    id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: eventData.id || `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     title: eventData.title.trim(),
     date: eventData.date,
     time: eventData.time,

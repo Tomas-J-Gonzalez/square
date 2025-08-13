@@ -270,6 +270,14 @@ const MainLayout = () => {
       <main role="main">
         <Outlet />
       </main>
+      {/* Footer */}
+      <footer className="mt-32 py-16">
+        <div className="text-center text-xs text-gray-400 space-x-12">
+          <Link to="/terms" className="hover:text-gray-600">Terms & Conditions</Link>
+          <Link to="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
+          <span>© {new Date().getFullYear()} Be There or Be Square</span>
+        </div>
+      </footer>
 
       <Modal {...modal} />
     </div>

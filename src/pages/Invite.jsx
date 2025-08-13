@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { eventService } from '../services/eventService';
+import { supabase } from '../../lib/supabaseClient';
 import Icon from '../components/Icon';
 
 const Invite = () => {
@@ -13,19 +14,48 @@ const Invite = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    try {
-      const events = eventService.getEvents();
-      const e = events.find(ev => ev.id === eventId);
-      if (!e) {
-        setError('Event not found');
-      } else {
-        setEvent(e);
+    const load = async () => {
+      try {
+        // Try server first
+        const { data, error } = await supabase
+          .from('events')
+          .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
+          .eq('id', eventId)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
+
+        if (data) {
+          setEvent({
+            id: data.id,
+            title: data.title,
+            date: data.date,
+            time: data.time,
+            location: data.location,
+            decisionMode: data.decision_mode,
+            punishment: data.punishment,
+            dateTime: `${data.date}T${data.time}`,
+            invitedBy: data.invited_by || 'A friend'
+          });
+        } else {
+          // Fallback to local (for dev)
+          const events = eventService.getEvents();
+          const e = events.find(ev => ev.id === eventId);
+          if (!e) {
+            setError('Event not found');
+          } else {
+            setEvent(e);
+          }
+        }
+      } catch (err) {
+        setError('Unable to load event');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Unable to load event');
-    } finally {
-      setLoading(false);
-    }
+    };
+    load();
   }, [eventId]);
 
   const handleChange = (e) => {
@@ -33,7 +63,7 @@ const Invite = () => {
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) {
       setError('Please provide your name');
@@ -41,12 +71,13 @@ const Invite = () => {
     }
     setSubmitting(true);
     try {
-      const message = form.willAttend === 'yes' ? 'Confirmed attendance' : 'Cannot attend';
-      eventService.addParticipant(eventId, {
+      // insert RSVP to server table
+      const { error } = await supabase.from('event_rsvps').insert({
+        event_id: eventId,
         name: form.name.trim(),
-        email: `${form.name.trim().toLowerCase().replace(/\s+/g, '')}@guest.local`,
-        message
+        will_attend: form.willAttend === 'yes'
       });
+      if (error) throw error;
       navigate(`/event/${eventId}`);
     } catch (err) {
       setError(err.message || 'Failed to submit response');
@@ -77,7 +108,8 @@ const Invite = () => {
     <div className="section">
       <div className="section-container max-w-xl mx-auto">
         <div className="card">
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">You're invited!</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">You're invited!</h1>
+          <p className="text-gray-700 mb-8">{event.invitedBy} invited you to…</p>
           <div className="space-y-4 mb-8 text-gray-700">
             <div><span className="font-medium">Event:</span> {event.title}</div>
             <div><span className="font-medium">When:</span> {new Date(event.dateTime || `${event.date}T${event.time}`).toLocaleString()}</div>
