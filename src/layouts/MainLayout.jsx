@@ -78,7 +78,7 @@ const MainLayout = () => {
           <div className="header-content">
             {/* Logo */}
             <Link to="/" className="logo" aria-label="Go to home page">
-              <img src={logoPath} alt="Logo" className="h-6 w-6 md:h-8 md:w-8 mr-8" />
+              <img src={logoPath} alt="Logo" className="h-8 w-8 mr-8" />
             </Link>
 
             {/* Desktop Navigation */}
