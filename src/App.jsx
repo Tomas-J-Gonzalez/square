@@ -26,13 +26,13 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/confirm-email" element={<ConfirmEmail />} />
+            <Route path="/invite/:eventId" element={<Invite />} />
             
             {/* Protected routes */}
             <Route path="/" element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
               <Route index element={<Home />} />
               <Route path="create" element={<CreateEvent />} />
               <Route path="event/:eventId" element={<ViewEvent />} />
-              <Route path="invite/:eventId" element={<Invite />} />
               <Route path="past" element={<PastEvents />} />
               <Route path="profile" element={<Profile />} />
             </Route>
