@@ -28,6 +28,15 @@ export const handler = async (event, context) => {
   }
 
   try {
+    if (!process.env.RESEND_API_KEY) {
+      console.error('Missing RESEND_API_KEY in Netlify environment');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ success: false, error: 'Server misconfiguration: RESEND_API_KEY is not set' })
+      };
+    }
+
     const { email, name, token } = JSON.parse(event.body);
 
     if (!email || !name || !token) {
