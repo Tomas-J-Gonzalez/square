@@ -119,7 +119,7 @@ The app sends beautifully formatted HTML emails with:
 
 ### Event Management
 - **Active Events**: Only one active event at a time
-- **Participant Management**: Add friends with required info
+- **Friend Management**: Add friends with required info
 - **Attendance Tracking**: Mark who attended vs flaked
 - **Event Completion**: Archive completed events
 - **History**: View past events with statistics
@@ -128,7 +128,7 @@ The app sends beautifully formatted HTML emails with:
 - **Event Sharing**: Multiple sharing options
 - **Invitation Links**: Direct event access
 - **Social Media Integration**: Facebook, Instagram, Twitter
-- **Friend Management**: Track participant relationships
+- **Friend Management**: Track friend relationships
 
 ## 🔒 Security Features
 

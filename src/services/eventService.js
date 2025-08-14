@@ -14,7 +14,7 @@ const STORAGE_KEY = 'be-there-or-be-square-events';
  * @property {string} location - Event location (optional)
  * @property {string} decisionMode - How to decide on flakes: 'vote', 'chance', 'game', 'none'
  * @property {string} punishment - Punishment for flakes
- * @property {Array} participants - List of participants
+ * @property {Array} participants - List of friends
  * @property {string} status - Event status: 'active', 'completed', 'cancelled'
  * @property {string} createdAt - Creation timestamp (ISO string)
  * @property {string} updatedAt - Last update timestamp (ISO string)
@@ -24,12 +24,12 @@ const STORAGE_KEY = 'be-there-or-be-square-events';
  */
 
 /**
- * Participant structure
+ * Friend structure
  * @typedef {Object} Participant
- * @property {string} id - Unique participant identifier
- * @property {string} name - Participant name
- * @property {string} email - Participant email
- * @property {string} message - Participant message
+ * @property {string} id - Unique friend identifier
+ * @property {string} name - Friend name
+ * @property {string} email - Friend email
+ * @property {string} message - Friend message
  * @property {string} joinedAt - Join timestamp (ISO string)
  */
 
@@ -214,18 +214,18 @@ const completeEvent = (eventId, result) => {
 };
 
 /**
- * Adds a participant to an event
+ * Adds a friend to an event
  * @param {string} eventId - Event ID
- * @param {Object} participantData - Participant data
+ * @param {Object} participantData - Friend data
  * @returns {Event} Updated event
- * @throws {Error} If event not found or invalid participant data
+ * @throws {Error} If event not found or invalid friend data
  */
 const addParticipant = (eventId, participantData) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
   if (!participantData?.name?.trim()) {
-    throw new Error('Participant name is required');
+    throw new Error('Friend name is required');
   }
   // Email and message are optional to support guest RSVPs and quick adds
 
@@ -237,7 +237,7 @@ const addParticipant = (eventId, participantData) => {
   }
   
   const participant = {
-    id: `participant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: `friend_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: participantData.name.trim(),
     email: (participantData.email || '').trim(),
     message: (participantData.message || '').trim(),
@@ -252,18 +252,18 @@ const addParticipant = (eventId, participantData) => {
 };
 
 /**
- * Removes a participant from an event
+ * Removes a friend from an event
  * @param {string} eventId - Event ID
- * @param {string} participantId - Participant ID
+ * @param {string} participantId - Friend ID
  * @returns {Event} Updated event
- * @throws {Error} If event or participant not found
+ * @throws {Error} If event or friend not found
  */
 const removeParticipant = (eventId, participantId) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
   if (!participantId) {
-    throw new Error('Participant ID is required');
+    throw new Error('Friend ID is required');
   }
 
   const events = getEvents();
@@ -278,7 +278,7 @@ const removeParticipant = (eventId, participantId) => {
   );
   
   if (participantIndex === -1) {
-    throw new Error('Participant not found');
+    throw new Error('Friend not found');
   }
   
   events[eventIndex].participants.splice(participantIndex, 1);

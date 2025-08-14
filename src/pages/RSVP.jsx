@@ -104,7 +104,7 @@ const RSVP = () => {
     e.preventDefault();
     setSubmitting(true);
     try {
-      // Add to local event participants
+      // Add to local event friends
       const participant = {
         name: currentUser.name,
         email: currentUser.email,

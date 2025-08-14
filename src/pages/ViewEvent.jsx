@@ -650,21 +650,21 @@ const ViewEvent = () => {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-32">
-          {/* Attendees Section */}
+          {/* Friends Section */}
           <div className="card">
             <div className="card-header">
               <h2 className="card-title flex items-center">
                 <Icon name="users" style="solid" size="sm" className="mr-8 text-pink-500" aria-hidden="true" />
-                Attendees ({event.participants.length})
+                Friends ({event.participants.length})
               </h2>
             </div>
             
-                        {/* Add Attendee Form - Only show for organizers */}
+                        {/* Add Friend Form - Only show for organizers */}
             {isOrganizer && (
               <div className="mb-32 p-16 bg-gray-50 rounded-md border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-900 mb-16 flex items-center">
                   <Icon name="user-plus" style="solid" size="sm" className="mr-8 text-pink-500" aria-hidden="true" />
-                  Add an attendee manually
+                  Add a friend manually
                 </h3>
                 <form onSubmit={handleAddParticipant}>
                   <div className="space-y-16">
@@ -681,7 +681,7 @@ const ViewEvent = () => {
                         required
                         aria-describedby="name-help"
                       />
-                      <div id="name-help" className="sr-only">Name is required to add an attendee</div>
+                      <div id="name-help" className="sr-only">Name is required to add a friend</div>
                     </div>
                     <div>
                       <label htmlFor="email" className="form-label">Email</label>
@@ -722,7 +722,7 @@ const ViewEvent = () => {
                           Adding...
                         </>
                       ) : (
-                        'Add Attendee'
+                         'Add Friend'
                       )}
                     </button>
                   </div>
@@ -730,14 +730,14 @@ const ViewEvent = () => {
               </div>
             )}
 
-            {/* Attendees List */}
+            {/* Friends List */}
             <div className="space-y-16">
               {event.participants.length === 0 ? (
                 <div className="text-center py-24">
                   <Icon name="users" style="solid" size="xl" className="text-gray-400 mx-auto mb-16" aria-hidden="true" />
-                  <p className="text-gray-600">No attendees yet.</p>
+                  <p className="text-gray-600">No friends yet.</p>
                   {isOrganizer && (
-                    <p className="text-sm text-gray-500 mt-8">Add attendees manually or share the invitation link.</p>
+                    <p className="text-sm text-gray-500 mt-8">Add friends manually or share the invitation link.</p>
                   )}
                 </div>
               ) : (
