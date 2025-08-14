@@ -17,7 +17,7 @@ const NotFound = () => {
           </div>
           
           <div className="space-y-16">
-            <Link to="/" className="btn btn-primary btn-lg inline-flex items-center">
+            <Link href="/" className="btn btn-primary btn-lg inline-flex items-center">
               <Icon name="home" style="solid" size="sm" className="mr-8" />
               Go Home
             </Link>
@@ -25,13 +25,13 @@ const NotFound = () => {
             <div className="text-sm text-gray-500">
               <p>Or try one of these pages:</p>
               <div className="flex justify-center space-x-16 mt-8">
-                <Link to="/create" className="text-pink-500 hover:text-pink-700 transition-colors">
+                <Link href="/create" className="text-pink-500 hover:text-pink-700 transition-colors">
                   Create Event
                 </Link>
-                <Link to="/past" className="text-pink-500 hover:text-pink-700 transition-colors">
+                <Link href="/past" className="text-pink-500 hover:text-pink-700 transition-colors">
                   Past Events
                 </Link>
-                <Link to="/profile" className="text-pink-500 hover:text-pink-700 transition-colors">
+                <Link href="/profile" className="text-pink-500 hover:text-pink-700 transition-colors">
                   Profile
                 </Link>
               </div>

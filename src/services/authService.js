@@ -152,6 +152,9 @@ const generateConfirmationToken = () => {
 const sendConfirmationEmail = async (email, token, name, userId) => {
   try {
     const result = await sendEmail({ email, name, token });
+    if (result?.confirmationUrl) {
+      console.log('Email confirmation URL:', result.confirmationUrl);
+    }
 
     if (!result.success) {
       console.error('Failed to send email:', result.error);

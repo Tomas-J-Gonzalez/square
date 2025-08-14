@@ -4,9 +4,8 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
-// Cloud-hosted logo (high-res)
-      const logoPath = 'https://res.cloudinary.com/tomasgo/image/upload/v1755132928/square/logo_j9ojkk.png';
 import Modal from '../components/Modal';
+const logoPath = '/assets/logo.svg';
 
 const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

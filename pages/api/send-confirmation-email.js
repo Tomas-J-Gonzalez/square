@@ -12,8 +12,15 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Missing required fields: email, name, token' });
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || `https://${process.env.VERCEL_URL}` || 'http://localhost:3000';
-    const confirmationUrl = `${baseUrl}/confirm-email?token=${token}`;
+    const rawBase = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'localhost:3000';
+    const normalizedBase = (() => {
+      let u = rawBase.trim();
+      if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
+      // remove trailing slash
+      return u.replace(/\/$/, '');
+    })();
+    const confirmationUrl = `${normalizedBase}/confirm-email?token=${encodeURIComponent(token)}`;
+    const logoUrl = `${normalizedBase}/assets/logo.svg`;
 
     const { data, error } = await resend.emails.send({
       from: 'Be There or Be Square <onboarding@resend.dev>',
@@ -21,7 +28,9 @@ export default async function handler(req, res) {
       subject: 'Confirm your Be There or Be Square account',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background-color: #ec4899; width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px;"></div>
+          <div style="text-align: center; margin-bottom: 20px;">
+            <img src="${logoUrl}" alt="Be There or Be Square" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
+          </div>
           <h1 style="color: #1f2937; text-align: center; margin-bottom: 10px;">Welcome to Be There or Be Square!</h1>
           <p style="color: #6b7280; text-align: center; margin-bottom: 30px;">Hi ${name},</p>
           <p style="color: #374151; line-height: 1.6; margin-bottom: 30px;">
@@ -44,7 +53,7 @@ export default async function handler(req, res) {
     });
 
     if (error) return res.status(500).json({ success: false, error: 'Failed to send confirmation email' });
-    return res.status(200).json({ success: true, message: 'Confirmation email sent successfully', data });
+    return res.status(200).json({ success: true, message: 'Confirmation email sent successfully', data, confirmationUrl });
   } catch (err) {
     return res.status(500).json({ success: false, error: 'Internal server error' });
   }

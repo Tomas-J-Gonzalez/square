@@ -108,7 +108,7 @@ const Home = () => {
                     </span>
                   </div>
                   <div className="flex gap-12">
-                    <Link to={`/event/${activeEvent.id}`} className="btn btn-primary btn-sm">
+                    <Link href={`/event/${activeEvent.id}`} className="btn btn-primary btn-sm">
                       Manage Event
                     </Link>
                     <button 
@@ -125,7 +125,7 @@ const Home = () => {
               <div className="text-center py-24">
                 <Icon name="calendar-times" style="solid" size="xl" className="text-gray-400 mx-auto mb-16" />
                 <p className="text-gray-600 mb-16">You're not organizing any events yet.</p>
-                <Link to="/create" className="btn btn-primary btn-sm">
+                <Link href="/create" className="btn btn-primary btn-sm">
                   Create Your First Event
                 </Link>
               </div>
@@ -164,7 +164,7 @@ const Home = () => {
                       }`}>
                         {participation.status === 'confirmed' ? 'Confirmed' : 'Declined'}
                       </span>
-                      <Link to={`/event/${participation.eventId}`} className="btn btn-secondary btn-sm">
+                      <Link href={`/event/${participation.eventId}`} className="btn btn-secondary btn-sm">
                         View Event
                       </Link>
                     </div>
@@ -185,7 +185,7 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-32">
           {/* Create Event Card */}
           <div className="card">
-            <Link to="/create" className="card-link">
+            <Link href="/create" className="card-link">
               <div className="card-content">
                 <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
                   <Icon name="plus" style="solid" size="xl" />
@@ -204,7 +204,7 @@ const Home = () => {
 
           {/* Past Events Card */}
           <div className="card">
-            <Link to="/past" className="card-link">
+            <Link href="/past" className="card-link">
               <div className="card-content">
                 <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
                   <Icon name="history" style="solid" size="xl" />
@@ -223,7 +223,7 @@ const Home = () => {
 
           {/* Profile Card */}
           <div className="card">
-            <Link to="/profile" className="card-link">
+            <Link href="/profile" className="card-link">
               <div className="card-content">
                 <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
                   <Icon name="user" style="solid" size="xl" />
