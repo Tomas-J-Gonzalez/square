@@ -7,7 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
 import Modal from '../components/Modal';
-const logoPath = '/logo.svg';
+const logoPath = '/logo.svg?v=1';
 
 const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

@@ -111,36 +111,19 @@ const RSVP = () => {
         message: form.message || (form.willAttend === 'yes' ? 'Confirmed attendance' : 'Cannot attend')
       };
 
-      // Try server write first
+      // Server-side RSVP
       try {
-        const { supabase } = await import('../../lib/supabaseClient');
-        if (supabase && event) {
-          // Ensure we have all required event data before upserting
-          const eventData = {
-            id: eventId,
-            title: event.title || 'Untitled Event',
-            date: event.date || (event.dateTime ? new Date(event.dateTime).toISOString().slice(0,10) : new Date().toISOString().slice(0,10)),
-            time: event.time || (event.dateTime ? new Date(event.dateTime).toTimeString().slice(0,5) : '12:00'),
-            location: event.location || null,
-            decision_mode: event.decisionMode || 'none',
-            punishment: event.punishment || 'No punishment specified',
-            invited_by: event.invitedBy || currentUser.name || 'Organizer'
-          };
-          
-          // Ensure the event exists server-side
-          await supabase.from('events').upsert(eventData);
-          
-          // Add RSVP to server
-          await supabase.from('event_rsvps').insert({
-            event_id: eventId,
+        await fetch('/api/rsvp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventId,
             name: currentUser.name,
-            will_attend: form.willAttend === 'yes'
-          });
-        }
-      } catch (error) {
-        console.warn('Could not save to server, continuing with local storage:', error);
-        // Continue with local storage even if server save fails
-      }
+            willAttend: form.willAttend === 'yes',
+            event
+          })
+        });
+      } catch (_) {}
 
       // Add to local event
       eventService.addParticipant(eventId, participant);

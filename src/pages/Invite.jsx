@@ -102,37 +102,24 @@ const Invite = () => {
     }
     setSubmitting(true);
     try {
-      // insert RSVP to server table (best-effort, dynamic import)
+      // Submit RSVP via server API (service role)
       try {
-        const { supabase } = await import('../../lib/supabaseClient');
-        if (supabase && event) {
-          // Ensure the event exists server-side (handles older events created before server upsert)
-          await supabase.from('events').upsert({
-            id: eventId,
-            title: event.title,
-            date: event.date || (event.dateTime ? new Date(event.dateTime).toISOString().slice(0,10) : null),
-            time: event.time || (event.dateTime ? new Date(event.dateTime).toTimeString().slice(0,5) : null),
-            location: event.location || null,
-            decision_mode: event.decisionMode || 'none',
-            punishment: event.punishment || '',
-            invited_by: event.invitedBy || 'Organizer'
-          });
-          
-          // Insert RSVP
-          const { error } = await supabase.from('event_rsvps').insert({
-            event_id: eventId,
+        const resp = await fetch('/api/rsvp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventId,
             name: form.name.trim(),
-            will_attend: form.willAttend === 'yes'
-          });
-          if (error) throw error;
-          
-          console.log('RSVP submitted successfully to server');
-        } else {
-          console.warn('Supabase not available, RSVP not saved to server');
+            willAttend: form.willAttend === 'yes',
+            event
+          })
+        });
+        if (!resp.ok) {
+          const j = await resp.json().catch(() => ({}));
+          throw new Error(j.error || 'Failed to submit RSVP');
         }
       } catch (error) {
-        console.error('Error submitting RSVP to server:', error);
-        // Continue with local submission even if server fails
+        console.error('Error submitting RSVP:', error);
       }
       setSubmitted(true);
     } catch (err) {

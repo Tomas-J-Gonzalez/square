@@ -25,9 +25,9 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <ErrorBoundary>
       <Head>
-        <link rel="icon" href="/favicon.png" sizes="32x32" type="image/png" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/favicon.png" />
+        <link rel="icon" href="/favicon.png?v=1" sizes="32x32" type="image/png" />
+        <link rel="icon" href="/favicon.svg?v=1" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/favicon.png?v=1" />
         <meta name="theme-color" content="#ec4899" />
       </Head>
       <AuthProvider>
