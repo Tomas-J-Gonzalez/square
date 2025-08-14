@@ -557,69 +557,83 @@ const ViewEvent = () => {
         {/* Event Header */}
         <div className="section-header">
           <h1 className="section-title">{event.title}</h1>
-          <div className="flex items-center justify-center space-x-16 mb-24">
+          <div className="flex flex-wrap items-center justify-center gap-16 mb-24">
             <span className="flex items-center text-sm text-gray-600">
-              <Icon name="calendar" style="solid" size="sm" className="mr-4" />
-              {new Date(event.dateTime || event.date).toLocaleDateString()}
+              <Icon name="calendar" style="solid" size="sm" className="mr-4" aria-hidden="true" />
+              <span>{new Date(event.dateTime || event.date).toLocaleDateString()}</span>
             </span>
             <span className="flex items-center text-sm text-gray-600">
-              <Icon name="clock" style="solid" size="sm" className="mr-4" />
-              {new Date(event.dateTime || event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              <Icon name="clock" style="solid" size="sm" className="mr-4" aria-hidden="true" />
+              <span>{new Date(event.dateTime || event.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
             </span>
             {event.location && (
               <span className="flex items-center text-sm text-gray-600">
-                <Icon name="map-marker-alt" style="solid" size="sm" className="mr-4" />
-                {event.location}
+                <Icon name="map-marker-alt" style="solid" size="sm" className="mr-4" aria-hidden="true" />
+                <span>{event.location}</span>
               </span>
             )}
           </div>
           
           {/* Share Options - Individual Buttons - Only show for organizers */}
           {isOrganizer && (
-            <div className="flex items-center justify-center space-x-8 mb-24">
+            <div className="flex flex-wrap items-center justify-center gap-8 mb-24">
               <button
                 onClick={() => handleShare('twitter')}
                 className="btn btn-secondary btn-sm flex items-center"
+                aria-label="Share event on Twitter"
+                type="button"
               >
-                <Icon name="twitter" style="brands" size="sm" className="mr-4" />
+                <Icon name="twitter" style="brands" size="sm" className="mr-4" aria-hidden="true" />
                 Twitter
               </button>
               <button
                 onClick={() => handleShare('facebook')}
                 className="btn btn-secondary btn-sm flex items-center"
+                aria-label="Share event on Facebook"
+                type="button"
               >
-                <Icon name="facebook" style="brands" size="sm" className="mr-4" />
+                <Icon name="facebook" style="brands" size="sm" className="mr-4" aria-hidden="true" />
                 Facebook
               </button>
               <button
                 onClick={() => handleShare('instagram')}
                 className="btn btn-secondary btn-sm flex items-center"
+                aria-label="Share event on Instagram"
+                type="button"
               >
-                <Icon name="instagram" style="brands" size="sm" className="mr-4" />
+                <Icon name="instagram" style="brands" size="sm" className="mr-4" aria-hidden="true" />
                 Instagram
               </button>
               <button
                 onClick={handleCopyInvitationLink}
                 className="btn btn-secondary btn-sm flex items-center"
+                aria-label="Copy invitation link to clipboard"
+                type="button"
               >
-                <Icon name="link" style="solid" size="sm" className="mr-4" />
+                <Icon name="link" style="solid" size="sm" className="mr-4" aria-hidden="true" />
                 Share Invitation Link
               </button>
             </div>
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-32">
           {/* Friends Section */}
           <div className="card">
-            <h2 className="card-title mb-24">
-              {isOrganizer ? 'Friends' : 'Participants'} ({event.participants.length})
-            </h2>
+            <div className="card-header">
+              <h2 className="card-title flex items-center">
+                <Icon name="users" style="solid" size="sm" className="mr-8 text-pink-500" aria-hidden="true" />
+                {isOrganizer ? 'Friends' : 'Participants'} ({event.participants.length})
+              </h2>
+            </div>
             
                         {/* Add Friend Form - Only show for organizers */}
             {isOrganizer && (
-              <div className="mb-32">
-                <h3 className="text-sm font-medium text-gray-900 mb-16">Add a friend manually</h3>
+              <div className="mb-32 p-16 bg-gray-50 rounded-md border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-16 flex items-center">
+                  <Icon name="user-plus" style="solid" size="sm" className="mr-8 text-pink-500" aria-hidden="true" />
+                  Add a friend manually
+                </h3>
                 <form onSubmit={handleAddParticipant}>
                   <div className="space-y-16">
                     <div>
@@ -633,7 +647,9 @@ const ViewEvent = () => {
                         className="form-input"
                         placeholder="Enter name"
                         required
+                        aria-describedby="name-help"
                       />
+                      <div id="name-help" className="sr-only">Name is required to add a friend</div>
                     </div>
                     <div>
                       <label htmlFor="email" className="form-label">Email</label>
@@ -645,7 +661,9 @@ const ViewEvent = () => {
                         onChange={(e) => setNewParticipant(prev => ({ ...prev, email: e.target.value }))}
                         className="form-input"
                         placeholder="Enter email (optional)"
+                        aria-describedby="email-help"
                       />
+                      <div id="email-help" className="sr-only">Email is optional</div>
                     </div>
                     <div>
                       <label htmlFor="message" className="form-label">Message</label>
@@ -657,14 +675,23 @@ const ViewEvent = () => {
                         className="form-input"
                         placeholder="Enter a message (optional)"
                         rows="3"
+                        aria-describedby="message-help"
                       />
+                      <div id="message-help" className="sr-only">Message is optional</div>
                     </div>
                     <button
                       type="submit"
                       disabled={isAddingParticipant}
-                      className="btn btn-primary btn-sm"
+                      className="btn btn-primary btn-sm w-full"
                     >
-                      {isAddingParticipant ? 'Adding...' : 'Add Friend'}
+                      {isAddingParticipant ? (
+                        <>
+                          <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" aria-hidden="true" />
+                          Adding...
+                        </>
+                      ) : (
+                        'Add Friend'
+                      )}
                     </button>
                   </div>
                 </form>
@@ -673,27 +700,38 @@ const ViewEvent = () => {
 
             {/* Friends List */}
             <div className="space-y-16">
-              {event.participants.map((participant) => (
-                <div key={participant.id} className="p-16 bg-gray-50 rounded-md">
-                  <div className="flex items-center justify-between mb-12">
-                    <div>
-                      <div className="font-medium">{participant.name}</div>
-                      <div className="text-sm text-gray-600">{participant.email}</div>
-                      {participant.message && (
-                        <div className="text-sm text-gray-500 mt-4">"{participant.message}"</div>
+              {event.participants.length === 0 ? (
+                <div className="text-center py-24">
+                  <Icon name="users" style="solid" size="xl" className="text-gray-400 mx-auto mb-16" aria-hidden="true" />
+                  <p className="text-gray-600">No {isOrganizer ? 'friends' : 'participants'} yet.</p>
+                  {isOrganizer && (
+                    <p className="text-sm text-gray-500 mt-8">Add friends manually or share the invitation link.</p>
+                  )}
+                </div>
+              ) : (
+                event.participants.map((participant) => (
+                  <div key={participant.id} className="p-16 bg-white rounded-md border border-gray-200 hover:border-gray-300 transition-colors">
+                    <div className="flex items-start justify-between mb-12">
+                      <div className="flex-1">
+                        <div className="font-medium text-gray-900">{participant.name}</div>
+                        {participant.email && (
+                          <div className="text-sm text-gray-600 mt-4">{participant.email}</div>
+                        )}
+                        {participant.message && (
+                          <div className="text-sm text-gray-500 mt-4 italic">"{participant.message}"</div>
+                        )}
+                      </div>
+                      {isOrganizer && (
+                        <button
+                          onClick={() => handleRemoveParticipant(participant.id)}
+                          className="text-red-500 hover:text-red-700 p-8 rounded-md hover:bg-red-50 transition-colors ml-16"
+                          aria-label={`Remove ${participant.name} from event`}
+                          type="button"
+                        >
+                          <Icon name="times" style="solid" size="sm" aria-hidden="true" />
+                        </button>
                       )}
                     </div>
-                    {isOrganizer && (
-                      <button
-                        onClick={() => handleRemoveParticipant(participant.id)}
-                        className="text-red-500 hover:text-red-700"
-                        aria-label={`Remove ${participant.name} from event`}
-                        type="button"
-                      >
-                        <Icon name="times" style="solid" size="sm" aria-hidden="true" />
-                      </button>
-                    )}
-                  </div>
                   
                   {/* Attendance Status - Only show for organizers */}
                   {isOrganizer && (
