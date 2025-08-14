@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
@@ -78,7 +79,7 @@ const MainLayout = ({ children }) => {
           <div className="header-content">
             {/* Logo */}
             <Link href="/" className="logo" aria-label="Go to home page">
-              <img src={logoPath} alt="Logo" className="h-8 w-8 mr-8" />
+              <Image src={logoPath} alt="Be There or Be Square" width={32} height={32} priority className="mr-8" />
             </Link>
 
             {/* Desktop Navigation (centered) */}

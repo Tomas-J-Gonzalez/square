@@ -195,19 +195,17 @@ const CreateEvent = () => {
   return (
     <div className="section">
       <div className="section-container">
-        <div className="form-container">
+        <div className="max-w-3xl mx-auto">
           <div className="section-header">
             <h1 className="section-title">Create New Event</h1>
-            <p className="section-subtitle">
-              Set up your event and choose how to handle flakes
-            </p>
+            <p className="section-subtitle">Set up your event and choose how to handle flakes</p>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} aria-labelledby="create-event-title">
             {/* Event Details */}
-            <div className="form-section">
-              <h2 className="form-section-title">Event Details</h2>
-              <div className="form-grid">
+            <div className="form-section bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+              <h2 id="create-event-title" className="text-xl font-semibold text-gray-900 mb-6">Event Details</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="form-group">
                   <label htmlFor="title" className="form-label">Event Title *</label>
                   <input
@@ -234,7 +232,7 @@ const CreateEvent = () => {
                   />
                 </div>
               </div>
-              <div className="form-grid">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="form-group">
                   <label htmlFor="date" className="form-label">Date *</label>
                   <input
@@ -265,12 +263,10 @@ const CreateEvent = () => {
             </div>
 
             {/* Decision Mode */}
-            <div className="form-section">
-              <h2 className="form-section-title">How to Decide on Event</h2>
-              <p className="form-section-description">
-                Choose how you will decide on the event
-              </p>
-              <div className="decision-grid">
+            <div className="form-section bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">How to Decide on Event</h2>
+              <p className="text-sm text-gray-600 mb-6">Choose how you will decide on the event</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {decisionModes.map((mode) => {
                   const isDisabled = mode.id !== 'none';
                   return (
@@ -303,12 +299,10 @@ const CreateEvent = () => {
             </div>
 
             {/* Punishment Selection */}
-            <div className="form-section">
-              <h2 className="form-section-title">Punishment for Flakes</h2>
-              <p className="form-section-description">
-                Select what happens to the person who flakes
-              </p>
-              <div className="punishment-grid">
+            <div className="form-section bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Punishment for Flakes</h2>
+              <p className="text-sm text-gray-600 mb-6">Select what happens to the person who flakes</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {punishments.map((punishment, index) => (
                   <label 
                     key={index} 
@@ -341,7 +335,7 @@ const CreateEvent = () => {
               </div>
 
               {isCustomPunishment && (
-                <div className="mt-16">
+                <div className="mt-6">
                   <label htmlFor="customPunishment" className="form-label">Enter custom punishment *</label>
                   <input
                     id="customPunishment"
