@@ -57,6 +57,17 @@ const ViewEvent = () => {
           // Try to merge server RSVPs into local participants
           try {
             const { supabase } = await import('../../lib/supabaseClient');
+            // Ensure the event row exists for this id
+            await supabase.from('events').upsert({
+              id: eventId,
+              title: foundEvent.title,
+              date: foundEvent.date || (foundEvent.dateTime ? new Date(foundEvent.dateTime).toISOString().slice(0,10) : null),
+              time: foundEvent.time || (foundEvent.dateTime ? new Date(foundEvent.dateTime).toTimeString().slice(0,5) : null),
+              location: foundEvent.location || null,
+              decision_mode: foundEvent.decisionMode || 'none',
+              punishment: foundEvent.punishment || '',
+              invited_by: (currentUser?.name) || 'Organizer'
+            });
             const { data } = await supabase
               .from('event_rsvps')
               .select('name, will_attend, created_at')

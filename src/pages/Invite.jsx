@@ -99,6 +99,19 @@ const Invite = () => {
       // insert RSVP to server table (best-effort, dynamic import)
       try {
         const { supabase } = await import('../../lib/supabaseClient');
+        // Ensure the event exists server-side (handles older events created before server upsert)
+        if (event) {
+          await supabase.from('events').upsert({
+            id: eventId,
+            title: event.title,
+            date: event.date || (event.dateTime ? new Date(event.dateTime).toISOString().slice(0,10) : null),
+            time: event.time || (event.dateTime ? new Date(event.dateTime).toTimeString().slice(0,5) : null),
+            location: event.location || null,
+            decision_mode: event.decisionMode || 'none',
+            punishment: event.punishment || '',
+            invited_by: event.invitedBy || 'Organizer'
+          });
+        }
         const { error } = await supabase.from('event_rsvps').insert({
           event_id: eventId,
           name: form.name.trim(),
