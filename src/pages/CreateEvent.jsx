@@ -56,28 +56,34 @@ const CreateEvent = () => {
 
   const isCustomPunishment = formData.punishment === '__custom__';
 
+  // Helper to get today's date in local timezone as YYYY-MM-DD (no UTC shift)
+  const getLocalDateString = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Additional validation for date input
+    // Additional validation for date input (non-blocking, timezone-safe)
     if (name === 'date' && value) {
-      const selectedDate = new Date(value);
+      const [y, m, d] = value.split('-').map(Number);
+      const selectedDate = new Date(y, (m || 1) - 1, d || 1);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset time to start of day
-      
-      // Check if the date is valid and not in the past
-      if (selectedDate < today) {
-        setError('Please select a date that is today or in the future.');
-        return;
-      }
-      
-      // Check if it's a valid date (not NaN)
-      if (isNaN(selectedDate.getTime())) {
+      today.setHours(0, 0, 0, 0);
+
+      if (Number.isNaN(selectedDate.getTime())) {
         setError('Please select a valid date.');
-        return;
+      } else if (d && selectedDate < today) {
+        // Only compare if a full date (with day) is present
+        setError('Please select a date that is today or in the future.');
+      } else if (error) {
+        setError('');
       }
     }
-    
+
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -103,7 +109,11 @@ const CreateEvent = () => {
     setIsSubmitting(true);
     
     try {
+      // Generate a stable ID before any persistence so server/local stay in sync
+      const generatedId = `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
       const eventData = {
+        id: generatedId,
         ...formData,
         punishment: formData.punishment === '__custom__' ? (formData.customPunishment || '').trim() : formData.punishment,
         dateTime: `${formData.date}T${formData.time}`,
@@ -234,8 +244,8 @@ const CreateEvent = () => {
                     value={formData.date}
                     onChange={handleInputChange}
                     className="form-input"
-                    min={new Date().toISOString().split('T')[0]}
-                    max={`${new Date().getFullYear()}-12-31`}
+                    min={getLocalDateString()}
+                    max={`${new Date().getFullYear() + 2}-12-31`}
                     required
                   />
                 </div>

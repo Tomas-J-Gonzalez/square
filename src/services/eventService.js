@@ -227,12 +227,7 @@ const addParticipant = (eventId, participantData) => {
   if (!participantData?.name?.trim()) {
     throw new Error('Participant name is required');
   }
-  if (!participantData?.email?.trim()) {
-    throw new Error('Participant email is required');
-  }
-  if (!participantData?.message?.trim()) {
-    throw new Error('Participant message is required');
-  }
+  // Email and message are optional to support guest RSVPs and quick adds
 
   const events = getEvents();
   const eventIndex = events.findIndex(event => event.id === eventId);
@@ -244,8 +239,8 @@ const addParticipant = (eventId, participantData) => {
   const participant = {
     id: `participant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     name: participantData.name.trim(),
-    email: participantData.email.trim(),
-    message: participantData.message.trim(),
+    email: (participantData.email || '').trim(),
+    message: (participantData.message || '').trim(),
     joinedAt: new Date().toISOString()
   };
   
