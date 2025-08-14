@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+// Use <img> for external Supabase Storage assets to avoid next/image domain allowlist issues
 import { getAssetUrl } from '../utils/assetUrl';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
@@ -80,7 +80,7 @@ const MainLayout = ({ children }) => {
           <div className="header-content">
             {/* Logo */}
             <Link href="/" className="logo" aria-label="Go to home page">
-              <Image src={logoPath} alt="Be There or Be Square" width={32} height={32} priority className="mr-8" />
+              <img src={logoPath} alt="Be There or Be Square" width="32" height="32" className="mr-8" />
             </Link>
 
             {/* Desktop Navigation (centered) */}
