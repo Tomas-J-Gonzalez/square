@@ -231,10 +231,10 @@ const ViewEvent = () => {
     e.preventDefault();
     
     // Validate required fields
-    if (!newParticipant.name.trim() || !newParticipant.email.trim() || !newParticipant.message.trim()) {
+    if (!newParticipant.name.trim()) {
       showModal({
         title: 'Missing Information',
-        message: 'Please fill in all required fields: name, email, and message.',
+        message: 'Please enter a name for the friend.',
         type: 'error'
       });
       return;
@@ -636,7 +636,7 @@ const ViewEvent = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="email" className="form-label">Email *</label>
+                      <label htmlFor="email" className="form-label">Email</label>
                       <input
                         type="email"
                         id="email"
@@ -644,21 +644,19 @@ const ViewEvent = () => {
                         value={newParticipant.email}
                         onChange={(e) => setNewParticipant(prev => ({ ...prev, email: e.target.value }))}
                         className="form-input"
-                        placeholder="Enter email"
-                        required
+                        placeholder="Enter email (optional)"
                       />
                     </div>
                     <div>
-                      <label htmlFor="message" className="form-label">Message *</label>
+                      <label htmlFor="message" className="form-label">Message</label>
                       <textarea
                         id="message"
                         name="message"
                         value={newParticipant.message}
                         onChange={(e) => setNewParticipant(prev => ({ ...prev, message: e.target.value }))}
                         className="form-input"
-                        placeholder="Enter a message"
+                        placeholder="Enter a message (optional)"
                         rows="3"
-                        required
                       />
                     </div>
                     <button

@@ -135,7 +135,7 @@ const Home = () => {
           <div className="card">
             <div className="card-header">
               <h2 className="card-title flex items-center">
-                <Icon name="user-friends" style="solid" size="sm" className="mr-8 text-blue-500" />
+                <Icon name="user-friends" style="solid" size="sm" className="mr-8 text-pink-500" />
                 Events I'm Part Of
               </h2>
             </div>
@@ -143,7 +143,7 @@ const Home = () => {
             {participatingEvents.length > 0 ? (
               <div className="space-y-12">
                 {participatingEvents.map((participation) => (
-                  <div key={participation.id} className="p-16 bg-blue-50 rounded-md border border-blue-200">
+                  <div key={participation.id} className="p-16 bg-pink-50 rounded-md border border-pink-200">
                     <h3 className="font-semibold text-gray-900 mb-8">{participation.eventTitle}</h3>
                     <div className="flex items-center space-x-16 mb-8">
                       <span className="flex items-center text-sm text-gray-600">
