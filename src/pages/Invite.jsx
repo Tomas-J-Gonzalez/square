@@ -18,11 +18,7 @@ const Invite = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        // If user is logged in, redirect to RSVP page
-        if (currentUser) {
-          router.push(`/rsvp/${eventId}${window.location.search}`);
-          return;
-        }
+        // Public route: do not force login; if logged in we still allow the page without redirect
 
         // Try server first (lazy import so missing env doesn't crash app)
         let data = null;

@@ -7,3 +7,6 @@ function RSVPPage() {
 
 export default withAuth(RSVPPage);
 
+// Let invite links work for the logged-in redirect case; RSVP remains protected
+RSVPPage.noLayout = true;
+

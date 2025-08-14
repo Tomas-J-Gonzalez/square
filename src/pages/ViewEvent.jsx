@@ -483,7 +483,9 @@ const ViewEvent = () => {
   };
 
   const handleCopyInvitationLink = () => {
-    const url = new URL(`${window.location.origin}/invite/${eventId}`);
+    const base = (process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '')).trim();
+    const normalized = (/^https?:\/\//i.test(base) ? base : `https://${base}`).replace(/\/$/, '');
+    const url = new URL(`${normalized}/invite/${eventId}`);
     // Embed minimal event summary for fallback rendering
     url.searchParams.set('title', event.title);
     const dt = new Date(event.dateTime || `${event.date}T${event.time}`);
@@ -768,36 +770,28 @@ const ViewEvent = () => {
                   
                   {/* Attendance Status - Only show for organizers */}
                   {isOrganizer && (
-                    <div className="flex items-center space-x-16">
-                      <span className="text-sm text-gray-600">Attendance:</span>
-                      <div className="flex space-x-8">
+                    <div className="attendance-row">
+                      <span className="attendance-label">Attendance:</span>
+                      <div className="attendance-buttons">
                         <button
                           onClick={() => handleAttendanceChange(participant.id, 'attended')}
-                          className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
-                            attendanceStatus[participant.id] === 'attended'
-                              ? 'bg-gray-100 text-gray-800 border border-gray-300'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                          }`}
+                          className={`attendance-btn ${attendanceStatus[participant.id] === 'attended' ? 'active' : ''}`}
                           aria-pressed={attendanceStatus[participant.id] === 'attended'}
                           aria-label={`Mark ${participant.name} as attended`}
                           type="button"
                         >
-                          <Icon name="check-circle" style="solid" size="sm" className={attendanceStatus[participant.id] === 'attended' ? 'text-green-600' : 'text-gray-500'} aria-hidden="true" />
+                          <Icon name="check-circle" style="solid" size="sm" aria-hidden="true" />
                           <span>Attended</span>
                         </button>
                         <button
                           onClick={() => handleAttendanceChange(participant.id, 'flaked')}
-                          className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
-                            attendanceStatus[participant.id] === 'flaked'
-                              ? 'bg-gray-100 text-gray-800 border border-gray-300'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                          }`}
+                          className={`attendance-btn ${attendanceStatus[participant.id] === 'flaked' ? 'active' : ''}`}
                           aria-pressed={attendanceStatus[participant.id] === 'flaked'}
                           aria-label={`Mark ${participant.name} as flaked`}
                           type="button"
                         >
-                          <Icon name="times-circle" style="solid" size="sm" className={attendanceStatus[participant.id] === 'flaked' ? 'text-red-600' : 'text-gray-500'} aria-hidden="true" />
-                           <span>Flaked</span>
+                          <Icon name="times-circle" style="solid" size="sm" aria-hidden="true" />
+                          <span>Flaked</span>
                         </button>
                       </div>
                     </div>

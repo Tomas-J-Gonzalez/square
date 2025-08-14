@@ -12,7 +12,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Missing required fields: email, name, token' });
     }
 
-    const rawBase = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'localhost:3000';
+    const rawBase = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || 'localhost:3000';
     const normalizedBase = (() => {
       let u = rawBase.trim();
       if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
@@ -20,8 +20,7 @@ export default async function handler(req, res) {
       return u.replace(/\/$/, '');
     })();
     const confirmationUrl = `${normalizedBase}/confirm-email?token=${encodeURIComponent(token)}`;
-    const externalAssetsBase = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/$/, '');
-    const logoUrl = externalAssetsBase ? `${externalAssetsBase}/logo.svg` : `${normalizedBase}/assets/logo.svg`;
+    const logoUrl = `${normalizedBase}/logo.svg`;
 
     // Store token server-side as well for cross-device confirmation
     try {
