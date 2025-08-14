@@ -28,12 +28,14 @@ const Invite = () => {
         let data = null;
         try {
           const { supabase } = await import('../../lib/supabaseClient');
-          const resp = await supabase
-            .from('events')
-            .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
-            .eq('id', eventId)
-            .single();
-          if (!resp.error) data = resp.data;
+          if (supabase) {
+            const resp = await supabase
+              .from('events')
+              .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
+              .eq('id', eventId)
+              .single();
+            if (!resp.error) data = resp.data;
+          }
         } catch (_) {
           // ignore if supabase not configured
         }
@@ -107,8 +109,8 @@ const Invite = () => {
       // insert RSVP to server table (best-effort, dynamic import)
       try {
         const { supabase } = await import('../../lib/supabaseClient');
-        // Ensure the event exists server-side (handles older events created before server upsert)
-        if (event) {
+        if (supabase && event) {
+          // Ensure the event exists server-side (handles older events created before server upsert)
           await supabase.from('events').upsert({
             id: eventId,
             title: event.title,

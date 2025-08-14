@@ -549,14 +549,79 @@ export default Profile;
 // UsersTable subcomponent
 const UsersTable = () => {
   const [users, setUsers] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  
   React.useEffect(() => {
-    try {
-      const all = authService.listUsers();
-      setUsers(all);
-    } catch (_) {
-      setUsers([]);
-    }
+    const loadUsers = async () => {
+      try {
+        setLoading(true);
+        
+        // Get local users
+        const localUsers = authService.listUsers();
+        
+        // Try to get users from Supabase as well
+        let serverUsers = [];
+        try {
+          const { supabase } = await import('../../lib/supabaseClient');
+          if (supabase) {
+            const { data: rsvps } = await supabase
+              .from('event_rsvps')
+              .select('name, email, created_at')
+              .not('name', 'is', null);
+            
+            if (Array.isArray(rsvps)) {
+              // Convert RSVPs to user-like objects
+              serverUsers = rsvps.map((rsvp, index) => ({
+                id: `server_user_${index}`,
+                name: rsvp.name,
+                email: rsvp.email || `${rsvp.name}@guest.local`,
+                createdAt: rsvp.created_at,
+                updatedAt: rsvp.created_at,
+                lastLoginAt: null,
+                emailConfirmed: true,
+                source: 'server'
+              }));
+            }
+          }
+        } catch (error) {
+          console.warn('Could not fetch server users:', error);
+        }
+        
+        // Combine local and server users, removing duplicates by email
+        const emailMap = new Map();
+        
+        // Add local users first
+        localUsers.forEach(user => {
+          emailMap.set(user.email.toLowerCase(), { ...user, source: 'local' });
+        });
+        
+        // Add server users, only if not already in local
+        serverUsers.forEach(user => {
+          if (!emailMap.has(user.email.toLowerCase())) {
+            emailMap.set(user.email.toLowerCase(), user);
+          }
+        });
+        
+        setUsers(Array.from(emailMap.values()));
+      } catch (error) {
+        console.error('Error loading users:', error);
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadUsers();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-pink-500"></div>
+        <span className="ml-2 text-sm text-gray-600">Loading users...</span>
+      </div>
+    );
+  }
 
   if (!users.length) {
     return <p className="text-sm text-gray-600">No users found.</p>;
@@ -573,6 +638,7 @@ const UsersTable = () => {
             <th className="py-2 pr-4">Updated</th>
             <th className="py-2 pr-4">Last Login</th>
             <th className="py-2 pr-4">Email Confirmed</th>
+            <th className="py-2 pr-4">Source</th>
           </tr>
         </thead>
         <tbody>
@@ -584,6 +650,15 @@ const UsersTable = () => {
               <td className="py-2 pr-4 whitespace-nowrap">{u.updatedAt ? new Date(u.updatedAt).toLocaleString() : '-'}</td>
               <td className="py-2 pr-4 whitespace-nowrap">{u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleString() : '-'}</td>
               <td className="py-2 pr-4 whitespace-nowrap">{u.emailConfirmed ? 'Yes' : 'No'}</td>
+              <td className="py-2 pr-4 whitespace-nowrap">
+                <span className={`px-2 py-1 rounded-full text-xs ${
+                  u.source === 'server' 
+                    ? 'bg-blue-100 text-blue-800' 
+                    : 'bg-green-100 text-green-800'
+                }`}>
+                  {u.source === 'server' ? 'Server' : 'Local'}
+                </span>
+              </td>
             </tr>
           ))}
         </tbody>

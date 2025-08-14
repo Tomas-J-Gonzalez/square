@@ -724,12 +724,11 @@ const ViewEvent = () => {
                       {isOrganizer && (
                         <button
                           onClick={() => handleRemoveParticipant(participant.id)}
-                          className="text-red-500 hover:text-red-700 p-8 rounded-md hover:bg-red-50 transition-colors ml-16 flex items-center"
+                          className="text-red-500 hover:text-red-700 p-8 rounded-md hover:bg-red-50 transition-colors ml-16"
                           aria-label={`Remove ${participant.name} from event`}
                           type="button"
                         >
-                          <Icon name="times" style="solid" size="sm" className="mr-4" aria-hidden="true" />
-                          <span className="text-sm">Remove participant</span>
+                          <Icon name="times" style="solid" size="sm" aria-hidden="true" />
                         </button>
                       )}
                     </div>
@@ -771,7 +770,7 @@ const ViewEvent = () => {
                     </div>
                   )}
                 </div>
-              )))
+              ))
             </div>
 
             {/* Server RSVPs (live) - Only show for organizers */}
@@ -819,19 +818,19 @@ const ViewEvent = () => {
 
               {/* Event Details */}
               <div className="space-y-16">
-                <div className="flex items-center">
-                  <h4 className="text-sm font-medium text-gray-900">Decision Mode: </h4>
-                  <p className="text-sm text-gray-600 ml-8">{event.decisionMode}</p>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-gray-900">Decision Mode:</h4>
+                  <p className="text-sm text-gray-600">{event.decisionMode}</p>
                 </div>
-                <div className="flex items-center">
-                  <h4 className="text-sm font-medium text-gray-900">Punishment: </h4>
-                  <p className="text-sm text-gray-600 ml-8">{event.punishment}</p>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-gray-900">Punishment:</h4>
+                  <p className="text-sm text-gray-600">{event.punishment}</p>
                 </div>
               </div>
 
               {/* Action Buttons - Only show for organizers */}
               {isOrganizer && (
-                <div className="space-y-16">
+                <div className="space-y-8">
                   <button
                     onClick={handleCompleteEvent}
                     disabled={isProcessing || pendingCount > 0}
@@ -868,7 +867,7 @@ const ViewEvent = () => {
               )}
               
               {isOrganizer && pendingCount > 0 && (
-                <p id="complete-event-help" className="text-sm text-gray-500 text-left">
+                <p id="complete-event-help" className="text-sm text-gray-500 text-center">
                   Please mark attendance for all friends before completing the event
                 </p>
               )}

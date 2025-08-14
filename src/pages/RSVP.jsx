@@ -24,12 +24,14 @@ const RSVP = () => {
         let data = null;
         try {
           const { supabase } = await import('../../lib/supabaseClient');
-          const resp = await supabase
-            .from('events')
-            .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
-            .eq('id', eventId)
-            .single();
-          if (!resp.error) data = resp.data;
+          if (supabase) {
+            const resp = await supabase
+              .from('events')
+              .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
+              .eq('id', eventId)
+              .single();
+            if (!resp.error) data = resp.data;
+          }
         } catch (_) {
           // ignore if supabase not configured
         }
@@ -108,8 +110,8 @@ const RSVP = () => {
       // Try server write first
       try {
         const { supabase } = await import('../../lib/supabaseClient');
-        // Ensure the event exists server-side
-        if (event) {
+        if (supabase && event) {
+          // Ensure the event exists server-side
           await supabase.from('events').upsert({
             id: eventId,
             title: event.title,
@@ -120,14 +122,14 @@ const RSVP = () => {
             punishment: event.punishment || '',
             invited_by: event.invitedBy || 'Organizer'
           });
+          
+          // Add RSVP to server
+          await supabase.from('event_rsvps').insert({
+            event_id: eventId,
+            name: currentUser.name,
+            will_attend: form.willAttend === 'yes'
+          });
         }
-        
-        // Add RSVP to server
-        await supabase.from('event_rsvps').insert({
-          event_id: eventId,
-          name: currentUser.name,
-          will_attend: form.willAttend === 'yes'
-        });
       } catch (_) {
         // ignore if supabase not configured
       }
