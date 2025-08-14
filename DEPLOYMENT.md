@@ -12,7 +12,7 @@ Go to your Netlify dashboard → Site settings → Environment variables and add
 
 ```
 RESEND_API_KEY=your_resend_api_key_here
-CUSTOM_DOMAIN=https://dontbesquare.netlify.app
+NEXT_PUBLIC_SITE_URL=https://your-vercel-domain.vercel.app
 ```
 
 ### 2. Deploy to Netlify
@@ -25,7 +25,7 @@ CUSTOM_DOMAIN=https://dontbesquare.netlify.app
 
 ### 3. Domain Configuration
 
-You've already configured your domain `dontbesquare.netlify.app` in Resend with the correct DNS records:
+You've configured your Vercel domain in Resend with the correct DNS records:
 - MX record: `send.dontbesquare` → `feedback-smtp.ap-northeast-1.amazonses.com`
 - SPF record: `send.dontbesquare` → `v=spf1 include:amazonses.com ~all`
 - DKIM record: `resend._domainkey.dontbesquare` → (your DKIM key)
@@ -34,12 +34,12 @@ You've already configured your domain `dontbesquare.netlify.app` in Resend with 
 ### 4. Verify Deployment
 
 After deployment, your email confirmation should work at:
-- `https://dontbesquare.netlify.app/.netlify/functions/send-confirmation-email`
+- `/api/send-confirmation-email`
 
 ## How It Works
 
-- **Development**: Uses your local server at `localhost:3001`
-- **Production**: Uses Netlify Functions at `/.netlify/functions/send-confirmation-email`
+- **Development**: Uses your local server at `localhost:3001` if available, otherwise Vercel API route
+- **Production**: Uses Vercel API route `/api/send-confirmation-email`
 
 ## Troubleshooting
 

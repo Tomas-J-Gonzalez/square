@@ -1,12 +1,10 @@
-// Endpoints: Netlify function (primary) and Vercel API (fallback)
-const NETLIFY_CONFIRM_EMAIL_ENDPOINT = '/.netlify/functions/send-confirmation-email';
-// Allow override via env; fallback to deployed Vercel URL
+// Single endpoint strategy on Vercel
 const VERCEL_CONFIRM_EMAIL_ENDPOINT =
   (import.meta.env && import.meta.env.VITE_VERCEL_API_BASE)
     ? `${import.meta.env.VITE_VERCEL_API_BASE.replace(/\/$/, '')}/send-confirmation-email`
-    : 'https://square-pjzq9113x-qualityraros-projects.vercel.app/api/send-confirmation-email';
+    : '/api/send-confirmation-email';
 
-// Local dev endpoint
+// Local dev endpoint (when running local Express email server)
 const LOCAL_CONFIRM_EMAIL_ENDPOINT = 'http://localhost:3001/api/send-confirmation-email';
 
 /**
@@ -40,17 +38,12 @@ export const sendConfirmationEmail = async (emailData) => {
       if (local.ok) return local.data;
     }
 
-    // Try Netlify function first
-    const netlify = await makeRequest(NETLIFY_CONFIRM_EMAIL_ENDPOINT);
-    if (netlify.ok) return netlify.data;
-    console.warn('Netlify email function failed:', netlify.status, netlify.data);
-
-    // Fallback to Vercel API
+    // Use Vercel API in all other cases
     const vercel = await makeRequest(VERCEL_CONFIRM_EMAIL_ENDPOINT);
     if (vercel.ok) return vercel.data;
     console.error('Vercel email API failed:', vercel.status, vercel.data);
 
-    return { success: false, error: vercel.data?.error || netlify.data?.error || 'Failed to send email' };
+    return { success: false, error: vercel.data?.error || 'Failed to send email' };
   } catch (error) {
     console.error('Error sending email:', error);
     return { success: false, error: 'Failed to send email. Please try again.' };
@@ -63,13 +56,8 @@ export const sendConfirmationEmail = async (emailData) => {
  */
 export const checkEmailService = async () => {
   try {
-    // In production, we assume the service is available since it's a Netlify function
+    // In production, probe Vercel API endpoint
     if (import.meta.env.PROD) {
-      // Probe Netlify first, then Vercel
-      try {
-        const res = await fetch(NETLIFY_CONFIRM_EMAIL_ENDPOINT, { method: 'OPTIONS' });
-        if (res.ok) return true;
-      } catch (_) {}
       try {
         const res = await fetch(VERCEL_CONFIRM_EMAIL_ENDPOINT, { method: 'OPTIONS' });
         if (res.ok) return true;

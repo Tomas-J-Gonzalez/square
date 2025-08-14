@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
 
 const CreateEvent = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [formData, setFormData] = useState({
     title: '',
     date: '',
@@ -137,12 +137,12 @@ const CreateEvent = () => {
             invited_by: (JSON.parse(localStorage.getItem('be-there-or-be-square-current-user')||'{}').name) || 'Organizer'
           });
         }
-        const newEvent = eventService.createNewEvent(eventData);
-        navigate(`/event/${newEvent.id}`);
+          const newEvent = eventService.createNewEvent(eventData);
+          router.push(`/event/${newEvent.id}`);
       } catch (_) {
         // Fallback to local only if supabase not configured
         const newEvent = eventService.createNewEvent(eventData);
-        navigate(`/event/${newEvent.id}`);
+        router.push(`/event/${newEvent.id}`);
       }
     } catch (error) {
       setError(error.message);
@@ -156,7 +156,7 @@ const CreateEvent = () => {
     const linkMatch = errorMessage.match(/\[View Current Event\]\(([^)]+)\)/);
     if (linkMatch) {
       const eventPath = linkMatch[1];
-      navigate(eventPath);
+      router.push(eventPath);
     }
   };
 

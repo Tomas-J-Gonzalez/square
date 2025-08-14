@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
 import Modal from '../components/Modal';
 import { useAuth } from '../contexts/AuthContext';
 
 const ViewEvent = () => {
-  const { eventId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { eventId } = router.query || {};
   const { currentUser } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -148,6 +148,7 @@ const ViewEvent = () => {
   };
 
   useEffect(() => {
+    if (!eventId) return;
     const loadEvent = async () => {
       try {
         setLoading(true);
@@ -210,12 +211,12 @@ const ViewEvent = () => {
               setAttendanceStatus(initialStatus);
             } else {
               setError('Event not found!');
-              setTimeout(() => navigate('/'), 2000);
+              setTimeout(() => router.push('/'), 2000);
             }
           } catch (serverError) {
             console.error('Error fetching event from server:', serverError);
             setError('Event not found!');
-            setTimeout(() => navigate('/'), 2000);
+            setTimeout(() => router.push('/'), 2000);
           }
         }
       } catch (err) {
@@ -247,7 +248,7 @@ const ViewEvent = () => {
       }
     }, 10000);
     return () => clearInterval(interval);
-  }, [eventId, navigate]);
+  }, [eventId, router]);
 
   // Keep ref in sync with latest event state
   useEffect(() => {
@@ -359,7 +360,7 @@ const ViewEvent = () => {
             type: 'success',
             onConfirm: () => {
               hideModal();
-              navigate('/');
+              router.push('/');
             }
           });
         } catch (error) {
@@ -436,7 +437,7 @@ const ViewEvent = () => {
         type: 'success',
         onConfirm: () => {
           hideModal();
-          navigate('/');
+          router.push('/');
         }
       });
     } catch (error) {
@@ -545,7 +546,7 @@ const ViewEvent = () => {
             <h3 className="text-xl font-semibold text-gray-900 mb-16">Error</h3>
             <p className="text-gray-600 mb-24">{error}</p>
             <button 
-              onClick={() => navigate('/')} 
+              onClick={() => router.push('/')} 
               className="btn btn-primary btn-md"
             >
               Go Back Home

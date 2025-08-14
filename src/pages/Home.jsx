@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
 import { participationService } from '../services/participationService';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,7 +11,7 @@ const Home = () => {
   const [participatingEvents, setParticipatingEvents] = useState([]);
   const [isCancelling, setIsCancelling] = useState(false);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const router = useRouter();
   const { currentUser } = useAuth();
 
   useEffect(() => {

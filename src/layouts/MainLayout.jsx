@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
@@ -7,21 +8,20 @@ import Icon from '../components/Icon';
       const logoPath = 'https://res.cloudinary.com/tomasgo/image/upload/v1755132928/square/logo_j9ojkk.png';
 import Modal from '../components/Modal';
 
-const MainLayout = () => {
+const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { currentUser, logout, isAdmin } = useAuth();
   const { modal, showConfirmModal } = useModal();
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => router.pathname === path;
 
   // Close mobile menu when route changes
   useEffect(() => {
     setIsMobileMenuOpen(false);
     setIsUserMenuOpen(false);
-  }, [location.pathname]);
+  }, [router.pathname]);
 
   // Handle escape key to close mobile menu
   useEffect(() => {
@@ -62,7 +62,7 @@ const MainLayout = () => {
       'Are you sure you want to sign out?',
       () => {
         logout();
-        navigate('/login');
+        router.push('/login');
       },
       () => {}
     );
@@ -77,7 +77,7 @@ const MainLayout = () => {
         <div className="header-container">
           <div className="header-content">
             {/* Logo */}
-            <Link to="/" className="logo" aria-label="Go to home page">
+            <Link href="/" className="logo" aria-label="Go to home page">
               <img src={logoPath} alt="Logo" className="h-8 w-8 mr-8" />
             </Link>
 
@@ -86,7 +86,7 @@ const MainLayout = () => {
               <ul className="flex items-center justify-center gap-32 list-none m-0 p-0">
                 <li>
                   <Link
-                    to="/"
+                    href="/"
                     className={`nav-link ${isActive('/') ? 'active' : ''}`}
                     aria-current={isActive('/') ? 'page' : undefined}
                   >
@@ -95,7 +95,7 @@ const MainLayout = () => {
                 </li>
                 <li>
                   <Link
-                    to="/create"
+                    href="/create"
                     className={`nav-link ${isActive('/create') ? 'active' : ''}`}
                     aria-current={isActive('/create') ? 'page' : undefined}
                   >
@@ -104,7 +104,7 @@ const MainLayout = () => {
                 </li>
                 <li>
                   <Link
-                    to="/past"
+                    href="/past"
                     className={`nav-link ${isActive('/past') ? 'active' : ''}`}
                     aria-current={isActive('/past') ? 'page' : undefined}
                   >
@@ -154,7 +154,7 @@ const MainLayout = () => {
                       <p className="user-email">{currentUser?.email}</p>
                     </div>
                     <Link
-                      to="/profile"
+                      href="/profile"
                       className="user-menu-item"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
@@ -162,7 +162,7 @@ const MainLayout = () => {
                       Profile
                     </Link>
                     <Link
-                      to="/profile"
+                      href="/profile"
                       className="user-menu-item"
                       onClick={() => setIsUserMenuOpen(false)}
                     >
@@ -211,7 +211,7 @@ const MainLayout = () => {
             <ul className="nav-mobile-content list-none m-0 p-0">
               <li>
                 <Link
-                  to="/"
+                  href="/"
                   className={`nav-link ${isActive('/') ? 'active' : ''}`}
                   aria-current={isActive('/') ? 'page' : undefined}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -221,7 +221,7 @@ const MainLayout = () => {
               </li>
               <li>
                 <Link
-                  to="/create"
+                  href="/create"
                   className={`nav-link ${isActive('/create') ? 'active' : ''}`}
                   aria-current={isActive('/create') ? 'page' : undefined}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -231,7 +231,7 @@ const MainLayout = () => {
               </li>
               <li>
                 <Link
-                  to="/past"
+                  href="/past"
                   className={`nav-link ${isActive('/past') ? 'active' : ''}`}
                   aria-current={isActive('/past') ? 'page' : undefined}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -241,7 +241,7 @@ const MainLayout = () => {
               </li>
               <li className="border-t border-gray-200 mt-4 pt-4">
                 <Link
-                  to="/profile"
+                  href="/profile"
                   className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
                   aria-current={isActive('/profile') ? 'page' : undefined}
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -267,14 +267,12 @@ const MainLayout = () => {
       </header>
 
       {/* Main Content */}
-      <main role="main">
-        <Outlet />
-      </main>
+      <main role="main">{children}</main>
       {/* Footer */}
       <footer className="mt-32 py-16">
         <div className="text-center text-xs text-gray-400 space-x-12">
-          <Link to="/terms" className="hover:text-gray-600">Terms & Conditions</Link>
-          <Link to="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
+          <Link href="/terms" className="hover:text-gray-600">Terms & Conditions</Link>
+          <Link href="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
           <span>© {new Date().getFullYear()} Be There or Be Square</span>
         </div>
       </footer>

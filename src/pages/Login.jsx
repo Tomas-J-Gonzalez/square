@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import { authService } from '../services/authService';
@@ -18,8 +19,8 @@ const Login = () => {
   const [showAdminButton, setShowAdminButton] = useState(false);
   
   const { login, setCurrentUser } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const location = { state: {}, search: typeof window !== 'undefined' ? window.location.search : '' };
   const { modal, showErrorModal } = useModal();
   // Only show admin sign-in for the site owner: enabled locally or via a private localStorage flag
   useEffect(() => {
@@ -78,7 +79,7 @@ const Login = () => {
         setCurrentUser(adminUser);
         
         // Redirect to the page they were trying to access
-        navigate(from, { replace: true });
+        router.replace(from);
         return;
       }
 
@@ -86,7 +87,7 @@ const Login = () => {
       
       if (result.success) {
         // Redirect to the page they were trying to access
-        navigate(from, { replace: true });
+        router.replace(from);
       } else {
         setErrors({ general: result.error });
       }
@@ -112,7 +113,7 @@ const Login = () => {
     // Persist and set session without using password input (avoids Chrome breach warning)
     authService.setCurrentUser(adminUser);
     setCurrentUser(adminUser);
-    navigate(from, { replace: true });
+    router.replace(from);
   };
 
   const handleInputChange = (e) => {
@@ -223,7 +224,7 @@ const Login = () => {
             <p className="text-sm text-gray-600">
               Don't have an account?{' '}
               <Link 
-                to="/register" 
+                href="/register" 
                 className="text-pink-600 hover:text-pink-700 font-medium"
               >
                 Sign up

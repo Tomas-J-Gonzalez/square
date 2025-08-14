@@ -135,8 +135,8 @@ SUPABASE_ANON_KEY=your_supabase_anon_key_here
 # Resend API Configuration
 RESEND_API_KEY=re_your_resend_api_key_here
 
-# Frontend URL (for email links)
-FRONTEND_URL=https://dontbesquare.netlify.app
+# Public site URL (for email links)
+NEXT_PUBLIC_SITE_URL=https://your-vercel-domain.vercel.app
 ```
 
 ### 2. Vercel Deployment

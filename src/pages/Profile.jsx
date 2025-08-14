@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import { authService } from '../services/authService';
@@ -9,7 +9,7 @@ import Modal from '../components/Modal';
 
 const Profile = () => {
   const { currentUser, updateProfile, changePassword, deleteAccount, logout } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { modal, showErrorModal, showSuccessModal, showConfirmModal } = useModal();
 
   const [activeTab, setActiveTab] = useState('profile');
@@ -132,7 +132,7 @@ const Profile = () => {
       if (result.success) {
         showSuccessModal('Account Deleted', 'Your account has been deleted successfully.');
         logout();
-        navigate('/');
+        router.push('/');
       } else {
         setDeleteErrors({ general: result.error });
       }
@@ -379,9 +379,9 @@ const Profile = () => {
               <div className="p-4 border border-gray-200 rounded-md">
                 <h3 className="text-md font-medium text-gray-900 mb-2">Environment</h3>
                 <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
-                  <li>Frontend URL: {import.meta.env.VITE_FRONTEND_URL || window.location.origin}</li>
+                  <li>Site URL: {import.meta.env.VITE_FRONTEND_URL || import.meta.env.VITE_SITE_URL || import.meta.env.VITE_VERCEL_API_BASE || window.location.origin}</li>
                   <li>Environment: {import.meta.env.MODE}</li>
-                  <li>Node (build): 18.x (Netlify config)</li>
+                  <li>Platform: Vercel</li>
                   <li>Email Provider: Resend</li>
                 </ul>
               </div>
@@ -400,7 +400,7 @@ const Profile = () => {
                 <h3 className="text-md font-medium text-gray-900 mb-2">Services</h3>
                 <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
                   <li>LocalStorage: Users, Events, Email Confirmations</li>
-                  <li>Netlify Functions: <code className="bg-gray-100 px-1 py-0.5 rounded">netlify/functions/send-confirmation-email.js</code></li>
+                  <li>API: <code className="bg-gray-100 px-1 py-0.5 rounded">/api/*</code> (Vercel)</li>
                 </ul>
               </div>
               <div className="p-4 border border-gray-200 rounded-md">

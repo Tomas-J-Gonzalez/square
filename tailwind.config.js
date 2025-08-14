@@ -1,14 +1,12 @@
-import { parseTokens } from './src/utils/tokenParser.js';
-
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    "./index.html",
+    "./pages/**/*.{js,ts,jsx,tsx}",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
-      ...parseTokens(),
+      // Keep Tailwind defaults; tokens can be re-added after Next migration stabilizes
       // 8px Grid System
       spacing: {
         // 8px grid system - multiples of 8

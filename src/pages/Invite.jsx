@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
 import { useAuth } from '../contexts/AuthContext';
 import Icon from '../components/Icon';
 
 const Invite = () => {
-  const { eventId } = useParams();
-  const navigate = useNavigate();
+  const router = useRouter();
+  const { eventId } = router.query;
   const { currentUser } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -20,7 +20,7 @@ const Invite = () => {
       try {
         // If user is logged in, redirect to RSVP page
         if (currentUser) {
-          navigate(`/rsvp/${eventId}${window.location.search}`);
+          router.push(`/rsvp/${eventId}${window.location.search}`);
           return;
         }
 
@@ -91,7 +91,7 @@ const Invite = () => {
       }
     };
     load();
-  }, [eventId, currentUser, navigate]);
+  }, [eventId, currentUser, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

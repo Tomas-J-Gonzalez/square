@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import { authService } from '../services/authService';
@@ -20,7 +21,7 @@ const Register = () => {
   const [passwordStrength, setPasswordStrength] = useState(null);
   
   const { register } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { modal, showErrorModal, showSuccessModal } = useModal();
 
   const validateForm = () => {
@@ -95,7 +96,7 @@ const Register = () => {
         showSuccessModal(
           'Account Created!', 
           'Your account has been created successfully! Please check your email for a confirmation link before you can log in.',
-          () => navigate('/login')
+          () => router.push('/login')
         );
       } else {
         setErrors({ general: result.error });
@@ -256,7 +257,7 @@ const Register = () => {
             <p className="text-sm text-gray-600">
               Already have an account?{' '}
               <Link 
-                to="/login" 
+                href="/login" 
                 className="text-pink-600 hover:text-pink-700 font-medium"
               >
                 Sign in

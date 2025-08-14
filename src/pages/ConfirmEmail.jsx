@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { authService } from '../services/authService';
 import { useModal } from '../hooks/useModal';
 import Button from '../components/Button';
@@ -7,8 +7,7 @@ import Icon from '../components/Icon';
 import Modal from '../components/Modal';
 
 const ConfirmEmail = () => {
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const router = useRouter();
   const { modal, showSuccessModal } = useModal();
   
   const [loading, setLoading] = useState(true);
@@ -16,7 +15,7 @@ const ConfirmEmail = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const token = searchParams.get('token');
+    const token = new URLSearchParams(window.location.search).get('token');
     console.log('🔍 ConfirmEmail: Token from URL:', token);
     
     if (!token) {
@@ -34,14 +33,14 @@ const ConfirmEmail = () => {
       showSuccessModal(
         'Email Confirmed!', 
         'Your email has been confirmed successfully. You can now log in to your account.',
-        () => navigate('/login')
+        () => router.push('/login')
       );
     } else {
       setError(result.message);
     }
     
     setLoading(false);
-  }, [searchParams, navigate, showSuccessModal]);
+  }, [router, showSuccessModal]);
 
   if (loading) {
     return (
@@ -80,7 +79,7 @@ const ConfirmEmail = () => {
                 Your email has been confirmed successfully. You can now log in to your account.
               </p>
               <Button
-                onClick={() => navigate('/login')}
+                onClick={() => router.push('/login')}
                 variant="primary"
                 size="lg"
                 fullWidth
@@ -105,7 +104,7 @@ const ConfirmEmail = () => {
               </p>
 
               <Button
-                onClick={() => navigate('/login')}
+                onClick={() => router.push('/login')}
                 variant="primary"
                 size="lg"
                 fullWidth

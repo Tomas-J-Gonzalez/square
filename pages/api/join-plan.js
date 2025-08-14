@@ -1,5 +1,5 @@
-import { cors } from '../lib/cors.js';
-import { supabase } from '../lib/supabaseClient.js';
+import { cors } from '../../lib/cors.js';
+import { supabase } from '../../lib/supabaseClient.js';
 
 export default async function handler(req, res) {
   // Apply CORS headers
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     }
 
     // Check if user is already a member
-    const { data: existingMember, error: memberCheckError } = await supabase
+    const { data: existingMember } = await supabase
       .from('plan_members')
       .select('*')
       .eq('plan_id', plan_id)
@@ -54,14 +54,12 @@ export default async function handler(req, res) {
 
     // Check if plan is full (if max_members is set)
     if (plan.max_members) {
-      const { count, error: countError } = await supabase
+      const { count } = await supabase
         .from('plan_members')
         .select('*', { count: 'exact', head: true })
         .eq('plan_id', plan_id);
 
-      if (countError) {
-        console.error('Error counting members:', countError);
-      } else if (count >= plan.max_members) {
+      if (count >= plan.max_members) {
         return res.status(400).json({ 
           error: 'Plan is full' 
         });
@@ -106,3 +104,4 @@ export default async function handler(req, res) {
     });
   }
 }
+

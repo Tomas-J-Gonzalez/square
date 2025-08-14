@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { eventService } from '../services/eventService';
 import { participationService } from '../services/participationService';
 import Icon from '../components/Icon';
 
 const RSVP = () => {
-  const { eventId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const { eventId } = router.query || {};
+  const location = { search: typeof window !== 'undefined' ? window.location.search : '' };
   const { currentUser } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -164,7 +164,7 @@ const RSVP = () => {
       
       // Redirect to event page after a short delay
       setTimeout(() => {
-        navigate(`/event/${eventId}`);
+        router.push(`/event/${eventId}`);
       }, 2000);
       
     } catch (err) {
@@ -192,7 +192,7 @@ const RSVP = () => {
           <Icon name="exclamation-triangle" style="solid" size="xl" className="text-red-500 mx-auto mb-16" />
           <p className="text-gray-600">{error}</p>
           <button 
-            onClick={() => navigate('/')} 
+            onClick={() => router.push('/')} 
             className="btn btn-primary btn-md mt-16"
           >
             Go Back Home

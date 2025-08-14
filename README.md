@@ -44,7 +44,7 @@ A fun, social web application designed to prevent people from flaking on events.
    ```bash
    # Create .env file
    echo "RESEND_API_KEY=your_resend_api_key_here" > .env
-   echo "FRONTEND_URL=http://localhost:5175" >> .env
+   echo "NEXT_PUBLIC_SITE_URL=http://localhost:3000" >> .env.local
    echo "PORT=3001" >> .env
    ```
 
@@ -236,7 +236,7 @@ npm run build
 ### Environment Variables for Production
 ```
 RESEND_API_KEY=your_production_api_key
-FRONTEND_URL=https://your-domain.com
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
 PORT=3001
 ```
 
