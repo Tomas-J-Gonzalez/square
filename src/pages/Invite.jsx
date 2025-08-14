@@ -11,6 +11,7 @@ const Invite = () => {
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', willAttend: 'yes' });
   const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -107,7 +108,7 @@ const Invite = () => {
       } catch (_) {
         // ignore if supabase not configured
       }
-      navigate(`/event/${eventId}`);
+      setSubmitted(true);
     } catch (err) {
       setError(err.message || 'Failed to submit response');
     } finally {
@@ -137,6 +138,14 @@ const Invite = () => {
     <div className="section">
       <div className="section-container max-w-xl mx-auto">
         <div className="card">
+          {submitted ? (
+            <div className="text-center">
+              <Icon name="check-circle" style="solid" size="xl" className="text-green-500 mx-auto mb-16" />
+              <h2 className="text-xl font-semibold text-gray-900 mb-8">Thanks for your response!</h2>
+              <p className="text-gray-700">You can close this window now.</p>
+            </div>
+          ) : (
+            <>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">You're invited!</h1>
           <p className="text-gray-700 mb-8">{event.invitedBy} invited you to…</p>
           <div className="space-y-4 mb-8 text-gray-700">
@@ -175,6 +184,8 @@ const Invite = () => {
               {submitting ? 'Submitting…' : 'Submit RSVP'}
             </button>
           </form>
+            </>
+          )}
         </div>
       </div>
     </div>
