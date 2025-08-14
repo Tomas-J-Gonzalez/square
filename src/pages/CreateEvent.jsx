@@ -58,10 +58,35 @@ const CreateEvent = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    
+    // Additional validation for date input
+    if (name === 'date' && value) {
+      const selectedDate = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset time to start of day
+      
+      // Check if the date is valid and not in the past
+      if (selectedDate < today) {
+        setError('Please select a date that is today or in the future.');
+        return;
+      }
+      
+      // Check if it's a valid date (not NaN)
+      if (isNaN(selectedDate.getTime())) {
+        setError('Please select a valid date.');
+        return;
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    
+    // Clear error when user starts typing
+    if (error) {
+      setError('');
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -90,18 +115,19 @@ const CreateEvent = () => {
       // Persist server-side for invite workflows (best-effort, non-fatal)
       try {
         const { supabase } = await import('../../lib/supabaseClient');
-        const serverId = eventData.id || `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        await supabase.from('events').upsert({
-          id: serverId,
-          title: eventData.title,
-          date: formData.date,
-          time: formData.time,
-          location: formData.location || null,
-          decision_mode: formData.decisionMode,
-          punishment: eventData.punishment,
-          invited_by: (JSON.parse(localStorage.getItem('be-there-or-be-square-current-user')||'{}').name) || 'Organizer'
-        });
-        const newEvent = eventService.createNewEvent({ ...eventData, id: serverId });
+        if (supabase) {
+          await supabase.from('events').upsert({
+            id: eventData.id, // Use the same ID for both local and server
+            title: eventData.title,
+            date: formData.date,
+            time: formData.time,
+            location: formData.location || null,
+            decision_mode: formData.decisionMode,
+            punishment: eventData.punishment,
+            invited_by: (JSON.parse(localStorage.getItem('be-there-or-be-square-current-user')||'{}').name) || 'Organizer'
+          });
+        }
+        const newEvent = eventService.createNewEvent(eventData);
         navigate(`/event/${newEvent.id}`);
       } catch (_) {
         // Fallback to local only if supabase not configured

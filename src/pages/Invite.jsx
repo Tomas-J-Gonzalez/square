@@ -121,15 +121,22 @@ const Invite = () => {
             punishment: event.punishment || '',
             invited_by: event.invitedBy || 'Organizer'
           });
+          
+          // Insert RSVP
+          const { error } = await supabase.from('event_rsvps').insert({
+            event_id: eventId,
+            name: form.name.trim(),
+            will_attend: form.willAttend === 'yes'
+          });
+          if (error) throw error;
+          
+          console.log('RSVP submitted successfully to server');
+        } else {
+          console.warn('Supabase not available, RSVP not saved to server');
         }
-        const { error } = await supabase.from('event_rsvps').insert({
-          event_id: eventId,
-          name: form.name.trim(),
-          will_attend: form.willAttend === 'yes'
-        });
-        if (error) throw error;
-      } catch (_) {
-        // ignore if supabase not configured
+      } catch (error) {
+        console.error('Error submitting RSVP to server:', error);
+        // Continue with local submission even if server fails
       }
       setSubmitted(true);
     } catch (err) {

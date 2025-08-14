@@ -51,6 +51,11 @@ const ViewEvent = () => {
   const fetchAndMergeRsvps = async (baseEvent) => {
     try {
       const { supabase } = await import('../../lib/supabaseClient');
+      if (!supabase) {
+        console.warn('Supabase not configured, skipping server sync');
+        return baseEvent;
+      }
+      
       // Ensure event row exists
       await supabase.from('events').upsert({
         id: eventId,
@@ -63,11 +68,23 @@ const ViewEvent = () => {
         invited_by: (currentUser?.name) || 'Organizer'
       });
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('event_rsvps')
         .select('name, will_attend, created_at')
         .eq('event_id', eventId);
-      if (!Array.isArray(data)) return baseEvent;
+      
+      if (error) {
+        console.error('Error fetching RSVPs:', error);
+        return baseEvent;
+      }
+      
+      if (!Array.isArray(data)) {
+        console.warn('No RSVPs found or invalid data format');
+        setServerRsvps([]);
+        return baseEvent;
+      }
+      
+      console.log('Fetched RSVPs from server:', data);
       setServerRsvps(data);
       
       // Create a map of existing participants by name (case-insensitive)
@@ -80,9 +97,15 @@ const ViewEvent = () => {
       const merged = [...baseEvent.participants];
       let addedAnything = false;
       
+      console.log('Existing participants:', baseEvent.participants.map(p => p.name));
+      console.log('Processing RSVPs:', data);
+      
       data.forEach(r => {
         const name = (r.name || '').trim();
-        if (!name) return;
+        if (!name) {
+          console.warn('Skipping RSVP with empty name:', r);
+          return;
+        }
         const key = name.toLowerCase();
         
         // Only add if not already in participants list
@@ -98,10 +121,14 @@ const ViewEvent = () => {
           merged.push(newParticipant);
           addedAnything = true;
           existingParticipants.set(key, newParticipant);
+          console.log('Added new participant from RSVP:', newParticipant);
+        } else {
+          console.log('Skipping duplicate participant:', name);
         }
       });
       
       if (addedAnything) {
+        console.log('Updated event with new participants:', merged);
         const updatedEvent = { ...baseEvent, participants: merged };
         const all = eventService.getEvents();
         const idx = all.findIndex(e => e.id === eventId);
@@ -110,6 +137,8 @@ const ViewEvent = () => {
           localStorage.setItem('be-there-or-be-square-events', JSON.stringify(all));
         }
         return updatedEvent;
+      } else {
+        console.log('No new participants added');
       }
       
       return baseEvent;
@@ -743,28 +772,28 @@ const ViewEvent = () => {
                           onClick={() => handleAttendanceChange(participant.id, 'attended')}
                           className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
                             attendanceStatus[participant.id] === 'attended'
-                              ? 'bg-green-100 text-green-800 border border-green-300'
-                              : 'bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700'
+                              ? 'bg-gray-100 text-gray-800 border border-gray-300'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
                           }`}
                           aria-pressed={attendanceStatus[participant.id] === 'attended'}
                           aria-label={`Mark ${participant.name} as attended`}
                           type="button"
                         >
-                          <Icon name="check-circle" style="solid" size="sm" aria-hidden="true" />
+                          <Icon name="check-circle" style="solid" size="sm" className={attendanceStatus[participant.id] === 'attended' ? 'text-green-600' : 'text-gray-500'} aria-hidden="true" />
                           <span>Attended</span>
                         </button>
                         <button
                           onClick={() => handleAttendanceChange(participant.id, 'flaked')}
                           className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
                             attendanceStatus[participant.id] === 'flaked'
-                              ? 'bg-red-100 text-red-800 border border-red-300'
-                              : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-700'
+                              ? 'bg-gray-100 text-gray-800 border border-gray-300'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200 hover:text-gray-800'
                           }`}
                           aria-pressed={attendanceStatus[participant.id] === 'flaked'}
                           aria-label={`Mark ${participant.name} as flaked`}
                           type="button"
                         >
-                          <Icon name="times-circle" style="solid" size="sm" aria-hidden="true" />
+                          <Icon name="times-circle" style="solid" size="sm" className={attendanceStatus[participant.id] === 'flaked' ? 'text-red-600' : 'text-gray-500'} aria-hidden="true" />
                           <span>Flaked</span>
                         </button>
                       </div>
@@ -778,6 +807,12 @@ const ViewEvent = () => {
             {isOrganizer && (
               <div className="mt-24">
                 <h3 className="text-sm font-medium text-gray-900 mb-12">Guest RSVPs (live)</h3>
+                <div className="mb-8 p-8 bg-gray-50 rounded-md text-xs">
+                  <p><strong>Debug Info:</strong></p>
+                  <p>Event ID: {eventId}</p>
+                  <p>Server RSVPs count: {serverRsvps.length}</p>
+                  <p>Server RSVPs data: {JSON.stringify(serverRsvps, null, 2)}</p>
+                </div>
                 {serverRsvps.length === 0 ? (
                   <p className="text-sm text-gray-500">No RSVPs yet.</p>
                 ) : (
@@ -804,16 +839,25 @@ const ViewEvent = () => {
               {/* Attendance Stats */}
               <div className="grid grid-cols-3 gap-16 text-center">
                 <div className="p-16 bg-gray-50 rounded-md">
+                  <div className="flex items-center justify-center mb-8">
+                    <Icon name="clock" style="solid" size="lg" className="text-gray-500" aria-hidden="true" />
+                  </div>
                   <div className="text-2xl font-bold text-gray-600">{pendingCount}</div>
                   <div className="text-sm text-gray-500">Pending</div>
                 </div>
-                <div className="p-16 bg-green-50 rounded-md">
-                  <div className="text-2xl font-bold text-green-600">{attendedCount}</div>
-                  <div className="text-sm text-green-500">Attended</div>
+                <div className="p-16 bg-gray-50 rounded-md">
+                  <div className="flex items-center justify-center mb-8">
+                    <Icon name="check-circle" style="solid" size="lg" className="text-green-600" aria-hidden="true" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-600">{attendedCount}</div>
+                  <div className="text-sm text-gray-500">Attended</div>
                 </div>
-                <div className="p-16 bg-red-50 rounded-md">
-                  <div className="text-2xl font-bold text-red-600">{flakedCount}</div>
-                  <div className="text-sm text-red-500">Flaked</div>
+                <div className="p-16 bg-gray-50 rounded-md">
+                  <div className="flex items-center justify-center mb-8">
+                    <Icon name="times-circle" style="solid" size="lg" className="text-red-600" aria-hidden="true" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-600">{flakedCount}</div>
+                  <div className="text-sm text-gray-500">Flaked</div>
                 </div>
               </div>
 

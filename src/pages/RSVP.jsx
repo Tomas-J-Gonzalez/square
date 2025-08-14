@@ -30,10 +30,13 @@ const RSVP = () => {
               .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
               .eq('id', eventId)
               .single();
-            if (!resp.error) data = resp.data;
+            if (!resp.error && resp.data) {
+              data = resp.data;
+            }
           }
-        } catch (_) {
-          // ignore if supabase not configured
+        } catch (error) {
+          console.warn('Could not fetch from server:', error);
+          // Continue with fallback methods
         }
 
         if (data) {
@@ -58,6 +61,7 @@ const RSVP = () => {
           const decision_mode = params.get('decision_mode');
           const punishment = params.get('punishment');
           const invited_by = params.get('invited_by');
+          
           if (title && date && time && punishment) {
             setEvent({
               id: eventId,
@@ -111,17 +115,20 @@ const RSVP = () => {
       try {
         const { supabase } = await import('../../lib/supabaseClient');
         if (supabase && event) {
-          // Ensure the event exists server-side
-          await supabase.from('events').upsert({
+          // Ensure we have all required event data before upserting
+          const eventData = {
             id: eventId,
-            title: event.title,
-            date: event.date || (event.dateTime ? new Date(event.dateTime).toISOString().slice(0,10) : null),
-            time: event.time || (event.dateTime ? new Date(event.dateTime).toTimeString().slice(0,5) : null),
+            title: event.title || 'Untitled Event',
+            date: event.date || (event.dateTime ? new Date(event.dateTime).toISOString().slice(0,10) : new Date().toISOString().slice(0,10)),
+            time: event.time || (event.dateTime ? new Date(event.dateTime).toTimeString().slice(0,5) : '12:00'),
             location: event.location || null,
             decision_mode: event.decisionMode || 'none',
-            punishment: event.punishment || '',
-            invited_by: event.invitedBy || 'Organizer'
-          });
+            punishment: event.punishment || 'No punishment specified',
+            invited_by: event.invitedBy || currentUser.name || 'Organizer'
+          };
+          
+          // Ensure the event exists server-side
+          await supabase.from('events').upsert(eventData);
           
           // Add RSVP to server
           await supabase.from('event_rsvps').insert({
@@ -130,8 +137,9 @@ const RSVP = () => {
             will_attend: form.willAttend === 'yes'
           });
         }
-      } catch (_) {
-        // ignore if supabase not configured
+      } catch (error) {
+        console.warn('Could not save to server, continuing with local storage:', error);
+        // Continue with local storage even if server save fails
       }
 
       // Add to local event

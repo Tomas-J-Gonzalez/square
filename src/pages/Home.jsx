@@ -83,12 +83,12 @@ const Home = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-32 mb-32">
-          {/* Events I'm Organizing */}
+          {/* Events I'm Hosting */}
           <div className="card">
             <div className="card-header">
               <h2 className="card-title flex items-center">
                 <Icon name="crown" style="solid" size="sm" className="mr-8 text-pink-500" />
-                Events I'm Organizing
+                Events I'm Hosting
               </h2>
             </div>
             
@@ -131,12 +131,12 @@ const Home = () => {
             )}
           </div>
 
-          {/* Events I'm Part Of */}
+          {/* Events I'm Attending */}
           <div className="card">
             <div className="card-header">
               <h2 className="card-title flex items-center">
                 <Icon name="user-friends" style="solid" size="sm" className="mr-8 text-pink-500" />
-                Events I'm Part Of
+                Events I'm Attending
               </h2>
             </div>
             

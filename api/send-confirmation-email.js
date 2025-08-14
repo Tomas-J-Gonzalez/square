@@ -36,7 +36,7 @@ export default async function handler(req, res) {
 			subject: 'Confirm your Be There or Be Square account',
 			html: `
 				<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-					<div style="background-color: #ec4899; width: 64px; height: 64px; border-radius: 4px; margin: 0 auto 20px;"></div>
+					<div style="background-color: #ec4899; width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 20px;"></div>
 					<h1 style="color: #1f2937; text-align: center; margin-bottom: 10px;">Welcome to Be There or Be Square!</h1>
 					<p style="color: #6b7280; text-align: center; margin-bottom: 30px;">Hi ${name},</p>
 					<p style="color: #374151; line-height: 1.6; margin-bottom: 30px;">
