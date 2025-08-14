@@ -44,6 +44,61 @@ const ViewEvent = () => {
     setModal(prev => ({ ...prev, isOpen: false }));
   };
 
+  // Helper: fetch RSVPs from server and merge into local event
+  const fetchAndMergeRsvps = async (baseEvent) => {
+    try {
+      const { supabase } = await import('../../lib/supabaseClient');
+      // Ensure event row exists
+      await supabase.from('events').upsert({
+        id: eventId,
+        title: baseEvent.title,
+        date: baseEvent.date || (baseEvent.dateTime ? new Date(baseEvent.dateTime).toISOString().slice(0,10) : null),
+        time: baseEvent.time || (baseEvent.dateTime ? new Date(baseEvent.dateTime).toTimeString().slice(0,5) : null),
+        location: baseEvent.location || null,
+        decision_mode: baseEvent.decisionMode || 'none',
+        punishment: baseEvent.punishment || '',
+        invited_by: (currentUser?.name) || 'Organizer'
+      });
+
+      const { data } = await supabase
+        .from('event_rsvps')
+        .select('name, will_attend, created_at')
+        .eq('event_id', eventId);
+      if (!Array.isArray(data)) return baseEvent;
+      const existingNames = new Set(baseEvent.participants.map(p => (p.name || '').trim().toLowerCase()));
+      const merged = [...baseEvent.participants];
+      let addedAnything = false;
+      data.forEach(r => {
+        const name = (r.name || '').trim();
+        if (!name) return;
+        const key = name.toLowerCase();
+        if (!existingNames.has(key)) {
+          const id = `guest_${key}_${Date.now()}`;
+          merged.push({
+            id,
+            name,
+            email: `${key.replace(/\s+/g,'')}@guest.local`,
+            message: r.will_attend ? 'Confirmed attendance' : 'Cannot attend',
+            joinedAt: r.created_at
+          });
+          addedAnything = true;
+          existingNames.add(key);
+        }
+      });
+      if (!addedAnything) return baseEvent;
+      const updatedEvent = { ...baseEvent, participants: merged };
+      const all = eventService.getEvents();
+      const idx = all.findIndex(e => e.id === eventId);
+      if (idx !== -1) {
+        all[idx] = updatedEvent;
+        localStorage.setItem('be-there-or-be-square-events', JSON.stringify(all));
+      }
+      return updatedEvent;
+    } catch (_) {
+      return baseEvent;
+    }
+  };
+
   useEffect(() => {
     const loadEvent = async () => {
       try {
@@ -54,50 +109,7 @@ const ViewEvent = () => {
         let foundEvent = events.find(e => e.id === eventId);
         
         if (foundEvent) {
-          // Try to merge server RSVPs into local participants
-          try {
-            const { supabase } = await import('../../lib/supabaseClient');
-            // Ensure the event row exists for this id
-            await supabase.from('events').upsert({
-              id: eventId,
-              title: foundEvent.title,
-              date: foundEvent.date || (foundEvent.dateTime ? new Date(foundEvent.dateTime).toISOString().slice(0,10) : null),
-              time: foundEvent.time || (foundEvent.dateTime ? new Date(foundEvent.dateTime).toTimeString().slice(0,5) : null),
-              location: foundEvent.location || null,
-              decision_mode: foundEvent.decisionMode || 'none',
-              punishment: foundEvent.punishment || '',
-              invited_by: (currentUser?.name) || 'Organizer'
-            });
-            const { data } = await supabase
-              .from('event_rsvps')
-              .select('name, will_attend, created_at')
-              .eq('event_id', eventId);
-            if (Array.isArray(data)) {
-              const existingNames = new Set(foundEvent.participants.map(p => p.name?.toLowerCase()));
-              const merged = [...foundEvent.participants];
-              data.forEach(r => {
-                const name = (r.name || '').trim();
-                if (name && !existingNames.has(name.toLowerCase())) {
-                  merged.push({
-                    id: `guest_${name}_${Date.now()}`,
-                    name,
-                    email: `${name.toLowerCase().replace(/\s+/g,'')}@guest.local`,
-                    message: r.will_attend ? 'Confirmed attendance' : 'Cannot attend',
-                    joinedAt: r.created_at
-                  });
-                  existingNames.add(name.toLowerCase());
-                }
-              });
-              foundEvent = { ...foundEvent, participants: merged };
-              // Persist merge locally so UI reflects
-              const all = eventService.getEvents();
-              const idx = all.findIndex(e => e.id === eventId);
-              if (idx !== -1) {
-                all[idx] = foundEvent;
-                localStorage.setItem('be-there-or-be-square-events', JSON.stringify(all));
-              }
-            }
-          } catch (_) {}
+          foundEvent = await fetchAndMergeRsvps(foundEvent);
 
           setEvent(foundEvent);
           // Initialize attendance status for existing participants
@@ -119,6 +131,15 @@ const ViewEvent = () => {
     };
 
     loadEvent();
+    // Poll RSVPs every 10 seconds for live updates
+    const interval = setInterval(async () => {
+      if (!event) return;
+      const updated = await fetchAndMergeRsvps(event);
+      if (updated !== event) {
+        setEvent(updated);
+      }
+    }, 10000);
+    return () => clearInterval(interval);
   }, [eventId, navigate]);
 
   const handleAddParticipant = async (e) => {
