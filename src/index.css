@@ -342,6 +342,44 @@ a:focus-visible {
 }
 
 /* ==========================================================================
+   Text Links (tertiary)
+   ========================================================================== */
+
+.text-link {
+  font-size: 13px; /* slightly smaller */
+  color: var(--brand-primary);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.text-link:focus-visible {
+  outline: 3px solid var(--brand-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.text-link-tertiary {
+  font-size: 13px; /* slightly smaller */
+  color: var(--text-subtle);
+  text-decoration: none;
+}
+
+.text-link-tertiary:hover {
+  color: #111827;
+  text-decoration: underline;
+}
+
+.text-link-tertiary:focus-visible {
+  outline: 3px solid var(--brand-focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ==========================================================================
    Form Components
    ========================================================================== */
 
@@ -474,6 +512,25 @@ a:focus-visible {
   border-color: #ec4899;
   background-color: #fdf2f8;
   color: #ec4899;
+}
+
+/* Hide native radio controls inside selectable cards, keep them accessible */
+.decision-option input[type="radio"],
+.punishment-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Show a focus ring when the hidden input receives focus */
+.decision-option:has(input[type="radio"]:focus-visible),
+.punishment-option:has(input[type="radio"]:focus-visible) {
+  outline: 3px solid var(--brand-focus);
+  outline-offset: 2px;
 }
 
 /* ==========================================================================
