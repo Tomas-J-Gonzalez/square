@@ -41,12 +41,7 @@ const PasswordInput = ({
         className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700"
         aria-label={showPassword ? 'Hide password' : 'Show password'}
       >
-        <Icon 
-          name={showPassword ? 'eye-slash' : 'eye'} 
-          style="solid" 
-          size="sm" 
-          aria-hidden="true"
-        />
+        <span aria-hidden="true">{showPassword ? '🙈' : '👁️'}</span>
       </button>
     </div>
   );

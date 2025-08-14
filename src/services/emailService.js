@@ -1,8 +1,5 @@
 // Single endpoint strategy on Vercel
-const VERCEL_CONFIRM_EMAIL_ENDPOINT =
-  (import.meta.env && import.meta.env.VITE_VERCEL_API_BASE)
-    ? `${import.meta.env.VITE_VERCEL_API_BASE.replace(/\/$/, '')}/send-confirmation-email`
-    : '/api/send-confirmation-email';
+const VERCEL_CONFIRM_EMAIL_ENDPOINT = '/api/send-confirmation-email';
 
 // Local dev endpoint (when running local Express email server)
 const LOCAL_CONFIRM_EMAIL_ENDPOINT = 'http://localhost:3001/api/send-confirmation-email';
@@ -32,13 +29,7 @@ export const sendConfirmationEmail = async (emailData) => {
   };
 
   try {
-    // Prefer local during development
-    if (!import.meta.env.PROD) {
-      const local = await makeRequest(LOCAL_CONFIRM_EMAIL_ENDPOINT);
-      if (local.ok) return local.data;
-    }
-
-    // Use Vercel API in all other cases
+    // Always use Vercel API in browser/runtime
     const vercel = await makeRequest(VERCEL_CONFIRM_EMAIL_ENDPOINT);
     if (vercel.ok) return vercel.data;
     console.error('Vercel email API failed:', vercel.status, vercel.data);
@@ -56,19 +47,8 @@ export const sendConfirmationEmail = async (emailData) => {
  */
 export const checkEmailService = async () => {
   try {
-    // In production, probe Vercel API endpoint
-    if (import.meta.env.PROD) {
-      try {
-        const res = await fetch(VERCEL_CONFIRM_EMAIL_ENDPOINT, { method: 'OPTIONS' });
-        if (res.ok) return true;
-      } catch (_) {}
-      return true;
-    }
-    
-    // In development, check the local server
-    const response = await fetch('http://localhost:3001/api/health');
-    const result = await response.json();
-    return result.success;
+    const res = await fetch(VERCEL_CONFIRM_EMAIL_ENDPOINT, { method: 'OPTIONS' });
+    return res.ok;
   } catch (error) {
     console.error('Email service not available:', error);
     return false;
