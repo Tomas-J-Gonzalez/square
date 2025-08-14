@@ -16,6 +16,7 @@ import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Invite from './pages/Invite';
 import RSVP from './pages/RSVP';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -41,6 +42,9 @@ function App() {
             {/* Public legal pages */}
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
+            
+            {/* 404 catch-all route */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Router>
       </AuthProvider>
