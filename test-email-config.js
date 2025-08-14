@@ -5,8 +5,8 @@ async function testEmailConfig() {
   console.log('🧪 Testing Email Configuration...');
   
   try {
-    // Test the Netlify function
-    const response = await fetch('/.netlify/functions/send-confirmation-email', {
+    // Test the Vercel API route
+    const response = await fetch('/api/send-confirmation-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

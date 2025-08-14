@@ -4,3 +4,5 @@ export default function RegisterPage() {
   return <Register />;
 }
 
+RegisterPage.noLayout = true;
+

@@ -7,17 +7,17 @@ import { useRouter } from 'next/router';
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
   const noLayoutRoutes = new Set(['/login', '/register']);
-  const useLayout = !noLayoutRoutes.has(router.pathname);
+  const wantsNoLayout = Component.noLayout === true || noLayoutRoutes.has(router.pathname);
 
   return (
     <ErrorBoundary>
       <AuthProvider>
-        {useLayout ? (
+        {wantsNoLayout ? (
+          <Component {...pageProps} />
+        ) : (
           <MainLayout>
             <Component {...pageProps} />
           </MainLayout>
-        ) : (
-          <Component {...pageProps} />
         )}
       </AuthProvider>
     </ErrorBoundary>
