@@ -27,10 +27,11 @@ export default async function handler(req, res) {
     try {
       const { createClient } = await import('@supabase/supabase-js');
       const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-      const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      const key = process.env.SUPABASE_SERVICE_ROLE_KEY; // must be service role on server
       if (url && key) {
         const s = createClient(url, key);
-        await s.from('email_confirmations').insert({ token, used: false });
+        const { error: insertError } = await s.from('email_confirmations').insert({ token, used: false });
+        if (insertError) console.error('Failed to store token:', insertError);
       }
     } catch (_) {}
 
