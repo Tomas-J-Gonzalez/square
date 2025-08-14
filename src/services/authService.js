@@ -397,10 +397,7 @@ const loginUser = (email, password) => {
     throw new Error('Invalid email or password');
   }
 
-  // Check if email is confirmed (unless it's admin)
-  if (!user.emailConfirmed && !isAdminCredentials(emailLower, password)) {
-    throw new Error('Please confirm your email address before logging in. Check your inbox for a confirmation link.');
-  }
+  // Temporarily allow login without email confirmation (confirmation emails may be delayed in production)
 
   // Update last login time
   user.lastLoginAt = new Date().toISOString();
