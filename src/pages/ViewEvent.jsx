@@ -576,7 +576,7 @@ const ViewEvent = () => {
           
           {/* Share Options - Individual Buttons - Only show for organizers */}
           {isOrganizer && (
-            <div className="flex items-center justify-center space-x-12 mb-24">
+            <div className="flex items-center justify-center space-x-8 mb-24">
               <button
                 onClick={() => handleShare('twitter')}
                 className="btn btn-secondary btn-sm flex items-center"
@@ -616,55 +616,61 @@ const ViewEvent = () => {
               {isOrganizer ? 'Friends' : 'Participants'} ({event.participants.length})
             </h2>
             
-            {/* Add Friend Form - Only show for organizers */}
+                        {/* Add Friend Form - Only show for organizers */}
             {isOrganizer && (
-              <form onSubmit={handleAddParticipant} className="mb-32">
-                <div className="space-y-16">
-                  <div>
-                    <label htmlFor="name" className="form-label">Name *</label>
-                    <input
-                      type="text"
-                      id="name"
-                      value={newParticipant.name}
-                      onChange={(e) => setNewParticipant(prev => ({ ...prev, name: e.target.value }))}
-                      className="form-input"
-                      placeholder="Enter name"
-                      required
-                    />
+              <div className="mb-32">
+                <h3 className="text-sm font-medium text-gray-900 mb-16">Add a friend manually</h3>
+                <form onSubmit={handleAddParticipant}>
+                  <div className="space-y-16">
+                    <div>
+                      <label htmlFor="name" className="form-label">Name *</label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        value={newParticipant.name}
+                        onChange={(e) => setNewParticipant(prev => ({ ...prev, name: e.target.value }))}
+                        className="form-input"
+                        placeholder="Enter name"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="form-label">Email *</label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={newParticipant.email}
+                        onChange={(e) => setNewParticipant(prev => ({ ...prev, email: e.target.value }))}
+                        className="form-input"
+                        placeholder="Enter email"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="message" className="form-label">Message *</label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={newParticipant.message}
+                        onChange={(e) => setNewParticipant(prev => ({ ...prev, message: e.target.value }))}
+                        className="form-input"
+                        placeholder="Enter a message"
+                        rows="3"
+                        required
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isAddingParticipant}
+                      className="btn btn-primary btn-sm"
+                    >
+                      {isAddingParticipant ? 'Adding...' : 'Add Friend'}
+                    </button>
                   </div>
-                  <div>
-                    <label htmlFor="email" className="form-label">Email *</label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={newParticipant.email}
-                      onChange={(e) => setNewParticipant(prev => ({ ...prev, email: e.target.value }))}
-                      className="form-input"
-                      placeholder="Enter email"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="message" className="form-label">Message *</label>
-                    <textarea
-                      id="message"
-                      value={newParticipant.message}
-                      onChange={(e) => setNewParticipant(prev => ({ ...prev, message: e.target.value }))}
-                      className="form-input"
-                      placeholder="Enter a message"
-                      rows="3"
-                      required
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isAddingParticipant}
-                    className="btn btn-primary btn-sm"
-                  >
-                    {isAddingParticipant ? 'Adding...' : 'Add Friend'}
-                  </button>
-                </div>
-              </form>
+                </form>
+              </div>
             )}
 
             {/* Friends List */}
@@ -683,8 +689,10 @@ const ViewEvent = () => {
                       <button
                         onClick={() => handleRemoveParticipant(participant.id)}
                         className="text-red-500 hover:text-red-700"
+                        aria-label={`Remove ${participant.name} from event`}
+                        type="button"
                       >
-                        <Icon name="times" style="solid" size="sm" />
+                        <Icon name="times" style="solid" size="sm" aria-hidden="true" />
                       </button>
                     )}
                   </div>
@@ -701,8 +709,11 @@ const ViewEvent = () => {
                               ? 'bg-green-100 text-green-800 border border-green-300'
                               : 'bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700'
                           }`}
+                          aria-pressed={attendanceStatus[participant.id] === 'attended'}
+                          aria-label={`Mark ${participant.name} as attended`}
+                          type="button"
                         >
-                          <Icon name="check-circle" style="solid" size="sm" />
+                          <Icon name="check-circle" style="solid" size="sm" aria-hidden="true" />
                           <span>Attended</span>
                         </button>
                         <button
@@ -712,8 +723,11 @@ const ViewEvent = () => {
                               ? 'bg-red-100 text-red-800 border border-red-300'
                               : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-700'
                           }`}
+                          aria-pressed={attendanceStatus[participant.id] === 'flaked'}
+                          aria-label={`Mark ${participant.name} as flaked`}
+                          type="button"
                         >
-                          <Icon name="times-circle" style="solid" size="sm" />
+                          <Icon name="times-circle" style="solid" size="sm" aria-hidden="true" />
                           <span>Flaked</span>
                         </button>
                       </div>
@@ -768,28 +782,29 @@ const ViewEvent = () => {
 
               {/* Event Details */}
               <div className="space-y-16">
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-8">Decision Mode:</h4>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-gray-900">Decision Mode:</h4>
                   <p className="text-sm text-gray-600">{event.decisionMode}</p>
                 </div>
-                <div>
-                  <h4 className="text-sm font-medium text-gray-900 mb-8">Punishment:</h4>
+                <div className="flex items-center justify-between">
+                  <h4 className="text-sm font-medium text-gray-900">Punishment:</h4>
                   <p className="text-sm text-gray-600">{event.punishment}</p>
                 </div>
               </div>
 
               {/* Action Buttons - Only show for organizers */}
               {isOrganizer && (
-                <div className="space-y-16">
+                <div className="space-y-8">
                   <button
                     onClick={handleCompleteEvent}
                     disabled={isProcessing || pendingCount > 0}
                     className="btn btn-primary btn-lg"
                     style={{ width: '200px' }}
+                    aria-describedby={pendingCount > 0 ? "complete-event-help" : undefined}
                   >
                     {isProcessing ? (
                       <>
-                        <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
+                        <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" aria-hidden="true" />
                         Completing Event...
                       </>
                     ) : (
@@ -805,7 +820,7 @@ const ViewEvent = () => {
                   >
                     {isCancelling ? (
                       <>
-                        <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
+                        <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" aria-hidden="true" />
                         Cancelling Event...
                       </>
                     ) : (
@@ -816,7 +831,7 @@ const ViewEvent = () => {
               )}
               
               {isOrganizer && pendingCount > 0 && (
-                <p className="text-sm text-gray-500 text-center">
+                <p id="complete-event-help" className="text-sm text-gray-500 text-center">
                   Please mark attendance for all friends before completing the event
                 </p>
               )}

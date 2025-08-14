@@ -82,7 +82,7 @@ const Home = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-32 mb-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-32 mb-32">
           {/* Events I'm Organizing */}
           <div className="card">
             <div className="card-header">

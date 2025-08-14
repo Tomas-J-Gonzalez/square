@@ -69,12 +69,14 @@ const RSVP = () => {
               invitedBy: invited_by || 'A friend'
             });
           } else {
+            // Try to find in local events (user might be the organizer)
             const events = eventService.getEvents();
             const e = events.find(ev => ev.id === eventId);
-            if (!e) {
-              setError('Event not found');
-            } else {
+            if (e) {
               setEvent(e);
+            } else {
+              // Event not found in server or local - show error
+              setError('Event not found. The invitation link may be invalid or the event may have been deleted.');
             }
           }
         }
