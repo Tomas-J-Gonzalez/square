@@ -20,7 +20,8 @@ export default async function handler(req, res) {
       return u.replace(/\/$/, '');
     })();
     const confirmationUrl = `${normalizedBase}/confirm-email?token=${encodeURIComponent(token)}`;
-    const logoUrl = `${normalizedBase}/assets/logo.svg`;
+    const externalAssetsBase = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/$/, '');
+    const logoUrl = externalAssetsBase ? `${externalAssetsBase}/logo.svg` : `${normalizedBase}/assets/logo.svg`;
 
     const { data, error } = await resend.emails.send({
       from: 'Be There or Be Square <onboarding@resend.dev>',

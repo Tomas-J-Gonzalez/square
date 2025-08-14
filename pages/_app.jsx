@@ -5,6 +5,7 @@ import { AuthProvider } from '../src/contexts/AuthContext';
 import MainLayout from '../src/layouts/MainLayout';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { getAssetUrl } from '../src/utils/assetUrl';
 
 export default function MyApp({ Component, pageProps }) {
   const router = useRouter();
@@ -14,8 +15,8 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <ErrorBoundary>
       <Head>
-        <link rel="icon" href="/assets/favicon.png" type="image/png" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href={getAssetUrl('favicon.png')} type="image/png" />
+        <link rel="icon" href={getAssetUrl('favicon.svg')} type="image/svg+xml" />
         <meta name="theme-color" content="#ec4899" />
       </Head>
       <AuthProvider>
