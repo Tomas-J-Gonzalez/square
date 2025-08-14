@@ -183,6 +183,15 @@ const Invite = () => {
             <button type="submit" className="btn btn-primary btn-lg w-full" disabled={submitting}>
               {submitting ? 'Submitting…' : 'Submit RSVP'}
             </button>
+
+            {/* Optional: sign in or sign up */}
+            <div className="text-center text-sm text-gray-600">
+              <p className="mb-8">Already have an account?</p>
+              <div className="flex flex-col sm:flex-row gap-8 justify-center">
+                <a href={`/login?redirect=/event/${eventId}`} className="btn btn-secondary btn-sm">Sign in and RSVP</a>
+                <a href="/register" className="btn btn-outline btn-sm">Create an account</a>
+              </div>
+            </div>
           </form>
             </>
           )}

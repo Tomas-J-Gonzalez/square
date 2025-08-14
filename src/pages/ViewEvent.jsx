@@ -45,15 +45,49 @@ const ViewEvent = () => {
   };
 
   useEffect(() => {
-    const loadEvent = () => {
+    const loadEvent = async () => {
       try {
         setLoading(true);
         setError(null);
         
         const events = eventService.getEvents();
-        const foundEvent = events.find(e => e.id === eventId);
+        let foundEvent = events.find(e => e.id === eventId);
         
         if (foundEvent) {
+          // Try to merge server RSVPs into local participants
+          try {
+            const { supabase } = await import('../../lib/supabaseClient');
+            const { data } = await supabase
+              .from('event_rsvps')
+              .select('name, will_attend, created_at')
+              .eq('event_id', eventId);
+            if (Array.isArray(data)) {
+              const existingNames = new Set(foundEvent.participants.map(p => p.name?.toLowerCase()));
+              const merged = [...foundEvent.participants];
+              data.forEach(r => {
+                const name = (r.name || '').trim();
+                if (name && !existingNames.has(name.toLowerCase())) {
+                  merged.push({
+                    id: `guest_${name}_${Date.now()}`,
+                    name,
+                    email: `${name.toLowerCase().replace(/\s+/g,'')}@guest.local`,
+                    message: r.will_attend ? 'Confirmed attendance' : 'Cannot attend',
+                    joinedAt: r.created_at
+                  });
+                  existingNames.add(name.toLowerCase());
+                }
+              });
+              foundEvent = { ...foundEvent, participants: merged };
+              // Persist merge locally so UI reflects
+              const all = eventService.getEvents();
+              const idx = all.findIndex(e => e.id === eventId);
+              if (idx !== -1) {
+                all[idx] = foundEvent;
+                localStorage.setItem('be-there-or-be-square-events', JSON.stringify(all));
+              }
+            }
+          } catch (_) {}
+
           setEvent(foundEvent);
           // Initialize attendance status for existing participants
           const initialStatus = {};
