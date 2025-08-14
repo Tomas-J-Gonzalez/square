@@ -24,22 +24,27 @@ const ConfirmEmail = () => {
       return;
     }
 
-    console.log('🔍 ConfirmEmail: Calling authService.confirmEmail with token:', token);
-    const result = authService.confirmEmail(token);
-    console.log('🔍 ConfirmEmail: Result:', result);
-    
-    if (result.success) {
-      setConfirmed(true);
-      showSuccessModal(
-        'Email Confirmed!', 
-        'Your email has been confirmed successfully. You can now log in to your account.',
-        () => router.push('/login')
-      );
-    } else {
-      setError(result.message);
-    }
-    
-    setLoading(false);
+    const confirm = async () => {
+      try {
+        const resp = await fetch(`/api/confirm-email?token=${encodeURIComponent(token)}`);
+        const json = await resp.json();
+        if (resp.ok && json.success) {
+          setConfirmed(true);
+          showSuccessModal(
+            'Email Confirmed!',
+            'Your email has been confirmed successfully. You can now log in to your account.',
+            () => router.push('/login')
+          );
+        } else {
+          setError(json.error || 'Invalid or expired confirmation token');
+        }
+      } catch (e) {
+        setError('Unable to confirm email');
+      } finally {
+        setLoading(false);
+      }
+    };
+    confirm();
   }, [router, showSuccessModal]);
 
   if (loading) {

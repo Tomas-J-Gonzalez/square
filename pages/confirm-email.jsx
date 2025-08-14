@@ -4,3 +4,5 @@ export default function ConfirmEmailPage() {
   return <ConfirmEmail />;
 }
 
+ConfirmEmailPage.noLayout = true;
+

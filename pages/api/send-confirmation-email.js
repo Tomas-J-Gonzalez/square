@@ -23,6 +23,17 @@ export default async function handler(req, res) {
     const externalAssetsBase = process.env.NEXT_PUBLIC_ASSETS_BASE_URL?.replace(/\/$/, '');
     const logoUrl = externalAssetsBase ? `${externalAssetsBase}/logo.svg` : `${normalizedBase}/assets/logo.svg`;
 
+    // Store token server-side as well for cross-device confirmation
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+      const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (url && key) {
+        const s = createClient(url, key);
+        await s.from('email_confirmations').insert({ token, used: false });
+      }
+    } catch (_) {}
+
     const { data, error } = await resend.emails.send({
       from: 'Be There or Be Square <onboarding@resend.dev>',
       to: email,
