@@ -379,8 +379,10 @@ const Profile = () => {
               <div className="p-4 border border-gray-200 rounded-md">
                 <h3 className="text-md font-medium text-gray-900 mb-2">Environment</h3>
                 <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
-                  <li>Site URL: {import.meta.env.VITE_FRONTEND_URL || import.meta.env.VITE_SITE_URL || import.meta.env.VITE_VERCEL_API_BASE || window.location.origin}</li>
-                  <li>Environment: {import.meta.env.MODE}</li>
+                  <li>
+                    Site URL: {process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '')}
+                  </li>
+                  <li>Environment: {process.env.NODE_ENV || 'development'}</li>
                   <li>Platform: Vercel</li>
                   <li>Email Provider: Resend</li>
                 </ul>
@@ -390,7 +392,11 @@ const Profile = () => {
               <div className="p-4 border border-gray-200 rounded-md">
                 <h3 className="text-md font-medium text-gray-900 mb-2">Connected APIs</h3>
                 <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
-                  <li>Resend Email API: {import.meta.env.VITE_RESEND_ENABLED === 'false' ? 'Disabled' : 'Enabled'}</li>
+                  <li>
+                    Resend Email API: {typeof process.env.NEXT_PUBLIC_RESEND_ENABLED !== 'undefined' 
+                      ? (process.env.NEXT_PUBLIC_RESEND_ENABLED === 'true' ? 'Enabled' : 'Disabled') 
+                      : 'Unknown'}
+                  </li>
                   <li>Email endpoint: <code className="bg-gray-100 px-1 py-0.5 rounded">/api/send-confirmation-email</code></li>
                 </ul>
               </div>

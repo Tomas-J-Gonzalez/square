@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
@@ -136,7 +137,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <img src="/assets/logo.svg" alt="Logo" className="w-16 h-16 mx-auto mb-4" />
+          <div className="mx-auto mb-4" style={{ width: 64, height: 64 }}>
+            <Image src="/assets/logo.svg" alt="Logo" width={64} height={64} priority />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>

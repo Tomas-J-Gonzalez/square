@@ -70,7 +70,7 @@ const MainLayout = ({ children }) => {
   const isAdminUserDisplay = isAdmin || currentUser?.id === 'admin' || currentUser?.email === 'admin@example.com' || currentUser?.name === 'Administrator';
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--background-default)' }}>
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="header" role="banner">
         <div className="header-container">
