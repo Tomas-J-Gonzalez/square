@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
@@ -22,6 +22,7 @@ const ViewEvent = () => {
   const [isCancelling, setIsCancelling] = useState(false);
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [showShareModal, setShowShareModal] = useState(false);
+  const latestEventRef = useRef(null);
   
   // Modal states
   const [modal, setModal] = useState({
@@ -112,6 +113,7 @@ const ViewEvent = () => {
           foundEvent = await fetchAndMergeRsvps(foundEvent);
 
           setEvent(foundEvent);
+          latestEventRef.current = foundEvent;
           // Initialize attendance status for existing participants
           const initialStatus = {};
           foundEvent.participants.forEach(participant => {
@@ -133,14 +135,29 @@ const ViewEvent = () => {
     loadEvent();
     // Poll RSVPs every 10 seconds for live updates
     const interval = setInterval(async () => {
-      if (!event) return;
-      const updated = await fetchAndMergeRsvps(event);
-      if (updated !== event) {
+      const base = latestEventRef.current;
+      if (!base) return;
+      const updated = await fetchAndMergeRsvps(base);
+      // If participants length changed, re-init state
+      if (updated && JSON.stringify(updated.participants) !== JSON.stringify(base.participants)) {
         setEvent(updated);
+        latestEventRef.current = updated;
+        const init = {};
+        updated.participants.forEach(p => {
+          if (!init[p.id]) init[p.id] = 'pending';
+        });
+        setAttendanceStatus(prev => ({ ...init, ...prev }));
       }
     }, 10000);
     return () => clearInterval(interval);
   }, [eventId, navigate]);
+
+  // Keep ref in sync with latest event state
+  useEffect(() => {
+    if (event) {
+      latestEventRef.current = event;
+    }
+  }, [event]);
 
   const handleAddParticipant = async (e) => {
     e.preventDefault();
