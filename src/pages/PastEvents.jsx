@@ -1,16 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { eventService } from '../services/eventService';
+import { participationService } from '../services/participationService';
+import { useAuth } from '../contexts/AuthContext';
 import Icon from '../components/Icon';
 
 const PastEvents = () => {
-  const [activeTab, setActiveTab] = useState('all');
-  const [pastEvents, setPastEvents] = useState([]);
+  const [activeTab, setActiveTab] = useState('hosted');
+  const [hostedEvents, setHostedEvents] = useState([]);
+  const [joinedEvents, setJoinedEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
-    // Load past events from event service
-    const events = eventService.getPastEvents();
-    setPastEvents(events);
-  }, []);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        
+        // Load hosted events (events user organized)
+        const hosted = eventService.getPastEvents();
+        setHostedEvents(hosted);
+        
+        // Load joined events (events user participated in)
+        if (currentUser?.email) {
+          // Sync with server first
+          await participationService.syncServerParticipations(currentUser.email);
+          
+          // Get all participations and filter for completed/cancelled events
+          const participations = participationService.getUserParticipations(currentUser.email);
+          const joined = participations.filter(p => {
+            // For now, we'll show all participations as "joined events"
+            // In a full implementation, you'd want to check if the event is actually completed/cancelled
+            return true;
+          });
+          setJoinedEvents(joined);
+        }
+      } catch (error) {
+        console.error('Error loading past events:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, [currentUser]);
 
   const getDecisionModeIcon = (mode) => {
     switch (mode) {
@@ -54,45 +86,44 @@ const PastEvents = () => {
 
   const getFilteredEvents = () => {
     switch (activeTab) {
-      case 'cancelled':
-        return pastEvents.filter(event => event.status === 'cancelled');
-      case 'flakes':
-        return pastEvents.filter(event => event.flakes && event.flakes.length > 0);
-      case 'no-flakes':
-        return pastEvents.filter(event => event.status !== 'cancelled' && (!event.flakes || event.flakes.length === 0));
+      case 'hosted':
+        return hostedEvents;
+      case 'joined':
+        return joinedEvents;
       default:
-        return pastEvents;
+        return hostedEvents;
     }
   };
 
   const tabs = [
     {
-      id: 'all',
-      label: 'All Past Events',
-      icon: 'calendar-check',
-      count: pastEvents.length
+      id: 'hosted',
+      label: 'Events I\'ve Hosted',
+      icon: 'crown',
+      count: hostedEvents.length
     },
     {
-      id: 'cancelled',
-      label: 'Events Cancelled',
-      icon: 'times-circle',
-      count: pastEvents.filter(event => event.status === 'cancelled').length
-    },
-    {
-      id: 'flakes',
-      label: 'Events with Flakes',
-      icon: 'user-times',
-      count: pastEvents.filter(event => event.flakes && event.flakes.length > 0).length
-    },
-    {
-      id: 'no-flakes',
-      label: 'Events with No Flakes',
-      icon: 'user-check',
-      count: pastEvents.filter(event => event.status !== 'cancelled' && (!event.flakes || event.flakes.length === 0)).length
+      id: 'joined',
+      label: 'Events I\'ve Joined',
+      icon: 'user-friends',
+      count: joinedEvents.length
     }
   ];
 
   const filteredEvents = getFilteredEvents();
+
+  if (loading) {
+    return (
+      <div className="section">
+        <div className="section-container">
+          <div className="text-center">
+            <Icon name="spinner" style="solid" size="xl" className="animate-spin text-pink-500 mx-auto mb-16" />
+            <p className="text-gray-600">Loading past events...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="section">
@@ -136,126 +167,200 @@ const PastEvents = () => {
         {/* Events Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-32">
           {filteredEvents.map((event) => {
-            const status = getEventStatus(event);
-            return (
-              <div key={event.id} className="card hover:shadow-lg transition-shadow duration-200">
-                <div className="space-y-24">
-                  {/* Event Header */}
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="card-title mb-8">
-                        {event.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {new Date(event.dateTime || event.date).toLocaleDateString()}
-                      </p>
+            // Handle both hosted events (full event objects) and joined events (participation records)
+            const isHostedEvent = event.participants !== undefined;
+            const isJoinedEvent = event.eventTitle !== undefined;
+            
+            if (isHostedEvent) {
+              // Render hosted event (full event data)
+              const status = getEventStatus(event);
+              return (
+                <div key={event.id} className="card hover:shadow-lg transition-shadow duration-200">
+                  <div className="space-y-24">
+                    {/* Event Header */}
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="card-title mb-8">
+                          {event.title}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {new Date(event.dateTime || event.date).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-8">
+                        <Icon name="users" style="solid" size="sm" className="text-gray-500" />
+                        <span className="text-sm text-gray-600">
+                          {event.participants.length}
+                        </span>
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-8">
-                      <Icon name="users" style="solid" size="sm" className="text-gray-500" />
-                      <span className="text-sm text-gray-600">
-                        {event.participants.length}
-                      </span>
-                    </div>
-                  </div>
 
-                  {/* Event Status */}
-                  <div className={`flex items-center justify-between p-16 rounded-md ${status.bgColor}`}>
-                    <div className="flex items-center space-x-8">
+                    {/* Event Status */}
+                    <div className={`flex items-center justify-between p-16 rounded-md ${status.bgColor}`}>
+                      <div className="flex items-center space-x-8">
+                        <Icon 
+                          name={status.icon} 
+                          style="solid" 
+                          size="sm" 
+                          className={status.color} 
+                        />
+                        <span className="text-sm font-medium text-gray-900">
+                          {status.text}
+                        </span>
+                      </div>
+                      {event.status === 'cancelled' && (
+                        <div className="text-sm text-red-600 font-medium">
+                          Cancelled
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Decision Method */}
+                    <div className="flex items-center space-x-12">
                       <Icon 
-                        name={status.icon} 
+                        name={getDecisionModeIcon(event.decisionMode)} 
                         style="solid" 
                         size="sm" 
-                        className={status.color} 
+                        className="text-pink-500" 
                       />
-                      <span className="text-sm font-medium text-gray-900">
-                        {status.text}
+                      <span className="text-sm text-gray-600">
+                        {getDecisionModeLabel(event.decisionMode)}
                       </span>
                     </div>
+
+                    {/* Event Details */}
+                    {event.status !== 'cancelled' && (
+                      <div className="space-y-16">
+                        {event.flakes && event.flakes.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-8">
+                              Flakes:
+                            </h4>
+                            <div className="flex flex-wrap gap-8">
+                              {event.flakes.map((flake, index) => (
+                                <span
+                                  key={index}
+                                  className="px-12 py-4 bg-red-100 text-red-800 text-xs rounded-full font-medium"
+                                >
+                                  {flake}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-900 mb-8">
+                            Punishment:
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {event.punishment}
+                          </p>
+                        </div>
+
+                        {event.winner && (
+                          <div>
+                            <h4 className="text-sm font-medium text-gray-900 mb-8">
+                              Winner (got to decide):
+                            </h4>
+                            <span className="px-12 py-4 bg-green-100 text-green-800 text-xs rounded-full font-medium">
+                              {event.winner.name}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* No Flakes Message */}
+                    {event.status !== 'cancelled' && (!event.flakes || event.flakes.length === 0) && (
+                      <div className="text-center py-24">
+                        <Icon name="trophy" style="solid" size="lg" className="text-yellow-500 mx-auto mb-16" />
+                        <p className="text-sm text-gray-600">
+                          Everyone showed up! 🎉
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Cancelled Message */}
                     {event.status === 'cancelled' && (
-                      <div className="text-sm text-red-600 font-medium">
-                        Cancelled
+                      <div className="text-center py-24">
+                        <Icon name="times-circle" style="solid" size="lg" className="text-red-500 mx-auto mb-16" />
+                        <p className="text-sm text-gray-600">
+                          Event was cancelled
+                        </p>
                       </div>
                     )}
                   </div>
+                </div>
+              );
+            } else if (isJoinedEvent) {
+              // Render joined event (participation record)
+              return (
+                <div key={event.id} className="card hover:shadow-lg transition-shadow duration-200">
+                  <div className="space-y-24">
+                    {/* Event Header */}
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h3 className="card-title mb-8">
+                          {event.eventTitle}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {new Date(event.eventDate).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-8">
+                        <Icon name="user" style="solid" size="sm" className="text-gray-500" />
+                        <span className="text-sm text-gray-600">
+                          {event.organizerName}
+                        </span>
+                      </div>
+                    </div>
 
-                  {/* Decision Method */}
-                  <div className="flex items-center space-x-12">
-                    <Icon 
-                      name={getDecisionModeIcon(event.decisionMode)} 
-                      style="solid" 
-                      size="sm" 
-                      className="text-pink-500" 
-                    />
-                    <span className="text-sm text-gray-600">
-                      {getDecisionModeLabel(event.decisionMode)}
-                    </span>
-                  </div>
+                    {/* Participation Status */}
+                    <div className={`flex items-center justify-between p-16 rounded-md ${
+                      event.status === 'confirmed' ? 'bg-green-50' : 'bg-red-50'
+                    }`}>
+                      <div className="flex items-center space-x-8">
+                        <Icon 
+                          name={event.status === 'confirmed' ? 'check-circle' : 'times-circle'} 
+                          style="solid" 
+                          size="sm" 
+                          className={event.status === 'confirmed' ? 'text-green-500' : 'text-red-500'} 
+                        />
+                        <span className="text-sm font-medium text-gray-900">
+                          {event.status === 'confirmed' ? 'Confirmed Attendance' : 'Declined'}
+                        </span>
+                      </div>
+                    </div>
 
-                  {/* Event Details */}
-                  {event.status !== 'cancelled' && (
+                    {/* Event Details */}
                     <div className="space-y-16">
-                      {event.flakes && event.flakes.length > 0 && (
+                      {event.message && (
                         <div>
                           <h4 className="text-sm font-medium text-gray-900 mb-8">
-                            Flakes:
+                            Your Message:
                           </h4>
-                          <div className="flex flex-wrap gap-8">
-                            {event.flakes.map((flake, index) => (
-                              <span
-                                key={index}
-                                className="px-12 py-4 bg-red-100 text-red-800 text-xs rounded-full font-medium"
-                              >
-                                {flake}
-                              </span>
-                            ))}
-                          </div>
+                          <p className="text-sm text-gray-600">
+                            "{event.message}"
+                          </p>
                         </div>
                       )}
 
                       <div>
                         <h4 className="text-sm font-medium text-gray-900 mb-8">
-                          Punishment:
+                          Joined:
                         </h4>
                         <p className="text-sm text-gray-600">
-                          {event.punishment}
+                          {new Date(event.joinedAt).toLocaleDateString()}
                         </p>
                       </div>
-
-                      {event.winner && (
-                        <div>
-                          <h4 className="text-sm font-medium text-gray-900 mb-8">
-                            Winner (got to decide):
-                          </h4>
-                          <span className="px-12 py-4 bg-green-100 text-green-800 text-xs rounded-full font-medium">
-                            {event.winner.name}
-                          </span>
-                        </div>
-                      )}
                     </div>
-                  )}
-
-                  {/* No Flakes Message */}
-                  {event.status !== 'cancelled' && (!event.flakes || event.flakes.length === 0) && (
-                    <div className="text-center py-24">
-                      <Icon name="trophy" style="solid" size="lg" className="text-yellow-500 mx-auto mb-16" />
-                      <p className="text-sm text-gray-600">
-                        Everyone showed up! 🎉
-                      </p>
-                    </div>
-                  )}
-
-                  {/* Cancelled Message */}
-                  {event.status === 'cancelled' && (
-                    <div className="text-center py-24">
-                      <Icon name="times-circle" style="solid" size="lg" className="text-red-500 mx-auto mb-16" />
-                      <p className="text-sm text-gray-600">
-                        Event was cancelled
-                      </p>
-                    </div>
-                  )}
+                  </div>
                 </div>
-              </div>
-            );
+              );
+            }
+            
+            return null;
           })}
         </div>
 
@@ -267,13 +372,9 @@ const PastEvents = () => {
               No events found
             </h3>
             <p className="text-gray-600">
-              {activeTab === 'all' 
-                ? "You haven't completed any events yet."
-                : activeTab === 'cancelled'
-                ? "No cancelled events found."
-                : activeTab === 'flakes'
-                ? "No events with flakes found."
-                : "No events without flakes found."
+              {activeTab === 'hosted' 
+                ? "You haven't hosted any events yet."
+                : "You haven't joined any events yet."
               }
             </p>
           </div>

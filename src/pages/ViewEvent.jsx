@@ -24,6 +24,7 @@ const ViewEvent = () => {
   const [showShareModal, setShowShareModal] = useState(false);
   const latestEventRef = useRef(null);
   const [serverRsvps, setServerRsvps] = useState([]);
+  const [isOrganizer, setIsOrganizer] = useState(false);
   
   // Modal states
   const [modal, setModal] = useState({
@@ -123,23 +124,70 @@ const ViewEvent = () => {
         setLoading(true);
         setError(null);
         
+        // First try to find event in local events (user is organizer)
         const events = eventService.getEvents();
         let foundEvent = events.find(e => e.id === eventId);
         
         if (foundEvent) {
+          // User is organizing this event
           foundEvent = await fetchAndMergeRsvps(foundEvent);
-
           setEvent(foundEvent);
           latestEventRef.current = foundEvent;
+          setIsOrganizer(true);
+          
           // Initialize attendance status for existing participants
           const initialStatus = {};
           foundEvent.participants.forEach(participant => {
-            initialStatus[participant.id] = participant.status || 'pending'; // pending, attended, flaked
+            initialStatus[participant.id] = participant.status || 'pending';
           });
           setAttendanceStatus(initialStatus);
         } else {
-          setError('Event not found!');
-          setTimeout(() => navigate('/'), 2000);
+          // Event not found locally - try to fetch from server (user is participant)
+          try {
+            const { supabase } = await import('../../lib/supabaseClient');
+            const { data: eventData } = await supabase
+              .from('events')
+              .select('*')
+              .eq('id', eventId)
+              .single();
+            
+            if (eventData) {
+              // Convert server event to local format
+              const serverEvent = {
+                id: eventData.id,
+                title: eventData.title,
+                date: eventData.date,
+                time: eventData.time,
+                location: eventData.location || '',
+                decisionMode: eventData.decision_mode || 'none',
+                punishment: eventData.punishment || '',
+                dateTime: eventData.dateTime || `${eventData.date}T${eventData.time}`,
+                participants: [], // Will be populated by fetchAndMergeRsvps
+                status: 'active',
+                createdAt: eventData.created_at,
+                updatedAt: eventData.updated_at
+              };
+              
+              const mergedEvent = await fetchAndMergeRsvps(serverEvent);
+              setEvent(mergedEvent);
+              latestEventRef.current = mergedEvent;
+              setIsOrganizer(false); // User is a participant, not organizer
+              
+              // Initialize attendance status
+              const initialStatus = {};
+              mergedEvent.participants.forEach(participant => {
+                initialStatus[participant.id] = participant.status || 'pending';
+              });
+              setAttendanceStatus(initialStatus);
+            } else {
+              setError('Event not found!');
+              setTimeout(() => navigate('/'), 2000);
+            }
+          } catch (serverError) {
+            console.error('Error fetching event from server:', serverError);
+            setError('Event not found!');
+            setTimeout(() => navigate('/'), 2000);
+          }
         }
       } catch (err) {
         console.error('Error loading event:', err);
@@ -526,92 +574,98 @@ const ViewEvent = () => {
             )}
           </div>
           
-          {/* Share Options - Individual Buttons */}
-          <div className="flex items-center justify-center space-x-12 mb-24">
-            <button
-              onClick={() => handleShare('twitter')}
-              className="btn btn-secondary btn-sm flex items-center"
-            >
-              <Icon name="twitter" style="brands" size="sm" className="mr-4" />
-              Twitter
-            </button>
-            <button
-              onClick={() => handleShare('facebook')}
-              className="btn btn-secondary btn-sm flex items-center"
-            >
-              <Icon name="facebook" style="brands" size="sm" className="mr-4" />
-              Facebook
-            </button>
-            <button
-              onClick={() => handleShare('instagram')}
-              className="btn btn-secondary btn-sm flex items-center"
-            >
-              <Icon name="instagram" style="brands" size="sm" className="mr-4" />
-              Instagram
-            </button>
-            <button
-              onClick={handleCopyInvitationLink}
-              className="btn btn-secondary btn-sm flex items-center"
-            >
-              <Icon name="link" style="solid" size="sm" className="mr-4" />
-              Share Invitation Link
-            </button>
-          </div>
+          {/* Share Options - Individual Buttons - Only show for organizers */}
+          {isOrganizer && (
+            <div className="flex items-center justify-center space-x-12 mb-24">
+              <button
+                onClick={() => handleShare('twitter')}
+                className="btn btn-secondary btn-sm flex items-center"
+              >
+                <Icon name="twitter" style="brands" size="sm" className="mr-4" />
+                Twitter
+              </button>
+              <button
+                onClick={() => handleShare('facebook')}
+                className="btn btn-secondary btn-sm flex items-center"
+              >
+                <Icon name="facebook" style="brands" size="sm" className="mr-4" />
+                Facebook
+              </button>
+              <button
+                onClick={() => handleShare('instagram')}
+                className="btn btn-secondary btn-sm flex items-center"
+              >
+                <Icon name="instagram" style="brands" size="sm" className="mr-4" />
+                Instagram
+              </button>
+              <button
+                onClick={handleCopyInvitationLink}
+                className="btn btn-secondary btn-sm flex items-center"
+              >
+                <Icon name="link" style="solid" size="sm" className="mr-4" />
+                Share Invitation Link
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-32">
           {/* Friends Section */}
           <div className="card">
-            <h2 className="card-title mb-24">Friends ({event.participants.length})</h2>
+            <h2 className="card-title mb-24">
+              {isOrganizer ? 'Friends' : 'Participants'} ({event.participants.length})
+            </h2>
             
-            {/* Add Friend Form */}
-            <form onSubmit={handleAddParticipant} className="mb-32">
-              <div className="space-y-16">
-                <div>
-                  <label htmlFor="name" className="form-label">Name *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={newParticipant.name}
-                    onChange={(e) => setNewParticipant(prev => ({ ...prev, name: e.target.value }))}
-                    className="form-input"
-                    placeholder="Enter name"
-                    required
-                  />
+            {/* Add Friend Form - Only show for organizers */}
+            {isOrganizer && (
+              <form onSubmit={handleAddParticipant} className="mb-32">
+                <div className="space-y-16">
+                  <div>
+                    <label htmlFor="name" className="form-label">Name *</label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={newParticipant.name}
+                      onChange={(e) => setNewParticipant(prev => ({ ...prev, name: e.target.value }))}
+                      className="form-input"
+                      placeholder="Enter name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="form-label">Email *</label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={newParticipant.email}
+                      onChange={(e) => setNewParticipant(prev => ({ ...prev, email: e.target.value }))}
+                      className="form-input"
+                      placeholder="Enter email"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="message" className="form-label">Message *</label>
+                    <textarea
+                      id="message"
+                      value={newParticipant.message}
+                      onChange={(e) => setNewParticipant(prev => ({ ...prev, message: e.target.value }))}
+                      className="form-input"
+                      placeholder="Enter a message"
+                      rows="3"
+                      required
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isAddingParticipant}
+                    className="btn btn-primary btn-sm"
+                  >
+                    {isAddingParticipant ? 'Adding...' : 'Add Friend'}
+                  </button>
                 </div>
-                <div>
-                  <label htmlFor="email" className="form-label">Email *</label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={newParticipant.email}
-                    onChange={(e) => setNewParticipant(prev => ({ ...prev, email: e.target.value }))}
-                    className="form-input"
-                    placeholder="Enter email"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message" className="form-label">Message *</label>
-                  <textarea
-                    id="message"
-                    value={newParticipant.message}
-                    onChange={(e) => setNewParticipant(prev => ({ ...prev, message: e.target.value }))}
-                    className="form-input"
-                    placeholder="Enter a message"
-                    rows="3"
-                    required
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isAddingParticipant}
-                  className="btn btn-primary btn-sm"
-                >
-                  {isAddingParticipant ? 'Adding...' : 'Add Friend'}
-                </button>
-              </div>
-            </form>
+              </form>
+            )}
 
             {/* Friends List */}
             <div className="space-y-16">
@@ -625,64 +679,70 @@ const ViewEvent = () => {
                         <div className="text-sm text-gray-500 mt-4">"{participant.message}"</div>
                       )}
                     </div>
-                    <button
-                      onClick={() => handleRemoveParticipant(participant.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Icon name="times" style="solid" size="sm" />
-                    </button>
+                    {isOrganizer && (
+                      <button
+                        onClick={() => handleRemoveParticipant(participant.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <Icon name="times" style="solid" size="sm" />
+                      </button>
+                    )}
                   </div>
                   
-                  {/* Attendance Status */}
-                  <div className="flex items-center space-x-16">
-                    <span className="text-sm text-gray-600">Status:</span>
-                    <div className="flex space-x-8">
-                      <button
-                        onClick={() => handleAttendanceChange(participant.id, 'attended')}
-                        className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
-                          attendanceStatus[participant.id] === 'attended'
-                            ? 'bg-green-100 text-green-800 border border-green-300'
-                            : 'bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700'
-                        }`}
-                      >
-                        <Icon name="check-circle" style="solid" size="sm" />
-                        <span>Attended</span>
-                      </button>
-                      <button
-                        onClick={() => handleAttendanceChange(participant.id, 'flaked')}
-                        className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
-                          attendanceStatus[participant.id] === 'flaked'
-                            ? 'bg-red-100 text-red-800 border border-red-300'
-                            : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-700'
-                        }`}
-                      >
-                        <Icon name="times-circle" style="solid" size="sm" />
-                        <span>Flaked</span>
-                      </button>
+                  {/* Attendance Status - Only show for organizers */}
+                  {isOrganizer && (
+                    <div className="flex items-center space-x-16">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <div className="flex space-x-8">
+                        <button
+                          onClick={() => handleAttendanceChange(participant.id, 'attended')}
+                          className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
+                            attendanceStatus[participant.id] === 'attended'
+                              ? 'bg-green-100 text-green-800 border border-green-300'
+                              : 'bg-gray-100 text-gray-600 hover:bg-green-50 hover:text-green-700'
+                          }`}
+                        >
+                          <Icon name="check-circle" style="solid" size="sm" />
+                          <span>Attended</span>
+                        </button>
+                        <button
+                          onClick={() => handleAttendanceChange(participant.id, 'flaked')}
+                          className={`flex items-center space-x-4 px-12 py-4 rounded-md text-sm font-medium transition-colors ${
+                            attendanceStatus[participant.id] === 'flaked'
+                              ? 'bg-red-100 text-red-800 border border-red-300'
+                              : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-700'
+                          }`}
+                        >
+                          <Icon name="times-circle" style="solid" size="sm" />
+                          <span>Flaked</span>
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))}
             </div>
 
-            {/* Server RSVPs (live) */}
-            <div className="mt-24">
-              <h3 className="text-sm font-medium text-gray-900 mb-12">Guest RSVPs (live)</h3>
-              {serverRsvps.length === 0 ? (
-                <p className="text-sm text-gray-500">No RSVPs yet.</p>
-              ) : (
-                <ul className="space-y-8">
-                  {serverRsvps.map((r, idx) => (
-                    <li key={idx} className="flex items-center justify-between text-sm">
-                      <span className="font-medium text-gray-800">{r.name}</span>
-                      <span className={r.will_attend ? 'text-green-600' : 'text-gray-500'}>
-                        {r.will_attend ? 'Will attend' : "Can't attend"}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            {/* Server RSVPs (live) - Only show for organizers */}
+            {isOrganizer && (
+              <div className="mt-24">
+                <h3 className="text-sm font-medium text-gray-900 mb-12">Guest RSVPs (live)</h3>
+                {serverRsvps.length === 0 ? (
+                  <p className="text-sm text-gray-500">No RSVPs yet.</p>
+                ) : (
+                  <ul className="space-y-8">
+                    {serverRsvps.map((r, idx) => (
+                      <li key={idx} className="flex items-center justify-between text-sm">
+                        <span className="font-medium text-gray-800">{r.name}</span>
+                        <span className={r.will_attend ? 'text-green-600' : 'text-gray-500'}>
+                          {r.will_attend ? 'Will attend' : "Can't attend"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Event Summary Section */}
@@ -718,42 +778,44 @@ const ViewEvent = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="space-y-16">
-                <button
-                  onClick={handleCompleteEvent}
-                  disabled={isProcessing || pendingCount > 0}
-                  className="btn btn-primary btn-lg"
-                  style={{ width: '200px' }}
-                >
-                  {isProcessing ? (
-                    <>
-                      <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
-                      Completing Event...
-                    </>
-                  ) : (
-                    'Complete Event'
-                  )}
-                </button>
-                
-                <button
-                  onClick={handleCancelEvent}
-                  disabled={isCancelling}
-                  className="btn btn-danger btn-lg"
-                  style={{ width: '200px' }}
-                >
-                  {isCancelling ? (
-                    <>
-                      <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
-                      Cancelling Event...
-                    </>
-                  ) : (
-                    'Cancel Event'
-                  )}
-                </button>
-              </div>
+              {/* Action Buttons - Only show for organizers */}
+              {isOrganizer && (
+                <div className="space-y-16">
+                  <button
+                    onClick={handleCompleteEvent}
+                    disabled={isProcessing || pendingCount > 0}
+                    className="btn btn-primary btn-lg"
+                    style={{ width: '200px' }}
+                  >
+                    {isProcessing ? (
+                      <>
+                        <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
+                        Completing Event...
+                      </>
+                    ) : (
+                      'Complete Event'
+                    )}
+                  </button>
+                  
+                  <button
+                    onClick={handleCancelEvent}
+                    disabled={isCancelling}
+                    className="btn btn-danger btn-lg"
+                    style={{ width: '200px' }}
+                  >
+                    {isCancelling ? (
+                      <>
+                        <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-8" />
+                        Cancelling Event...
+                      </>
+                    ) : (
+                      'Cancel Event'
+                    )}
+                  </button>
+                </div>
+              )}
               
-              {pendingCount > 0 && (
+              {isOrganizer && pendingCount > 0 && (
                 <p className="text-sm text-gray-500 text-center">
                   Please mark attendance for all friends before completing the event
                 </p>

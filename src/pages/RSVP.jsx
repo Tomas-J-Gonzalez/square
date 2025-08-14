@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { eventService } from '../services/eventService';
+import { participationService } from '../services/participationService';
 import Icon from '../components/Icon';
 
 const RSVP = () => {
@@ -131,6 +132,21 @@ const RSVP = () => {
 
       // Add to local event
       eventService.addParticipant(eventId, participant);
+      
+      // Add to participation service
+      participationService.addParticipation({
+        eventId,
+        eventTitle: event.title,
+        eventDate: event.date || (event.dateTime ? new Date(event.dateTime).toISOString().slice(0,10) : ''),
+        eventTime: event.time || (event.dateTime ? new Date(event.dateTime).toTimeString().slice(0,5) : ''),
+        eventLocation: event.location || '',
+        organizerName: event.invitedBy || 'Unknown',
+        participantName: currentUser.name,
+        participantEmail: currentUser.email,
+        status: form.willAttend === 'yes' ? 'confirmed' : 'declined',
+        message: form.message || (form.willAttend === 'yes' ? 'Confirmed attendance' : 'Cannot attend'),
+        source: 'local'
+      });
       
       setSubmitted(true);
       

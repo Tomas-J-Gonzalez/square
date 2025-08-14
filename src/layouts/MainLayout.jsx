@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
 // Cloud-hosted logo (high-res)
-const logoPath = 'https://res.cloudinary.com/tomasgo/image/upload/v1755124460/square/logo-new_lrgqgm.png';
+      const logoPath = 'https://res.cloudinary.com/tomasgo/image/upload/v1755132928/square/logo_j9ojkk.png';
 import Modal from '../components/Modal';
 
 const MainLayout = () => {
