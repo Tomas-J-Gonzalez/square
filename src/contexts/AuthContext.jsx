@@ -17,11 +17,14 @@ export const AuthProvider = ({ children }) => {
 
 
 
-  // Initialize auth state on app load
+  // Initialize auth state on app load (client-side only)
   useEffect(() => {
-    const user = authService.getCurrentUser();
-    setCurrentUser(user);
-    setLoading(false);
+    try {
+      const user = authService.getCurrentUser();
+      setCurrentUser(user);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   // Check if current user is admin

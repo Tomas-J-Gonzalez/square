@@ -135,7 +135,7 @@ const Register = () => {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="mx-auto mb-4" style={{ width: 64, height: 64 }}>
-            <Image src="/assets/logo.svg" alt="Logo" width={64} height={64} priority />
+            <Image src="/logo.svg" alt="Logo" width={64} height={64} priority />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
           <p className="text-gray-600">Join the anti-flake movement</p>

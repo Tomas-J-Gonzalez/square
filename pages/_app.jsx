@@ -14,7 +14,8 @@ export default function MyApp({ Component, pageProps }) {
   return (
     <ErrorBoundary>
       <Head>
-        <link rel="icon" href="/assets/favicon.png" />
+        <link rel="icon" href="/assets/favicon.png" type="image/png" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <meta name="theme-color" content="#ec4899" />
       </Head>
       <AuthProvider>

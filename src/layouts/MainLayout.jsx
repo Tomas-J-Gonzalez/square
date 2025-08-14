@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
 import Modal from '../components/Modal';
-const logoPath = '/assets/logo.svg';
+const logoPath = '/logo.svg';
 
 const MainLayout = ({ children }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -71,6 +71,7 @@ const MainLayout = ({ children }) => {
 
   return (
     <div className="min-h-screen bg-white">
+      <a href="#main" className="skip-link">Skip to content</a>
       {/* Header */}
       <header className="header" role="banner">
         <div className="header-container">
@@ -266,7 +267,7 @@ const MainLayout = ({ children }) => {
       </header>
 
       {/* Main Content */}
-      <main role="main">{children}</main>
+      <main id="main" role="main">{children}</main>
       {/* Footer */}
       <footer className="mt-32 py-16">
         <div className="text-center text-xs text-gray-400 space-x-12">

@@ -79,6 +79,24 @@ const getUsers = () => {
   }
 };
 
+// --- Cookie helpers for session redundancy (prevents logout on refresh if storage races) ---
+const getCookie = (name) => {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(new RegExp('(?:^|; )' + name.replace(/([.$?*|{}()\[\]\\\/\+^])/g, '\\$1') + '=([^;]*)'));
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
+const setCookie = (name, value, days = 30) => {
+  if (typeof document === 'undefined') return;
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+};
+
+const deleteCookie = (name) => {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; SameSite=Lax`;
+};
+
 /**
  * Returns all users without sensitive fields
  * @returns {Array<User>} Users without passwordHash
@@ -692,7 +710,10 @@ const resendConfirmationEmail = (email) => {
 const getCurrentUser = () => {
   try {
     const user = localStorage.getItem(CURRENT_USER_KEY);
-    return user ? JSON.parse(user) : null;
+    if (user) return JSON.parse(user);
+    // Fallback to cookie session if storage is empty (e.g., SSR hydration race)
+    const cookieUser = getCookie(CURRENT_USER_KEY);
+    return cookieUser ? JSON.parse(cookieUser) : null;
   } catch (error) {
     console.error('Error reading current user from localStorage:', error);
     return null;
@@ -707,8 +728,10 @@ const setCurrentUser = (user) => {
   try {
     if (user) {
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+      setCookie(CURRENT_USER_KEY, JSON.stringify(user));
     } else {
       localStorage.removeItem(CURRENT_USER_KEY);
+      deleteCookie(CURRENT_USER_KEY);
     }
   } catch (error) {
     console.error('Error setting current user:', error);
