@@ -139,7 +139,7 @@ const Login = () => {
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="mx-auto mb-4" style={{ width: 64, height: 64 }}>
-            <img src="/logo.svg" alt="Logo" width="64" height="64" />
+            <img src="/logo.svg?v=1" alt="Logo" width="64" height="64" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
           <p className="text-gray-600">Sign in to your account</p>
@@ -233,6 +233,8 @@ const Login = () => {
               >
                 Sign up
               </Link>
+              {' '}·{' '}
+              <Link href="/forgot-password" className="text-link-tertiary">Forgot password?</Link>
             </p>
           </div>
         </div>

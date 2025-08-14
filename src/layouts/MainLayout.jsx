@@ -80,7 +80,7 @@ const MainLayout = ({ children }) => {
           <div className="header-content">
             {/* Logo */}
             <Link href="/" className="logo" aria-label="Go to home page">
-              <img src={logoPath} alt="Be There or Be Square" width="32" height="32" className="mr-8" />
+              <img src={logoPath} alt="Be There or Be Square" width="32" height="32" className="mr-8" onError={(e)=>{ e.currentTarget.src='/favicon.png?v=1'; }} />
             </Link>
 
             {/* Desktop Navigation (centered) */}

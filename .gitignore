@@ -83,7 +83,6 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
@@ -95,8 +94,6 @@ temp/
 
 # Font Awesome Pro files (if accidentally included)
 fontawesome-pro-plus-7.0.0-desktop/
-*.svg
-!src/assets/*.svg
 
 # Large assets that shouldn't be in git
 *.zip

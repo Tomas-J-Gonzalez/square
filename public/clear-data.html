@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear User Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #ec4899;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        button:hover {
+            background-color: #db2777;
+        }
+        .success {
+            color: #059669;
+            background-color: #d1fae5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .info {
+            background-color: #dbeafe;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Clear User Data</h1>
+        
+        <div class="info">
+            <p><strong>This will clear all your stored data:</strong></p>
+            <ul>
+                <li>User accounts</li>
+                <li>Current user session</li>
+                <li>Email confirmations</li>
+                <li>Events</li>
+            </ul>
+        </div>
+
+        <button onclick="clearData()">Clear All Data</button>
+        
+        <div id="result"></div>
+        
+        <div class="info">
+            <p><strong>Next:</strong></p>
+            <ol>
+                <li>Go to: <a href="/register" target="_blank">/register</a></li>
+                <li>Register with any email domain</li>
+                <li>Use any valid email address</li>
+                <li>Or seed demo data: <a href="/seed-demo.html" target="_blank">/seed-demo.html</a></li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function clearData() {
+            const keysToRemove = [
+                'be-there-or-be-square-users',
+                'be-there-or-be-square-current-user',
+                'be-there-or-be-square-email-confirmations',
+                'be-there-or-be-square-events'
+            ];
+            
+            let clearedCount = 0;
+            
+            keysToRemove.forEach(key => {
+                try {
+                    localStorage.removeItem(key);
+                    clearedCount++;
+                } catch (error) {
+                    console.error(`Error removing ${key}:`, error);
+                }
+            });
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="success">
+                    <h3>✅ Data Cleared Successfully!</h3>
+                    <p>Removed ${clearedCount} data entries from localStorage.</p>
+                    <p>You can now register with any email address.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

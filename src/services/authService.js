@@ -418,7 +418,14 @@ const loginUser = (email, password) => {
     throw new Error('Invalid email or password');
   }
 
-  // Temporarily allow login without email confirmation (confirmation emails may be delayed in production)
+  // Require email confirmation before login
+  if (!user.emailConfirmed) {
+    try {
+      // Fire-and-forget resend to help user get a fresh link
+      resendConfirmationEmail(user.email);
+    } catch (_) {}
+    throw new Error('Please confirm your email address before signing in. We just sent you a new confirmation email.');
+  }
 
   // Update last login time
   user.lastLoginAt = new Date().toISOString();
@@ -789,5 +796,29 @@ export const authService = {
   confirmEmail,
   resendConfirmationEmail,
   isAdminCredentials,
-  listUsers
+  listUsers,
+  isValidEmail
+};
+
+/**
+ * Sets a new password for a user identified by email (used by reset flow)
+ * @param {string} email
+ * @param {string} newPassword
+ */
+export const setPasswordForEmail = (email, newPassword) => {
+  const users = getUsers();
+  const idx = users.findIndex(u => u.email === (email || '').trim().toLowerCase());
+  if (idx === -1) throw new Error('User not found');
+  const validation = validatePassword(newPassword);
+  if (!validation.isValid) throw new Error(validation.message);
+  users[idx].passwordHash = hashPassword(newPassword);
+  users[idx].updatedAt = new Date().toISOString();
+  saveUsers(users);
+  // Update current user cache if matches
+  const current = getCurrentUser();
+  if (current && current.email === users[idx].email) {
+    const { passwordHash, ...userWithout } = users[idx];
+    setCurrentUser(userWithout);
+  }
+  return true;
 };

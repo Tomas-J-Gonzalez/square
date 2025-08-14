@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seed Demo Data</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+    .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    button { background: #10b981; color: white; border: none; padding: 12px 24px; border-radius: 25px; cursor: pointer; font-size: 16px; margin: 10px 0; }
+    button:hover { background: #059669; }
+    .success { color: #059669; background: #d1fae5; padding: 15px; border-radius: 5px; margin: 15px 0; }
+    .info { background: #dbeafe; padding: 15px; border-radius: 5px; margin: 15px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌱 Seed Demo Data</h1>
+    <div class="info">
+      <p>This will create a demo user and a couple of events so you can see the full UI on Netlify.</p>
+    </div>
+    <button onclick="seed()">Seed Demo</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function seed() {
+      const usersKey = 'be-there-or-be-square-users';
+      const eventsKey = 'be-there-or-be-square-events';
+      const confirmationsKey = 'be-there-or-be-square-email-confirmations';
+
+      const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const demoUsers = [{
+        id: userId,
+        email: 'demo@example.com',
+        name: 'Demo User',
+        passwordHash: btoa('password' + 'salt'),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        lastLoginAt: new Date().toISOString(),
+        eventIds: [],
+        emailConfirmed: true,
+        emailConfirmationToken: null
+      }];
+
+      const demoEvents = [
+        {
+          id: `event_${Date.now()}_a`,
+          title: 'Movie Night',
+          date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+          time: '19:00',
+          decisionMode: 'democracy',
+          punishment: 'Buy snacks',
+          createdBy: userId,
+          createdAt: new Date().toISOString(),
+        },
+        {
+          id: `event_${Date.now()}_b`,
+          title: 'Hike',
+          date: new Date(Date.now() + 172800000).toISOString().split('T')[0],
+          time: '08:30',
+          decisionMode: 'democracy',
+          punishment: 'Carry water',
+          createdBy: userId,
+          createdAt: new Date().toISOString(),
+        }
+      ];
+
+      localStorage.setItem(usersKey, JSON.stringify(demoUsers));
+      localStorage.setItem(eventsKey, JSON.stringify(demoEvents));
+      localStorage.setItem(confirmationsKey, JSON.stringify([]));
+
+      document.getElementById('result').innerHTML = `
+        <div class="success">
+          <h3>✅ Seeded!</h3>
+          <p>Demo user: demo@example.com / password</p>
+          <p>Go to <a href="/login">/login</a> or <a href="/">home</a>.</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
