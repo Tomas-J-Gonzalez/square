@@ -23,6 +23,7 @@ const ViewEvent = () => {
   const [attendanceStatus, setAttendanceStatus] = useState({});
   const [showShareModal, setShowShareModal] = useState(false);
   const latestEventRef = useRef(null);
+  const [serverRsvps, setServerRsvps] = useState([]);
   
   // Modal states
   const [modal, setModal] = useState({
@@ -66,6 +67,7 @@ const ViewEvent = () => {
         .select('name, will_attend, created_at')
         .eq('event_id', eventId);
       if (!Array.isArray(data)) return baseEvent;
+      setServerRsvps(data);
       const existingNames = new Set(baseEvent.participants.map(p => (p.name || '').trim().toLowerCase()));
       const merged = [...baseEvent.participants];
       let addedAnything = false;
@@ -643,6 +645,25 @@ const ViewEvent = () => {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Server RSVPs (live) */}
+            <div className="mt-24">
+              <h3 className="text-sm font-medium text-gray-900 mb-12">Guest RSVPs (live)</h3>
+              {serverRsvps.length === 0 ? (
+                <p className="text-sm text-gray-500">No RSVPs yet.</p>
+              ) : (
+                <ul className="space-y-8">
+                  {serverRsvps.map((r, idx) => (
+                    <li key={idx} className="flex items-center justify-between text-sm">
+                      <span className="font-medium text-gray-800">{r.name}</span>
+                      <span className={r.will_attend ? 'text-green-600' : 'text-gray-500'}>
+                        {r.will_attend ? 'Will attend' : "Can't attend"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </div>
 
