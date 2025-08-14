@@ -33,7 +33,7 @@ const Login = () => {
   }, []);
 
   // Get the page user was trying to access
-  const from = location.state?.from?.pathname || '/';
+  const from = location.state?.from?.pathname || new URLSearchParams(location.search).get('redirect') || '/';
 
   const validateForm = () => {
     const newErrors = {};

@@ -15,6 +15,7 @@ import PastEvents from './pages/PastEvents';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 import Invite from './pages/Invite';
+import RSVP from './pages/RSVP';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
               <Route index element={<Home />} />
               <Route path="create" element={<CreateEvent />} />
               <Route path="event/:eventId" element={<ViewEvent />} />
+              <Route path="rsvp/:eventId" element={<RSVP />} />
               <Route path="past" element={<PastEvents />} />
               <Route path="profile" element={<Profile />} />
             </Route>

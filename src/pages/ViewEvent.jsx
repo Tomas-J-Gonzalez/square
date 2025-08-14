@@ -68,35 +68,50 @@ const ViewEvent = () => {
         .eq('event_id', eventId);
       if (!Array.isArray(data)) return baseEvent;
       setServerRsvps(data);
-      const existingNames = new Set(baseEvent.participants.map(p => (p.name || '').trim().toLowerCase()));
+      
+      // Create a map of existing participants by name (case-insensitive)
+      const existingParticipants = new Map();
+      baseEvent.participants.forEach(p => {
+        const key = (p.name || '').trim().toLowerCase();
+        if (key) existingParticipants.set(key, p);
+      });
+      
       const merged = [...baseEvent.participants];
       let addedAnything = false;
+      
       data.forEach(r => {
         const name = (r.name || '').trim();
         if (!name) return;
         const key = name.toLowerCase();
-        if (!existingNames.has(key)) {
+        
+        // Only add if not already in participants list
+        if (!existingParticipants.has(key)) {
           const id = `guest_${key}_${Date.now()}`;
-          merged.push({
+          const newParticipant = {
             id,
             name,
             email: `${key.replace(/\s+/g,'')}@guest.local`,
             message: r.will_attend ? 'Confirmed attendance' : 'Cannot attend',
             joinedAt: r.created_at
-          });
+          };
+          merged.push(newParticipant);
           addedAnything = true;
-          existingNames.add(key);
+          existingParticipants.set(key, newParticipant);
         }
       });
-      if (!addedAnything) return baseEvent;
-      const updatedEvent = { ...baseEvent, participants: merged };
-      const all = eventService.getEvents();
-      const idx = all.findIndex(e => e.id === eventId);
-      if (idx !== -1) {
-        all[idx] = updatedEvent;
-        localStorage.setItem('be-there-or-be-square-events', JSON.stringify(all));
+      
+      if (addedAnything) {
+        const updatedEvent = { ...baseEvent, participants: merged };
+        const all = eventService.getEvents();
+        const idx = all.findIndex(e => e.id === eventId);
+        if (idx !== -1) {
+          all[idx] = updatedEvent;
+          localStorage.setItem('be-there-or-be-square-events', JSON.stringify(all));
+        }
+        return updatedEvent;
       }
-      return updatedEvent;
+      
+      return baseEvent;
     } catch (_) {
       return baseEvent;
     }
@@ -140,15 +155,18 @@ const ViewEvent = () => {
       const base = latestEventRef.current;
       if (!base) return;
       const updated = await fetchAndMergeRsvps(base);
-      // If participants length changed, re-init state
-      if (updated && JSON.stringify(updated.participants) !== JSON.stringify(base.participants)) {
+      // If participants changed, update state
+      if (updated && updated.participants.length !== base.participants.length) {
         setEvent(updated);
         latestEventRef.current = updated;
+        // Initialize attendance status for new participants
         const init = {};
         updated.participants.forEach(p => {
-          if (!init[p.id]) init[p.id] = 'pending';
+          if (!attendanceStatus[p.id]) init[p.id] = 'pending';
         });
-        setAttendanceStatus(prev => ({ ...init, ...prev }));
+        if (Object.keys(init).length > 0) {
+          setAttendanceStatus(prev => ({ ...prev, ...init }));
+        }
       }
     }, 10000);
     return () => clearInterval(interval);
@@ -705,7 +723,8 @@ const ViewEvent = () => {
                 <button
                   onClick={handleCompleteEvent}
                   disabled={isProcessing || pendingCount > 0}
-                  className="btn btn-primary btn-lg w-full"
+                  className="btn btn-primary btn-lg"
+                  style={{ width: '200px' }}
                 >
                   {isProcessing ? (
                     <>
@@ -720,7 +739,8 @@ const ViewEvent = () => {
                 <button
                   onClick={handleCancelEvent}
                   disabled={isCancelling}
-                  className="btn btn-danger btn-lg w-full"
+                  className="btn btn-danger btn-lg"
+                  style={{ width: '200px' }}
                 >
                   {isCancelling ? (
                     <>

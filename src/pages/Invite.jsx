@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { eventService } from '../services/eventService';
+import { useAuth } from '../contexts/AuthContext';
 import Icon from '../components/Icon';
 
 const Invite = () => {
   const { eventId } = useParams();
   const navigate = useNavigate();
+  const { currentUser } = useAuth();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -16,6 +18,12 @@ const Invite = () => {
   useEffect(() => {
     const load = async () => {
       try {
+        // If user is logged in, redirect to RSVP page
+        if (currentUser) {
+          navigate(`/rsvp/${eventId}${window.location.search}`);
+          return;
+        }
+
         // Try server first (lazy import so missing env doesn't crash app)
         let data = null;
         try {
@@ -81,7 +89,7 @@ const Invite = () => {
       }
     };
     load();
-  }, [eventId]);
+  }, [eventId, currentUser, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -201,7 +209,7 @@ const Invite = () => {
             <div className="text-center text-sm text-gray-600">
               <p className="mb-8">Already have an account?</p>
               <div className="flex flex-col sm:flex-row gap-8 justify-center">
-                <a href={`/login?redirect=/event/${eventId}`} className="btn btn-secondary btn-sm">Sign in and RSVP</a>
+                <a href={`/login?redirect=/rsvp/${eventId}${window.location.search}`} className="btn btn-secondary btn-sm">Sign in and RSVP</a>
                 <a href="/register" className="btn btn-outline btn-sm">Create an account</a>
               </div>
             </div>
