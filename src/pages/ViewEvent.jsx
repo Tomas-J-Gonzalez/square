@@ -100,7 +100,9 @@ const ViewEvent = () => {
       console.log('Existing participants:', baseEvent.participants.map(p => p.name));
       console.log('Processing RSVPs:', data);
       
-      data.forEach(r => {
+      data
+        .filter(r => r.will_attend === true) // only confirmed attendees become participants
+        .forEach(r => {
         const name = (r.name || '').trim();
         if (!name) {
           console.warn('Skipping RSVP with empty name:', r);
@@ -586,7 +588,7 @@ const ViewEvent = () => {
       <div className="section-container">
         {/* Event Header */}
         <div className="section-header">
-          <h1 className="section-title">{event.title}</h1>
+          <h1 className="section-title text-center">{event.title}</h1>
           <div className="flex flex-wrap items-center justify-center gap-16 mb-24">
             <span className="flex items-center text-sm text-gray-600">
               <Icon name="calendar" style="solid" size="sm" className="mr-4" aria-hidden="true" />
@@ -648,21 +650,21 @@ const ViewEvent = () => {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-32">
-          {/* Friends Section */}
+          {/* Attendees Section */}
           <div className="card">
             <div className="card-header">
               <h2 className="card-title flex items-center">
                 <Icon name="users" style="solid" size="sm" className="mr-8 text-pink-500" aria-hidden="true" />
-                {isOrganizer ? 'Friends' : 'Participants'} ({event.participants.length})
+                Attendees ({event.participants.length})
               </h2>
             </div>
             
-                        {/* Add Friend Form - Only show for organizers */}
+                        {/* Add Attendee Form - Only show for organizers */}
             {isOrganizer && (
               <div className="mb-32 p-16 bg-gray-50 rounded-md border border-gray-200">
                 <h3 className="text-sm font-medium text-gray-900 mb-16 flex items-center">
                   <Icon name="user-plus" style="solid" size="sm" className="mr-8 text-pink-500" aria-hidden="true" />
-                  Add a friend manually
+                  Add an attendee manually
                 </h3>
                 <form onSubmit={handleAddParticipant}>
                   <div className="space-y-16">
@@ -679,7 +681,7 @@ const ViewEvent = () => {
                         required
                         aria-describedby="name-help"
                       />
-                      <div id="name-help" className="sr-only">Name is required to add a friend</div>
+                      <div id="name-help" className="sr-only">Name is required to add an attendee</div>
                     </div>
                     <div>
                       <label htmlFor="email" className="form-label">Email</label>
@@ -720,7 +722,7 @@ const ViewEvent = () => {
                           Adding...
                         </>
                       ) : (
-                        'Add Friend'
+                        'Add Attendee'
                       )}
                     </button>
                   </div>
@@ -728,14 +730,14 @@ const ViewEvent = () => {
               </div>
             )}
 
-            {/* Friends List */}
+            {/* Attendees List */}
             <div className="space-y-16">
               {event.participants.length === 0 ? (
                 <div className="text-center py-24">
                   <Icon name="users" style="solid" size="xl" className="text-gray-400 mx-auto mb-16" aria-hidden="true" />
-                  <p className="text-gray-600">No {isOrganizer ? 'friends' : 'participants'} yet.</p>
+                  <p className="text-gray-600">No attendees yet.</p>
                   {isOrganizer && (
-                    <p className="text-sm text-gray-500 mt-8">Add friends manually or share the invitation link.</p>
+                    <p className="text-sm text-gray-500 mt-8">Add attendees manually or share the invitation link.</p>
                   )}
                 </div>
               ) : (
@@ -767,7 +769,7 @@ const ViewEvent = () => {
                   {/* Attendance Status - Only show for organizers */}
                   {isOrganizer && (
                     <div className="flex items-center space-x-16">
-                      <span className="text-sm text-gray-600">Status:</span>
+                      <span className="text-sm text-gray-600">Attendance:</span>
                       <div className="flex space-x-8">
                         <button
                           onClick={() => handleAttendanceChange(participant.id, 'attended')}
@@ -795,7 +797,7 @@ const ViewEvent = () => {
                           type="button"
                         >
                           <Icon name="times-circle" style="solid" size="sm" className={attendanceStatus[participant.id] === 'flaked' ? 'text-red-600' : 'text-gray-500'} aria-hidden="true" />
-                          <span>Flaked</span>
+                           <span>Flaked</span>
                         </button>
                       </div>
                     </div>
@@ -839,23 +841,23 @@ const ViewEvent = () => {
             
             <div className="space-y-24">
               {/* Attendance Stats */}
-              <div className="grid grid-cols-3 gap-16 text-center">
+            <div className="grid grid-cols-3 gap-16 text-center">
                 <div className="p-16 bg-gray-50 rounded-md">
-                  <div className="flex items-center justify-center mb-8">
+                  <div className="flex items-center justify-center mb-2">
                     <Icon name="clock" style="solid" size="lg" className="text-gray-500" aria-hidden="true" />
                   </div>
                   <div className="text-2xl font-bold text-gray-600">{pendingCount}</div>
                   <div className="text-sm text-gray-500">Pending</div>
                 </div>
                 <div className="p-16 bg-gray-50 rounded-md">
-                  <div className="flex items-center justify-center mb-8">
+                  <div className="flex items-center justify-center mb-2">
                     <Icon name="check-circle" style="solid" size="lg" className="text-green-600" aria-hidden="true" />
                   </div>
                   <div className="text-2xl font-bold text-gray-600">{attendedCount}</div>
                   <div className="text-sm text-gray-500">Attended</div>
                 </div>
                 <div className="p-16 bg-gray-50 rounded-md">
-                  <div className="flex items-center justify-center mb-8">
+                  <div className="flex items-center justify-center mb-2">
                     <Icon name="times-circle" style="solid" size="lg" className="text-red-600" aria-hidden="true" />
                   </div>
                   <div className="text-2xl font-bold text-gray-600">{flakedCount}</div>
@@ -899,7 +901,7 @@ const ViewEvent = () => {
                     onClick={handleCancelEvent}
                     disabled={isCancelling}
                     className="btn btn-danger btn-lg"
-                    style={{ width: '200px' }}
+                    style={{ width: '200px', marginLeft: '12px' }}
                   >
                     {isCancelling ? (
                       <>

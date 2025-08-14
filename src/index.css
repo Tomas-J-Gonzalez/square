@@ -466,6 +466,24 @@ a:focus-visible {
   font-size: 20px;
 }
 
+/* Center content inside decision cards */
+.decision-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Ensure the pink icon circle is centered within the card */
+.decision-icon {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.decision-icon i {
+  line-height: 1;
+}
+
 .decision-title {
   font-weight: 600;
   color: #111827;
