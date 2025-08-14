@@ -770,7 +770,7 @@ const ViewEvent = () => {
                     </div>
                   )}
                 </div>
-              ))}
+              ))
             </div>
 
             {/* Server RSVPs (live) - Only show for organizers */}

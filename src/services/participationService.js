@@ -135,6 +135,10 @@ const removeParticipation = (eventId, participantEmail) => {
 const syncServerParticipations = async (userEmail) => {
   try {
     const { supabase } = await import('../../lib/supabaseClient');
+    if (!supabase) {
+      console.warn('Supabase not configured, returning local participations');
+      return getUserParticipations(userEmail);
+    }
     
     // Get all RSVPs for this user from server
     const { data: rsvps } = await supabase
