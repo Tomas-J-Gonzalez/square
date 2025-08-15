@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
-import Modal from '../components/Modal';
+import { useModal } from '../hooks/useModal';
 import { useAuth } from '../contexts/AuthContext';
 
 const ViewEvent = () => {
@@ -25,26 +25,8 @@ const ViewEvent = () => {
   const [participants, setParticipants] = useState([]);
   const [isOrganizer, setIsOrganizer] = useState(false);
   
-  // Modal states
-  const [modal, setModal] = useState({
-    isOpen: false,
-    title: '',
-    message: '',
-    type: 'info',
-    onConfirm: null,
-    onCancel: null,
-    confirmText: 'OK',
-    cancelText: 'Cancel',
-    showCancel: false
-  });
-
-  const showModal = (config) => {
-    setModal({ ...config, isOpen: true });
-  };
-
-  const hideModal = () => {
-    setModal(prev => ({ ...prev, isOpen: false }));
-  };
+  // Use the modal hook
+  const { modal, showModal, showConfirmModal } = useModal();
 
   // Fetch participants from Supabase
   const fetchParticipants = async () => {
@@ -583,10 +565,17 @@ const ViewEvent = () => {
                 </div>
                 <button
                   type="submit"
-                  className="btn btn-primary btn-sm"
+                  className="btn btn-primary btn-sm flex items-center justify-center"
                   disabled={isAddingParticipant}
                 >
-                  {isAddingParticipant ? 'Adding...' : 'Add Friend'}
+                  {isAddingParticipant ? (
+                    <>
+                      <Icon name="spinner" style="solid" size="sm" className="animate-spin mr-4" />
+                      Adding...
+                    </>
+                  ) : (
+                    'Add Friend'
+                  )}
                 </button>
               </form>
 
@@ -602,7 +591,7 @@ const ViewEvent = () => {
                 <button
                   onClick={handleCompleteEvent}
                   disabled={isProcessing}
-                  className="btn btn-success btn-sm"
+                  className="btn btn-success btn-sm flex items-center justify-center"
                 >
                   {isProcessing ? (
                     <>
@@ -616,7 +605,7 @@ const ViewEvent = () => {
                 <button
                   onClick={handleCancelEvent}
                   disabled={isCancelling}
-                  className="btn btn-danger btn-sm"
+                  className="btn btn-danger btn-sm flex items-center justify-center"
                 >
                   {isCancelling ? (
                     <>
@@ -712,7 +701,7 @@ const ViewEvent = () => {
       </div>
       
       {/* Modals */}
-      <Modal {...modal} />
+      {modal.isOpen && <Modal {...modal} />}
       
       {/* Share Modal */}
       {showShareModal && (

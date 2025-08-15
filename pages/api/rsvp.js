@@ -50,10 +50,21 @@ export default async function handler(req, res) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     
+    console.log('RSVP API - Environment check:', {
+      hasSupabaseUrl: !!supabaseUrl,
+      hasSupabaseKey: !!supabaseKey,
+      supabaseUrl: supabaseUrl ? 'SET' : 'MISSING',
+      supabaseKey: supabaseKey ? 'SET' : 'MISSING'
+    });
+    
     if (!supabaseUrl || !supabaseKey) {
+      console.error('RSVP API - Missing environment variables:', {
+        supabaseUrl: !!supabaseUrl,
+        supabaseKey: !!supabaseKey
+      });
       return res.status(500).json({ 
         success: false, 
-        error: 'Database configuration error' 
+        error: 'Database configuration error - missing environment variables' 
       });
     }
 
@@ -62,6 +73,14 @@ export default async function handler(req, res) {
     const normalizedName = name.trim();
     const normalizedEmail = email?.trim() || null;
     const normalizedMessage = message?.trim() || null;
+
+    console.log('RSVP API - Request data:', {
+      eventId,
+      normalizedName,
+      normalizedEmail,
+      willAttend,
+      normalizedMessage
+    });
 
     // Ensure event exists in Supabase (upsert)
     if (event) {
@@ -109,6 +128,8 @@ export default async function handler(req, res) {
     }
 
     // Check if RSVP already exists for this event + name combination
+    console.log('RSVP API - Checking existing RSVP for:', { eventId, normalizedName });
+    
     const { data: existingRsvp, error: checkError } = await supabase
       .from('event_rsvps')
       .select('id, name, email, will_attend, message, created_at')
@@ -117,12 +138,14 @@ export default async function handler(req, res) {
       .maybeSingle();
 
     if (checkError) {
-      console.error('Error checking existing RSVP:', checkError);
+      console.error('RSVP API - Error checking existing RSVP:', checkError);
       return res.status(500).json({ 
         success: false, 
-        error: 'Database error while checking existing RSVP' 
+        error: 'Database error while checking existing RSVP: ' + checkError.message 
       });
     }
+
+    console.log('RSVP API - Existing RSVP check result:', { existingRsvp, checkError });
 
     let participant;
 
