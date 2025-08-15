@@ -163,14 +163,7 @@ const MainLayout = ({ children }) => {
                       <Icon name="user" style="solid" size="sm" />
                       Profile
                     </Link>
-                    <Link
-                      href="/profile"
-                      className="user-menu-item"
-                      onClick={() => setIsUserMenuOpen(false)}
-                    >
-                      <Icon name="cog" style="solid" size="sm" />
-                      Settings
-                    </Link>
+
                     <button
                       onClick={handleLogout}
                       className="user-menu-item danger"

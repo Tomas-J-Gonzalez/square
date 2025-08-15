@@ -87,6 +87,25 @@ export default async function handler(req, res) {
           error: 'Failed to create/update event' 
         });
       }
+    } else {
+      // Check if event exists, if not, skip the upsert
+      const { data: existingEvent, error: eventCheckError } = await supabase
+        .from('events')
+        .select('id')
+        .eq('id', eventId)
+        .maybeSingle();
+
+      if (eventCheckError) {
+        console.error('Error checking event existence:', eventCheckError);
+        return res.status(500).json({ 
+          success: false, 
+          error: 'Database error while checking event' 
+        });
+      }
+
+      if (!existingEvent) {
+        console.warn(`Event ${eventId} does not exist, but continuing with RSVP`);
+      }
     }
 
     // Check if RSVP already exists for this event + name combination

@@ -226,8 +226,7 @@ const ViewEvent = () => {
           name: newParticipant.name.trim(),
           email: newParticipant.email.trim() || null,
           willAttend: true,
-          message: newParticipant.message.trim() || 'Added by organizer',
-          event
+          message: newParticipant.message.trim() || 'Added by organizer'
         })
       });
 
@@ -594,6 +593,13 @@ const ViewEvent = () => {
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-12">
                 <button
+                  onClick={() => setShowShareModal(true)}
+                  className="btn btn-secondary btn-sm flex items-center"
+                >
+                  <Icon name="share" style="solid" size="sm" className="mr-4" />
+                  Share Invitation
+                </button>
+                <button
                   onClick={handleCompleteEvent}
                   disabled={isProcessing}
                   className="btn btn-success btn-sm"
@@ -707,6 +713,73 @@ const ViewEvent = () => {
       
       {/* Modals */}
       <Modal {...modal} />
+      
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="modal-overlay" onClick={() => setShowShareModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 className="modal-title">Share Event Invitation</h3>
+              <button 
+                onClick={() => setShowShareModal(false)}
+                className="modal-close"
+                aria-label="Close modal"
+              >
+                <Icon name="times" style="solid" size="sm" />
+              </button>
+            </div>
+            <div className="modal-body">
+              <p className="modal-message mb-16">
+                Share this link with your friends to invite them to your event:
+              </p>
+              <div className="flex gap-8">
+                <input
+                  type="text"
+                  value={`${window.location.origin}/invite/${eventId}`}
+                  readOnly
+                  className="form-input flex-1"
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/invite/${eventId}`);
+                    showModal({
+                      title: 'Link Copied!',
+                      message: 'The invitation link has been copied to your clipboard.',
+                      type: 'success'
+                    });
+                  }}
+                  className="btn btn-primary btn-sm"
+                >
+                  Copy Link
+                </button>
+              </div>
+              <div className="mt-16 flex gap-8">
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/invite/${eventId}`;
+                    const text = `Join me at ${event?.title || 'my event'}! ${url}`;
+                    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`);
+                  }}
+                  className="btn btn-secondary btn-sm flex-1"
+                >
+                  <Icon name="twitter" style="brands" size="sm" className="mr-4" />
+                  Twitter
+                </button>
+                <button
+                  onClick={() => {
+                    const url = `${window.location.origin}/invite/${eventId}`;
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+                  }}
+                  className="btn btn-secondary btn-sm flex-1"
+                >
+                  <Icon name="facebook" style="brands" size="sm" className="mr-4" />
+                  Facebook
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

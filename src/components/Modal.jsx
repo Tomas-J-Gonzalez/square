@@ -72,6 +72,7 @@ const Modal = ({
   const icon = getIcon();
 
   const handleBackdropClick = (e) => {
+    // Only close if clicking the backdrop itself, not the modal content
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -80,17 +81,19 @@ const Modal = ({
   const handleConfirm = () => {
     if (onConfirm) {
       onConfirm();
-    } else {
-      onClose();
     }
+    onClose();
   };
 
   const handleCancel = () => {
     if (onCancel) {
       onCancel();
-    } else {
-      onClose();
     }
+    onClose();
+  };
+
+  const handleClose = () => {
+    onClose();
   };
 
   return (
@@ -120,7 +123,7 @@ const Modal = ({
             <h3 id="modal-title" className="modal-title">{title}</h3>
           </div>
           <button 
-            onClick={onClose} 
+            onClick={handleClose} 
             className="modal-close"
             aria-label="Close modal"
             type="button"
