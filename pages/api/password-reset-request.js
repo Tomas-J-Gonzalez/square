@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     if (process.env.RESEND_API_KEY) {
       const logoUrl = `${base}/logo.svg`;
       await resend.emails.send({
-        from: 'Show Up or Else <noreply@showuporelse.com>',
+                  from: 'noreply@showuporelse.com',
         to: email,
         subject: 'Reset your password - Show Up or Else',
         html: `

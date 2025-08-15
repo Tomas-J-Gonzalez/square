@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     // The token should already exist in the email_confirmations table
 
     const { data, error } = await resend.emails.send({
-      from: 'Show Up or Else <noreply@showuporelse.com>',
+      from: 'noreply@showuporelse.com',
       to: email,
       subject: 'Confirm your Show Up or Else account',
       html: `

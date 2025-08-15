@@ -96,7 +96,7 @@ export default async function handler(req, res) {
     }
 
     const { data, error } = await resend.emails.send({
-      from: 'Show Up or Else <noreply@showuporelse.com>',
+              from: 'noreply@showuporelse.com',
       to: to_email,
       subject: subject,
       html: htmlContent

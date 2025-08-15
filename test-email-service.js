@@ -80,7 +80,7 @@ async function testEmailService() {
     const resend = new Resend(resendApiKey);
     
     const { data, error } = await resend.emails.send({
-      from: 'Show Up or Else <noreply@showuporelse.com>',
+      from: 'noreply@showuporelse.com',
       to: 'tomachos08@gmail.com', // Use verified email address
       subject: 'Test Email',
       html: '<p>This is a test email</p>'
