@@ -379,7 +379,7 @@ const isAdminCredentials = (username, password) => {
  * @returns {User} Logged in user (without password)
  * @throws {Error} If credentials are invalid
  */
-const loginUser = async (email, password) => {
+const loginUser = (email, password) => {
   if (!email?.trim()) {
     throw new Error('Email is required');
   }
