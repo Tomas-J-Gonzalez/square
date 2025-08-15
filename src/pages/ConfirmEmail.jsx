@@ -29,6 +29,11 @@ const ConfirmEmail = () => {
         const resp = await fetch(`/api/confirm-email?token=${encodeURIComponent(token)}`);
         const json = await resp.json();
         if (resp.ok && json.success) {
+          // Email confirmation is now handled entirely by the server
+          // The user's email_confirmed status is updated in Supabase
+          // No localStorage updates needed
+          console.log('✅ Email confirmed successfully via server');
+          
           setConfirmed(true);
           showSuccessModal(
             'Email Confirmed!',
@@ -44,7 +49,6 @@ const ConfirmEmail = () => {
         setLoading(false);
       }
     };
-    confirm();
   }, [router, showSuccessModal]);
 
   if (loading) {
@@ -62,7 +66,9 @@ const ConfirmEmail = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-pink-500 rounded-sm mx-auto mb-4"></div>
+          <div className="mx-auto mb-4" style={{ width: 64, height: 64 }}>
+            <img src="/logo.svg?v=1" alt="Logo" width="64" height="64" />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             {confirmed ? 'Email Confirmed!' : 'Confirm Your Email'}
           </h1>

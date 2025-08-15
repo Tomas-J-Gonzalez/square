@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { eventService } from '../services/eventService';
 import { useAuth } from '../contexts/AuthContext';
+import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
+import Modal from '../components/Modal';
 
 const Invite = () => {
   const router = useRouter();
   const { eventId } = router.query;
   const { currentUser } = useAuth();
+  const { modal, showSuccessModal, showErrorModal } = useModal();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', willAttend: 'yes' });
+  const [form, setForm] = useState({ name: '', email: '', willAttend: 'yes' });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -71,13 +73,7 @@ const Invite = () => {
               invitedBy: invited_by || 'A friend'
             });
           } else {
-            const events = eventService.getEvents();
-            const e = events.find(ev => ev.id === eventId);
-            if (!e) {
-              setError('Event not found');
-            } else {
-              setEvent(e);
-            }
+            setError('Event not found');
           }
         }
       } catch (err) {
@@ -101,29 +97,39 @@ const Invite = () => {
       return;
     }
     setSubmitting(true);
+    setError('');
+    
     try {
-      // Submit RSVP via server API (service role)
-      try {
-        const resp = await fetch('/api/rsvp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            eventId,
-            name: form.name.trim(),
-            willAttend: form.willAttend === 'yes',
-            event
-          })
-        });
-        if (!resp.ok) {
-          const j = await resp.json().catch(() => ({}));
-          throw new Error(j.error || 'Failed to submit RSVP');
-        }
-      } catch (error) {
-        console.error('Error submitting RSVP:', error);
+      // Submit RSVP to Supabase only
+      const response = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId,
+          name: form.name.trim(),
+          email: form.email.trim() || null,
+          willAttend: form.willAttend === 'yes',
+          event
+        })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setSubmitted(true);
+        showSuccessModal(
+          'RSVP Submitted!',
+          'Thanks for your response! Your RSVP has been submitted successfully.',
+          () => {}
+        );
+      } else {
+        setError(result.error || 'Failed to submit RSVP');
+        showErrorModal('RSVP Error', result.error || 'Failed to submit RSVP');
       }
-      setSubmitted(true);
     } catch (err) {
-      setError(err.message || 'Failed to submit response');
+      const errorMessage = err.message || 'Failed to submit response';
+      setError(errorMessage);
+      showErrorModal('RSVP Error', errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -131,19 +137,23 @@ const Invite = () => {
 
   if (loading) {
     return (
-      <div className="section"><div className="section-container text-center">
-        <Icon name="spinner" style="solid" size="xl" className="animate-spin text-pink-500 mx-auto mb-16" />
-        <p className="text-gray-600">Loading invitation…</p>
-      </div></div>
+      <div className="section">
+        <div className="section-container text-center">
+          <Icon name="spinner" style="solid" size="xl" className="animate-spin text-pink-500 mx-auto mb-16" />
+          <p className="text-gray-600">Loading invitation…</p>
+        </div>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <div className="section"><div className="section-container text-center">
-        <Icon name="exclamation-triangle" style="solid" size="xl" className="text-red-500 mx-auto mb-16" />
-        <p className="text-gray-600">{error}</p>
-      </div></div>
+      <div className="section">
+        <div className="section-container text-center">
+          <Icon name="exclamation-triangle" style="solid" size="xl" className="text-red-500 mx-auto mb-16" />
+          <p className="text-gray-600">{error}</p>
+        </div>
+      </div>
     );
   }
 
@@ -159,57 +169,103 @@ const Invite = () => {
             </div>
           ) : (
             <>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">You're invited!</h1>
-          <p className="text-gray-700 mb-8">{event.invitedBy} invited you to…</p>
-          <div className="space-y-4 mb-8 text-gray-700">
-            <div><span className="font-medium">Event:</span> {event.title}</div>
-            <div><span className="font-medium">When:</span> {new Date(event.dateTime || `${event.date}T${event.time}`).toLocaleString()}</div>
-            {event.location && (
-              <div><span className="font-medium">Where:</span> {event.location}</div>
-            )}
-            <div><span className="font-medium">Decision mode:</span> {event.decisionMode}</div>
-            <div><span className="font-medium">Punishment for flaking:</span> {event.punishment}</div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="form-label" htmlFor="name">Your name *</label>
-              <input id="name" name="name" type="text" className="form-input" value={form.name} onChange={handleChange} required />
-            </div>
-
-            <div>
-              <span className="form-label">Will you attend? *</span>
-              <div className="flex gap-12 mt-2">
-                <label className="flex items-center gap-8 text-sm text-gray-700">
-                  <input type="radio" name="willAttend" value="yes" checked={form.willAttend === 'yes'} onChange={handleChange} />
-                  Yes, I'll be there
-                </label>
-                <label className="flex items-center gap-8 text-sm text-gray-700">
-                  <input type="radio" name="willAttend" value="no" checked={form.willAttend === 'no'} onChange={handleChange} />
-                  No, can't make it
-                </label>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">You're invited!</h1>
+              <p className="text-gray-700 mb-8">{event.invitedBy} invited you to…</p>
+              <div className="space-y-4 mb-8 text-gray-700">
+                <div><span className="font-medium">Event:</span> {event.title}</div>
+                <div><span className="font-medium">When:</span> {new Date(event.dateTime || `${event.date}T${event.time}`).toLocaleString()}</div>
+                {event.location && (
+                  <div><span className="font-medium">Where:</span> {event.location}</div>
+                )}
+                <div><span className="font-medium">Decision mode:</span> {event.decisionMode}</div>
+                <div><span className="font-medium">Punishment for flaking:</span> {event.punishment}</div>
               </div>
-            </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="form-label" htmlFor="name">Your name *</label>
+                  <input 
+                    id="name" 
+                    name="name" 
+                    type="text" 
+                    className="form-input" 
+                    value={form.name} 
+                    onChange={handleChange} 
+                    required 
+                  />
+                </div>
 
-            <button type="submit" className="btn btn-primary btn-lg w-full" disabled={submitting}>
-              {submitting ? 'Submitting…' : 'Submit RSVP'}
-            </button>
+                <div>
+                  <label className="form-label" htmlFor="email">Your email (optional)</label>
+                  <input 
+                    id="email" 
+                    name="email" 
+                    type="email" 
+                    className="form-input" 
+                    value={form.email} 
+                    onChange={handleChange}
+                    placeholder="your@email.com"
+                  />
+                </div>
 
-            {/* Optional: sign in or sign up */}
-            <div className="text-center text-sm text-gray-600">
-              <p className="mb-8">Already have an account?</p>
-              <div className="flex flex-col sm:flex-row gap-8 justify-center">
-                <a href={`/login?redirect=/rsvp/${eventId}${window.location.search}`} className="btn btn-secondary btn-sm">Sign in and RSVP</a>
-                <a href="/register" className="btn btn-outline btn-sm">Create an account</a>
-              </div>
-            </div>
-          </form>
+                <div>
+                  <span className="form-label">Will you attend? *</span>
+                  <div className="flex gap-12 mt-2">
+                    <label className="flex items-center gap-8 text-sm text-gray-700">
+                      <input 
+                        type="radio" 
+                        name="willAttend" 
+                        value="yes" 
+                        checked={form.willAttend === 'yes'} 
+                        onChange={handleChange} 
+                      />
+                      Yes, I'll be there
+                    </label>
+                    <label className="flex items-center gap-8 text-sm text-gray-700">
+                      <input 
+                        type="radio" 
+                        name="willAttend" 
+                        value="no" 
+                        checked={form.willAttend === 'no'} 
+                        onChange={handleChange} 
+                      />
+                      No, can't make it
+                    </label>
+                  </div>
+                </div>
+
+                {error && <p className="text-sm text-red-600">{error}</p>}
+
+                <button 
+                  type="submit" 
+                  className="btn btn-primary btn-lg w-full" 
+                  disabled={submitting}
+                >
+                  {submitting ? 'Submitting…' : 'Submit RSVP'}
+                </button>
+
+                {/* Optional: sign in or sign up */}
+                <div className="text-center text-sm text-gray-600">
+                  <p className="mb-8">Already have an account?</p>
+                  <div className="flex flex-col sm:flex-row gap-8 justify-center">
+                    <a 
+                      href={`/login?redirect=/rsvp/${eventId}${window.location.search}`} 
+                      className="btn btn-secondary btn-sm"
+                    >
+                      Sign in and RSVP
+                    </a>
+                    <a href="/register" className="btn btn-outline btn-sm">
+                      Create an account
+                    </a>
+                  </div>
+                </div>
+              </form>
             </>
           )}
         </div>
       </div>
+      
+      <Modal {...modal} />
     </div>
   );
 };

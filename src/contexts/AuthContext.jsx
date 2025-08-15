@@ -32,21 +32,43 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const user = authService.loginUser(email, password);
-      setCurrentUser(user);
-      return { success: true, user };
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setCurrentUser(result.user);
+        return { success: true, user: result.user };
+      } else {
+        return { success: false, error: result.message };
+      }
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Network error during login' };
     }
   };
 
   const register = async (userData) => {
     try {
-      const user = authService.registerUser(userData);
-      setCurrentUser(user);
-      return { success: true, user };
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData)
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        // Don't set current user immediately since email needs confirmation
+        return { success: true, user: result.user };
+      } else {
+        return { success: false, error: result.message };
+      }
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Network error during registration' };
     }
   };
 

@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../contexts/AuthContext';
-import { eventService } from '../services/eventService';
-import { participationService } from '../services/participationService';
+import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
+import Modal from '../components/Modal';
 
 const RSVP = () => {
   const router = useRouter();
   const { eventId } = router.query || {};
-  const location = { search: typeof window !== 'undefined' ? window.location.search : '' };
   const { currentUser } = useAuth();
+  const { modal, showSuccessModal, showErrorModal } = useModal();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -75,15 +75,8 @@ const RSVP = () => {
               invitedBy: invited_by || 'A friend'
             });
           } else {
-            // Try to find in local events (user might be the organizer)
-            const events = eventService.getEvents();
-            const e = events.find(ev => ev.id === eventId);
-            if (e) {
-              setEvent(e);
-            } else {
-              // Event not found in server or local - show error
-              setError('Event not found. The invitation link may be invalid or the event may have been deleted.');
-            }
+            // Event not found in server or local - show error
+            setError('Event not found. The invitation link may be invalid or the event may have been deleted.');
           }
         }
       } catch (err) {
@@ -103,55 +96,45 @@ const RSVP = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
+    setError('');
+    
     try {
-      // Add to local event friends
-      const participant = {
-        name: currentUser.name,
-        email: currentUser.email,
-        message: form.message || (form.willAttend === 'yes' ? 'Confirmed attendance' : 'Cannot attend')
-      };
-
-      // Server-side RSVP
-      try {
-        await fetch('/api/rsvp', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            eventId,
-            name: currentUser.name,
-            willAttend: form.willAttend === 'yes',
-            event
-          })
-        });
-      } catch (_) {}
-
-      // Add to local event
-      eventService.addParticipant(eventId, participant);
-      
-      // Add to participation service
-      participationService.addParticipation({
-        eventId,
-        eventTitle: event.title,
-        eventDate: event.date || (event.dateTime ? new Date(event.dateTime).toISOString().slice(0,10) : ''),
-        eventTime: event.time || (event.dateTime ? new Date(event.dateTime).toTimeString().slice(0,5) : ''),
-        eventLocation: event.location || '',
-        organizerName: event.invitedBy || 'Unknown',
-        participantName: currentUser.name,
-        participantEmail: currentUser.email,
-        status: form.willAttend === 'yes' ? 'confirmed' : 'declined',
-        message: form.message || (form.willAttend === 'yes' ? 'Confirmed attendance' : 'Cannot attend'),
-        source: 'local'
+      // Submit RSVP to Supabase only
+      const response = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          eventId,
+          name: currentUser.name,
+          email: currentUser.email,
+          willAttend: form.willAttend === 'yes',
+          message: form.message || (form.willAttend === 'yes' ? 'Confirmed attendance' : 'Cannot attend'),
+          event
+        })
       });
+
+      const result = await response.json();
       
-      setSubmitted(true);
-      
-      // Redirect to event page after a short delay
-      setTimeout(() => {
-        router.push(`/event/${eventId}`);
-      }, 2000);
-      
+      if (result.success) {
+        setSubmitted(true);
+        showSuccessModal(
+          'RSVP Submitted!',
+          `Your RSVP has been submitted successfully. You will be redirected to the event page shortly.`,
+          () => {
+            // Redirect to event page after a short delay
+            setTimeout(() => {
+              router.push(`/event/${eventId}`);
+            }, 2000);
+          }
+        );
+      } else {
+        setError(result.error || 'Failed to submit RSVP');
+        showErrorModal('RSVP Error', result.error || 'Failed to submit RSVP');
+      }
     } catch (err) {
-      setError(err.message || 'Failed to submit RSVP');
+      const errorMessage = err.message || 'Failed to submit RSVP';
+      setError(errorMessage);
+      showErrorModal('RSVP Error', errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -271,6 +254,8 @@ const RSVP = () => {
           )}
         </div>
       </div>
+      
+      <Modal {...modal} />
     </div>
   );
 };

@@ -22,17 +22,9 @@ export default async function handler(req, res) {
     const confirmationUrl = `${normalizedBase}/confirm-email?token=${encodeURIComponent(token)}`;
     const logoUrl = `${normalizedBase}/logo.svg`;
 
-    // Store token server-side as well for cross-device confirmation
-    try {
-      const { createClient } = await import('@supabase/supabase-js');
-      const url = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-      const key = process.env.SUPABASE_SERVICE_ROLE_KEY; // must be service role on server
-      if (url && key) {
-        const s = createClient(url, key);
-        const { error: insertError } = await s.from('email_confirmations').insert({ token, used: false });
-        if (insertError) console.error('Failed to store token:', insertError);
-      }
-    } catch (_) {}
+    // Note: Tokens are now stored in Supabase during user registration
+    // This endpoint is called by the registration API to send the email
+    // The token should already exist in the email_confirmations table
 
     const { data, error } = await resend.emails.send({
       from: 'Be There or Be Square <onboarding@resend.dev>',

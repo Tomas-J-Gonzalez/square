@@ -4,7 +4,9 @@ import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
 import { participationService } from '../services/participationService';
 import { useAuth } from '../contexts/AuthContext';
+import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
+import Modal from '../components/Modal';
 
 const Home = () => {
   const [activeEvent, setActiveEvent] = useState(null);
@@ -13,6 +15,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { currentUser } = useAuth();
+  const { modal, showConfirmModal, showSuccessModal, showErrorModal } = useModal();
 
   useEffect(() => {
     const loadData = async () => {
@@ -45,19 +48,29 @@ const Home = () => {
   const handleCancelEvent = async () => {
     if (!activeEvent) return;
     
-    if (window.confirm('Are you sure you want to cancel this event? It will be marked as cancelled.')) {
-      setIsCancelling(true);
-      try {
-        eventService.cancelEvent(activeEvent.id);
-        setActiveEvent(null);
-        alert('Event cancelled successfully!');
-      } catch (error) {
-        console.error('Error cancelling event:', error);
-        alert('Error cancelling event. Please try again.');
-      } finally {
-        setIsCancelling(false);
+    showConfirmModal(
+      'Cancel Event',
+      'Are you sure you want to cancel this event? It will be marked as cancelled.',
+      async () => {
+        setIsCancelling(true);
+        try {
+          eventService.cancelEvent(activeEvent.id);
+          setActiveEvent(null);
+          showSuccessModal(
+            'Event Cancelled',
+            'Event cancelled successfully!'
+          );
+        } catch (error) {
+          console.error('Error cancelling event:', error);
+          showErrorModal(
+            'Error',
+            'Error cancelling event. Please try again.'
+          );
+        } finally {
+          setIsCancelling(false);
+        }
       }
-    }
+    );
   };
 
   if (loading) {
@@ -241,6 +254,8 @@ const Home = () => {
           </div>
         </div>
       </div>
+      
+      <Modal {...modal} />
     </div>
   );
 };
