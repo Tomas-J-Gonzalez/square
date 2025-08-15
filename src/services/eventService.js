@@ -12,21 +12,30 @@ const getCurrentUser = () => {
   }
 };
 
-// Initialize Supabase client
-let supabase = null;
-const initSupabase = async () => {
-  if (!supabase) {
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase environment variables not configured');
-    }
-    
-    supabase = createClient(supabaseUrl, supabaseKey);
+// API helper function
+const callEventsAPI = async (action, data = {}) => {
+  const user = getCurrentUser();
+  if (!user || !user.email) {
+    throw new Error('User not authenticated');
   }
-  return supabase;
+
+  const response = await fetch('/api/events', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action,
+      userEmail: user.email,
+      ...data
+    })
+  });
+
+  const result = await response.json();
+  
+  if (!result.success) {
+    throw new Error(result.error || 'API call failed');
+  }
+  
+  return result;
 };
 
 /**
@@ -102,32 +111,15 @@ const createEvent = (eventData) => {
 };
 
 /**
- * Gets all events from Supabase for the current user
+ * Gets all events from the API for the current user
  * @returns {Promise<Array<Event>>} Array of events
  */
 const getEvents = async () => {
   try {
-    const supabase = await initSupabase();
-    const user = getCurrentUser();
+    const result = await callEventsAPI('getEvents');
     
-    if (!user || !user.email) {
-      console.warn('No current user found, returning empty events array');
-      return [];
-    }
-
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('invited_by', user.email)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching events from Supabase:', error);
-      return [];
-    }
-
-    // Convert Supabase format to event format
-    return (data || []).map(event => ({
+    // Convert API format to event format
+    return (result.events || []).map(event => ({
       id: event.id,
       title: event.title,
       date: event.date,
@@ -165,61 +157,17 @@ const getActiveEvent = async () => {
 };
 
 /**
- * Creates a new event in Supabase
+ * Creates a new event via the API
  * @param {Object} eventData - Event data
  * @returns {Promise<Event>} Created event
  * @throws {Error} If there's already an active event
  */
 const createNewEvent = async (eventData) => {
   try {
-    const supabase = await initSupabase();
-    const user = getCurrentUser();
-    
-    if (!user || !user.email) {
-      throw new Error('User not authenticated');
-    }
-
-    // Check if there's already an active event
-    const { data: existingEvents, error: checkError } = await supabase
-      .from('events')
-      .select('id, title')
-      .eq('invited_by', user.email)
-      .eq('status', 'active');
-
-    if (checkError) {
-      console.error('Error checking existing events:', checkError);
-    } else if (existingEvents && existingEvents.length > 0) {
-      const activeEvent = existingEvents[0];
-      throw new Error(`There is already an active event. Please cancel or complete the current event first. [View Current Event](/event/${activeEvent.id})`);
-    }
-
     const newEvent = createEvent(eventData);
     
-    // Insert into Supabase
-    const { data, error } = await supabase
-      .from('events')
-      .insert({
-        id: newEvent.id,
-        title: newEvent.title,
-        date: newEvent.date,
-        time: newEvent.time,
-        dateTime: newEvent.dateTime,
-        location: newEvent.location,
-        decision_mode: newEvent.decisionMode,
-        punishment: newEvent.punishment,
-        status: newEvent.status,
-        invited_by: user.email,
-        created_at: newEvent.createdAt,
-        updated_at: newEvent.updatedAt
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating event in Supabase:', error);
-      throw new Error('Failed to create event');
-    }
-
+    const result = await callEventsAPI('createEvent', { eventData: newEvent });
+    
     return newEvent;
   } catch (error) {
     console.error('Error in createNewEvent:', error);
@@ -228,7 +176,7 @@ const createNewEvent = async (eventData) => {
 };
 
 /**
- * Updates an event in Supabase
+ * Updates an event via the API
  * @param {string} eventId - Event ID
  * @param {Object} updates - Updates to apply
  * @returns {Promise<Event>} Updated event
@@ -240,56 +188,22 @@ const updateEvent = async (eventId, updates) => {
   }
 
   try {
-    const supabase = await initSupabase();
-    const user = getCurrentUser();
+    const result = await callEventsAPI('updateEvent', { eventId, updates });
     
-    if (!user || !user.email) {
-      throw new Error('User not authenticated');
-    }
-
-    // Convert updates to Supabase format
-    const supabaseUpdates = {
-      ...updates,
-      updated_at: new Date().toISOString()
-    };
-
-    // Remove fields that don't exist in Supabase
-    delete supabaseUpdates.participants;
-    delete supabaseUpdates.flakes;
-    delete supabaseUpdates.winner;
-    delete supabaseUpdates.loser;
-
-    const { data, error } = await supabase
-      .from('events')
-      .update(supabaseUpdates)
-      .eq('id', eventId)
-      .eq('invited_by', user.email)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating event in Supabase:', error);
-      throw new Error('Failed to update event');
-    }
-
-    if (!data) {
-      throw new Error('Event not found');
-    }
-
     // Convert back to event format
     return {
-      id: data.id,
-      title: data.title,
-      date: data.date,
-      time: data.time,
-      dateTime: data.dateTime,
-      location: data.location,
-      decisionMode: data.decision_mode,
-      punishment: data.punishment,
+      id: result.event.id,
+      title: result.event.title,
+      date: result.event.date,
+      time: result.event.time,
+      dateTime: result.event.dateTime,
+      location: result.event.location,
+      decisionMode: result.event.decision_mode,
+      punishment: result.event.punishment,
       participants: [],
-      status: data.status,
-      createdAt: data.created_at,
-      updatedAt: data.updated_at,
+      status: result.event.status,
+      createdAt: result.event.created_at,
+      updatedAt: result.event.updated_at,
       flakes: [],
       winner: null,
       loser: null
@@ -301,7 +215,7 @@ const updateEvent = async (eventId, updates) => {
 };
 
 /**
- * Deletes an event completely from Supabase
+ * Deletes an event completely via the API
  * @param {string} eventId - Event ID
  * @returns {Promise<boolean>} Success status
  * @throws {Error} If event not found
@@ -312,24 +226,7 @@ const deleteEvent = async (eventId) => {
   }
 
   try {
-    const supabase = await initSupabase();
-    const user = getCurrentUser();
-    
-    if (!user || !user.email) {
-      throw new Error('User not authenticated');
-    }
-
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .eq('id', eventId)
-      .eq('invited_by', user.email);
-
-    if (error) {
-      console.error('Error deleting event from Supabase:', error);
-      throw new Error('Failed to delete event');
-    }
-
+    await callEventsAPI('deleteEvent', { eventId });
     return true;
   } catch (error) {
     console.error('Error in deleteEvent:', error);
@@ -338,7 +235,7 @@ const deleteEvent = async (eventId) => {
 };
 
 /**
- * Cancels an event
+ * Cancels an event via the API
  * @param {string} eventId - Event ID
  * @returns {Promise<Event>} Cancelled event
  * @throws {Error} If event not found
@@ -348,7 +245,7 @@ const cancelEvent = async (eventId) => {
 };
 
 /**
- * Completes an event
+ * Completes an event via the API
  * @param {string} eventId - Event ID
  * @returns {Promise<Event>} Completed event
  * @throws {Error} If event not found
@@ -373,25 +270,6 @@ const addParticipant = async (eventId, participantData) => {
   }
 
   try {
-    const supabase = await initSupabase();
-    const user = getCurrentUser();
-    
-    if (!user || !user.email) {
-      throw new Error('User not authenticated');
-    }
-
-    // Check if event exists and user owns it
-    const { data: event, error: eventError } = await supabase
-      .from('events')
-      .select('id')
-      .eq('id', eventId)
-      .eq('invited_by', user.email)
-      .single();
-
-    if (eventError || !event) {
-      throw new Error('Event not found');
-    }
-
     // Add participant via RSVP API
     const response = await fetch('/api/rsvp', {
       method: 'POST',
@@ -435,23 +313,22 @@ const removeParticipant = async (eventId, participantId) => {
   }
 
   try {
-    const supabase = await initSupabase();
-    const user = getCurrentUser();
+    // For now, we'll use a direct API call to update the RSVP
+    // This could be moved to a dedicated API endpoint later
+    const response = await fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventId,
+        participantId,
+        willAttend: false
+      })
+    });
+
+    const result = await response.json();
     
-    if (!user || !user.email) {
-      throw new Error('User not authenticated');
-    }
-
-    // Update RSVP to will_attend = false
-    const { error } = await supabase
-      .from('event_rsvps')
-      .update({ will_attend: false })
-      .eq('id', participantId)
-      .eq('event_id', eventId);
-
-    if (error) {
-      console.error('Error removing participant from Supabase:', error);
-      throw new Error('Failed to remove participant');
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to remove participant');
     }
 
     // Return the updated event
