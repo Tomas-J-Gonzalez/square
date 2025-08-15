@@ -1,13 +1,21 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+// Initialize Supabase client (will be created when needed)
+let supabase = null;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Supabase environment variables not configured');
+function getSupabaseClient() {
+  if (!supabase) {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase environment variables not configured');
+    }
+
+    supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return supabase;
 }
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
   // Handle preflight requests
@@ -72,6 +80,7 @@ async function getEvents(req, res) {
       return res.status(400).json({ success: false, error: 'User email required' });
     }
 
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('events')
       .select('*')
@@ -110,6 +119,7 @@ async function createEvent(req, res) {
     console.log('Events API - createEvent - Event data:', eventData);
 
     // Check if there's already an active event (since status column doesn't exist, we'll check for any events)
+    const supabase = getSupabaseClient();
     const { data: existingEvents, error: checkError } = await supabase
       .from('events')
       .select('id, title')
@@ -186,6 +196,7 @@ async function updateEvent(req, res) {
     delete supabaseUpdates.winner;
     delete supabaseUpdates.loser;
 
+    const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('events')
       .update(supabaseUpdates)
@@ -222,6 +233,7 @@ async function deleteEvent(req, res) {
       return res.status(400).json({ success: false, error: 'Event ID required' });
     }
 
+    const supabase = getSupabaseClient();
     const { error } = await supabase
       .from('events')
       .delete()
