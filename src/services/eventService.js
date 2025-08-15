@@ -1,7 +1,33 @@
-// Event Service for managing events with localStorage persistence
+// Event Service for managing events with Supabase persistence
 // Provides CRUD operations for events with proper error handling and validation
 
-const STORAGE_KEY = 'show-up-or-else-events';
+// Get current user
+const getCurrentUser = () => {
+  try {
+    const user = localStorage.getItem('show-up-or-else-current-user');
+    return user ? JSON.parse(user) : null;
+  } catch (error) {
+    console.error('Error reading current user:', error);
+    return null;
+  }
+};
+
+// Initialize Supabase client
+let supabase = null;
+const initSupabase = async () => {
+  if (!supabase) {
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase environment variables not configured');
+    }
+    
+    supabase = createClient(supabaseUrl, supabaseKey);
+  }
+  return supabase;
+};
 
 /**
  * Event structure
@@ -76,236 +102,377 @@ const createEvent = (eventData) => {
 };
 
 /**
- * Gets all events from localStorage
- * @returns {Array<Event>} Array of events
+ * Gets all events from Supabase for the current user
+ * @returns {Promise<Array<Event>>} Array of events
  */
-const getEvents = () => {
+const getEvents = async () => {
   try {
-    const events = localStorage.getItem(STORAGE_KEY);
-    return events ? JSON.parse(events) : [];
+    const supabase = await initSupabase();
+    const user = getCurrentUser();
+    
+    if (!user || !user.email) {
+      console.warn('No current user found, returning empty events array');
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('invited_by', user.email)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching events from Supabase:', error);
+      return [];
+    }
+
+    // Convert Supabase format to event format
+    return (data || []).map(event => ({
+      id: event.id,
+      title: event.title,
+      date: event.date,
+      time: event.time,
+      dateTime: event.dateTime,
+      location: event.location,
+      decisionMode: event.decision_mode,
+      punishment: event.punishment,
+      participants: [], // Will be fetched separately
+      status: event.status || 'active',
+      createdAt: event.created_at,
+      updatedAt: event.updated_at,
+      flakes: [],
+      winner: null,
+      loser: null
+    }));
   } catch (error) {
-    console.error('Error reading events from localStorage:', error);
+    console.error('Error in getEvents:', error);
     return [];
   }
 };
 
 /**
- * Saves events to localStorage
- * @param {Array<Event>} events - Events to save
+ * Gets the active event (only one can be active at a time)
+ * @returns {Promise<Event|null>} Active event or null
  */
-const saveEvents = (events) => {
+const getActiveEvent = async () => {
   try {
-    if (!Array.isArray(events)) {
-      throw new Error('Events must be an array');
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
+    const events = await getEvents();
+    return events.find(event => event.status === 'active') || null;
   } catch (error) {
-    console.error('Error saving events to localStorage:', error);
-    throw new Error('Failed to save events');
+    console.error('Error getting active event:', error);
+    return null;
   }
 };
 
 /**
- * Gets the active event (only one can be active at a time)
- * @returns {Event|null} Active event or null
- */
-const getActiveEvent = () => {
-  const events = getEvents();
-  return events.find(event => event.status === 'active') || null;
-};
-
-/**
- * Creates a new event
+ * Creates a new event in Supabase
  * @param {Object} eventData - Event data
- * @returns {Event} Created event
+ * @returns {Promise<Event>} Created event
  * @throws {Error} If there's already an active event
  */
-const createNewEvent = (eventData) => {
-  const events = getEvents();
-  
-  // Check if there's already an active event
-  const activeEvent = events.find(event => event.status === 'active');
-  if (activeEvent) {
-    throw new Error(`There is already an active event. Please cancel or complete the current event first. [View Current Event](/event/${activeEvent.id})`);
+const createNewEvent = async (eventData) => {
+  try {
+    const supabase = await initSupabase();
+    const user = getCurrentUser();
+    
+    if (!user || !user.email) {
+      throw new Error('User not authenticated');
+    }
+
+    // Check if there's already an active event
+    const { data: existingEvents, error: checkError } = await supabase
+      .from('events')
+      .select('id, title')
+      .eq('invited_by', user.email)
+      .eq('status', 'active');
+
+    if (checkError) {
+      console.error('Error checking existing events:', checkError);
+    } else if (existingEvents && existingEvents.length > 0) {
+      const activeEvent = existingEvents[0];
+      throw new Error(`There is already an active event. Please cancel or complete the current event first. [View Current Event](/event/${activeEvent.id})`);
+    }
+
+    const newEvent = createEvent(eventData);
+    
+    // Insert into Supabase
+    const { data, error } = await supabase
+      .from('events')
+      .insert({
+        id: newEvent.id,
+        title: newEvent.title,
+        date: newEvent.date,
+        time: newEvent.time,
+        dateTime: newEvent.dateTime,
+        location: newEvent.location,
+        decision_mode: newEvent.decisionMode,
+        punishment: newEvent.punishment,
+        status: newEvent.status,
+        invited_by: user.email,
+        created_at: newEvent.createdAt,
+        updated_at: newEvent.updatedAt
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating event in Supabase:', error);
+      throw new Error('Failed to create event');
+    }
+
+    return newEvent;
+  } catch (error) {
+    console.error('Error in createNewEvent:', error);
+    throw error;
   }
-  
-  const newEvent = createEvent(eventData);
-  events.push(newEvent);
-  saveEvents(events);
-  
-  return newEvent;
 };
 
 /**
- * Updates an event
+ * Updates an event in Supabase
  * @param {string} eventId - Event ID
  * @param {Object} updates - Updates to apply
- * @returns {Event} Updated event
+ * @returns {Promise<Event>} Updated event
  * @throws {Error} If event not found
  */
-const updateEvent = (eventId, updates) => {
+const updateEvent = async (eventId, updates) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
 
-  const events = getEvents();
-  const eventIndex = events.findIndex(event => event.id === eventId);
-  
-  if (eventIndex === -1) {
-    throw new Error('Event not found');
+  try {
+    const supabase = await initSupabase();
+    const user = getCurrentUser();
+    
+    if (!user || !user.email) {
+      throw new Error('User not authenticated');
+    }
+
+    // Convert updates to Supabase format
+    const supabaseUpdates = {
+      ...updates,
+      updated_at: new Date().toISOString()
+    };
+
+    // Remove fields that don't exist in Supabase
+    delete supabaseUpdates.participants;
+    delete supabaseUpdates.flakes;
+    delete supabaseUpdates.winner;
+    delete supabaseUpdates.loser;
+
+    const { data, error } = await supabase
+      .from('events')
+      .update(supabaseUpdates)
+      .eq('id', eventId)
+      .eq('invited_by', user.email)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating event in Supabase:', error);
+      throw new Error('Failed to update event');
+    }
+
+    if (!data) {
+      throw new Error('Event not found');
+    }
+
+    // Convert back to event format
+    return {
+      id: data.id,
+      title: data.title,
+      date: data.date,
+      time: data.time,
+      dateTime: data.dateTime,
+      location: data.location,
+      decisionMode: data.decision_mode,
+      punishment: data.punishment,
+      participants: [],
+      status: data.status,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+      flakes: [],
+      winner: null,
+      loser: null
+    };
+  } catch (error) {
+    console.error('Error in updateEvent:', error);
+    throw error;
   }
-  
-  events[eventIndex] = {
-    ...events[eventIndex],
-    ...updates,
-    updatedAt: new Date().toISOString()
-  };
-  
-  saveEvents(events);
-  return events[eventIndex];
 };
 
 /**
- * Deletes an event completely
+ * Deletes an event completely from Supabase
  * @param {string} eventId - Event ID
- * @returns {boolean} Success status
+ * @returns {Promise<boolean>} Success status
  * @throws {Error} If event not found
  */
-const deleteEvent = (eventId) => {
+const deleteEvent = async (eventId) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
 
-  const events = getEvents();
-  const eventIndex = events.findIndex(event => event.id === eventId);
-  
-  if (eventIndex === -1) {
-    throw new Error('Event not found');
+  try {
+    const supabase = await initSupabase();
+    const user = getCurrentUser();
+    
+    if (!user || !user.email) {
+      throw new Error('User not authenticated');
+    }
+
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', eventId)
+      .eq('invited_by', user.email);
+
+    if (error) {
+      console.error('Error deleting event from Supabase:', error);
+      throw new Error('Failed to delete event');
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in deleteEvent:', error);
+    throw error;
   }
-  
-  events.splice(eventIndex, 1);
-  saveEvents(events);
-  
-  return true;
 };
 
 /**
- * Cancels an active event (marks as cancelled)
+ * Cancels an event
  * @param {string} eventId - Event ID
- * @returns {Event} Cancelled event
+ * @returns {Promise<Event>} Cancelled event
+ * @throws {Error} If event not found
  */
-const cancelEvent = (eventId) => {
+const cancelEvent = async (eventId) => {
   return updateEvent(eventId, { status: 'cancelled' });
 };
 
 /**
  * Completes an event
  * @param {string} eventId - Event ID
- * @param {Object} result - Event result
- * @returns {Event} Completed event
+ * @returns {Promise<Event>} Completed event
+ * @throws {Error} If event not found
  */
-const completeEvent = (eventId, result) => {
-  return updateEvent(eventId, {
-    status: 'completed',
-    winner: result.winner,
-    loser: result.loser,
-    flakes: result.flakes || []
-  });
+const completeEvent = async (eventId) => {
+  return updateEvent(eventId, { status: 'completed' });
 };
 
 /**
- * Adds a friend to an event
+ * Adds a participant to an event
  * @param {string} eventId - Event ID
- * @param {Object} participantData - Friend data
- * @returns {Event} Updated event
- * @throws {Error} If event not found or invalid friend data
+ * @param {Object} participantData - Participant data
+ * @returns {Promise<Event>} Updated event
+ * @throws {Error} If event not found
  */
-const addParticipant = (eventId, participantData) => {
+const addParticipant = async (eventId, participantData) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
-  if (!participantData?.name?.trim()) {
-    throw new Error('Friend name is required');
+  if (!participantData.name?.trim()) {
+    throw new Error('Participant name is required');
   }
-  // Email and message are optional to support guest RSVPs and quick adds
 
-  const events = getEvents();
-  const eventIndex = events.findIndex(event => event.id === eventId);
-  
-  if (eventIndex === -1) {
-    throw new Error('Event not found');
+  try {
+    const supabase = await initSupabase();
+    const user = getCurrentUser();
+    
+    if (!user || !user.email) {
+      throw new Error('User not authenticated');
+    }
+
+    // Check if event exists and user owns it
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .select('id')
+      .eq('id', eventId)
+      .eq('invited_by', user.email)
+      .single();
+
+    if (eventError || !event) {
+      throw new Error('Event not found');
+    }
+
+    // Add participant via RSVP API
+    const response = await fetch('/api/rsvp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        eventId,
+        name: participantData.name.trim(),
+        email: participantData.email?.trim() || null,
+        willAttend: true,
+        message: participantData.message?.trim() || null
+      })
+    });
+
+    const result = await response.json();
+    
+    if (!result.success) {
+      throw new Error(result.error || 'Failed to add participant');
+    }
+
+    // Return the updated event
+    return await getActiveEvent();
+  } catch (error) {
+    console.error('Error in addParticipant:', error);
+    throw error;
   }
-  
-  const participant = {
-    id: `friend_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-    name: participantData.name.trim(),
-    email: (participantData.email || '').trim(),
-    message: (participantData.message || '').trim(),
-    joinedAt: new Date().toISOString()
-  };
-  
-  events[eventIndex].participants.push(participant);
-  events[eventIndex].updatedAt = new Date().toISOString();
-  
-  saveEvents(events);
-  return events[eventIndex];
 };
 
 /**
- * Removes a friend from an event
+ * Removes a participant from an event
  * @param {string} eventId - Event ID
- * @param {string} participantId - Friend ID
- * @returns {Event} Updated event
- * @throws {Error} If event or friend not found
+ * @param {string} participantId - Participant ID
+ * @returns {Promise<Event>} Updated event
+ * @throws {Error} If event or participant not found
  */
-const removeParticipant = (eventId, participantId) => {
+const removeParticipant = async (eventId, participantId) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
   if (!participantId) {
-    throw new Error('Friend ID is required');
+    throw new Error('Participant ID is required');
   }
 
-  const events = getEvents();
-  const eventIndex = events.findIndex(event => event.id === eventId);
-  
-  if (eventIndex === -1) {
-    throw new Error('Event not found');
+  try {
+    const supabase = await initSupabase();
+    const user = getCurrentUser();
+    
+    if (!user || !user.email) {
+      throw new Error('User not authenticated');
+    }
+
+    // Update RSVP to will_attend = false
+    const { error } = await supabase
+      .from('event_rsvps')
+      .update({ will_attend: false })
+      .eq('id', participantId)
+      .eq('event_id', eventId);
+
+    if (error) {
+      console.error('Error removing participant from Supabase:', error);
+      throw new Error('Failed to remove participant');
+    }
+
+    // Return the updated event
+    return await getActiveEvent();
+  } catch (error) {
+    console.error('Error in removeParticipant:', error);
+    throw error;
   }
-  
-  const participantIndex = events[eventIndex].participants.findIndex(
-    p => p.id === participantId
-  );
-  
-  if (participantIndex === -1) {
-    throw new Error('Friend not found');
-  }
-  
-  events[eventIndex].participants.splice(participantIndex, 1);
-  events[eventIndex].updatedAt = new Date().toISOString();
-  
-  saveEvents(events);
-  return events[eventIndex];
 };
 
 /**
  * Gets past events (completed or cancelled)
- * @returns {Array<Event>} Array of past events
+ * @returns {Promise<Array<Event>>} Array of past events
  */
-const getPastEvents = () => {
-  const events = getEvents();
-  return events.filter(event => event.status === 'completed' || event.status === 'cancelled');
-};
-
-/**
- * Clears all events (for testing/reset)
- */
-const clearAllEvents = () => {
+const getPastEvents = async () => {
   try {
-    localStorage.removeItem(STORAGE_KEY);
+    const events = await getEvents();
+    return events.filter(event => event.status === 'completed' || event.status === 'cancelled');
   } catch (error) {
-    console.error('Error clearing events:', error);
-    throw new Error('Failed to clear events');
+    console.error('Error in getPastEvents:', error);
+    return [];
   }
 };
 
@@ -354,6 +521,5 @@ export const eventService = {
   addParticipant,
   removeParticipant,
   getPastEvents,
-  clearAllEvents,
   validateEventData
 };

@@ -26,32 +26,90 @@ export default async function handler(req, res) {
     if (process.env.RESEND_API_KEY) {
       const logoUrl = `${base}/logo.svg`;
       await resend.emails.send({
-                  from: 'noreply@showuporelse.com',
+        from: 'Show Up or Else <noreply@showuporelse.com>',
         to: email,
-        subject: 'Reset your password - Show Up or Else',
+        subject: 'Reset your Show Up or Else password',
         html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
-            <div style="margin-bottom: 20px;">
-              <img src="${logoUrl}" alt="Show Up or Else" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Reset your Show Up or Else password</title>
+            <meta name="description" content="Reset your password for Show Up or Else">
+          </head>
+          <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); overflow: hidden;">
+              <!-- Header -->
+              <div style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); padding: 40px 20px; text-align: center;">
+                <div style="margin-bottom: 20px;">
+                  <img src="${logoUrl}" alt="Show Up or Else" width="80" height="80" style="display: inline-block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px;" />
+                </div>
+                <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700;">Password Reset</h1>
+                <p style="color: rgba(255, 255, 255, 0.9); margin: 8px 0 0 0; font-size: 16px;">Secure your Show Up or Else account</p>
+              </div>
+              
+              <!-- Content -->
+              <div style="padding: 40px 30px; text-align: center;">
+                <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 24px; font-weight: 600;">Hi there,</h2>
+                
+                <p style="color: #374151; line-height: 1.6; margin-bottom: 30px; font-size: 16px;">
+                  We received a request to reset your password for your Show Up or Else account. Click the button below to create a new password.
+                </p>
+                
+                <div style="margin: 30px 0;">
+                  <a href="${resetUrl}"
+                     style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3); transition: all 0.2s ease;">
+                    Reset Password
+                  </a>
+                </div>
+                
+                <p style="color: #6b7280; font-size: 14px; margin: 20px 0;">
+                  If the button above doesn't work, copy and paste this link into your browser:
+                </p>
+                
+                <div style="background-color: #f3f4f6; padding: 16px; border-radius: 6px; margin: 20px 0; word-break: break-all;">
+                  <a href="${resetUrl}" style="color: #ec4899; text-decoration: none; font-size: 14px; font-family: 'Courier New', monospace;">${resetUrl}</a>
+                </div>
+                
+                <div style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 16px; margin: 30px 0; text-align: left;">
+                  <p style="color: #92400e; margin: 0; font-size: 14px; font-weight: 500;">
+                    <strong>Security Note:</strong> This link will expire in 1 hour for your security. If you didn't request this password reset, you can safely ignore this email and your password will remain unchanged.
+                  </p>
+                </div>
+              </div>
+              
+              <!-- Footer -->
+              <div style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
+                <p style="color: #6b7280; margin: 0 0 10px 0; font-size: 14px;">
+                  <strong>Show Up or Else</strong> - Making sure your friends show up
+                </p>
+                <p style="color: #9ca3af; margin: 0; font-size: 12px;">
+                  This email was sent to ${email} because you requested a password reset.
+                </p>
+                <p style="color: #9ca3af; margin: 10px 0 0 0; font-size: 12px;">
+                  © 2024 Show Up or Else. All rights reserved.
+                </p>
+              </div>
             </div>
-            <h1 style="color: #1f2937; margin-bottom: 10px;">Reset Your Password</h1>
-            <p style="color: #6b7280; margin-bottom: 30px;">Hi there,</p>
-            <p style="color: #374151; line-height: 1.6; margin-bottom: 30px;">
-              We received a request to reset your password for your Show Up or Else account.
-            </p>
-            <div style="margin-bottom: 30px;">
-              <a href="${resetUrl}"
-                 style="background-color: #ec4899; color: white; padding: 12px 24px; text-decoration: none; border-radius: 9999px; display: inline-block; font-weight: 500;">
-                Reset Password
-              </a>
-            </div>
-            <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">If the button doesn't work, copy and paste this link:</p>
-            <p style="color: #6b7280; font-size: 14px; word-break: break-all; margin-bottom: 30px;">
-              <a href="${resetUrl}" style="color: #ec4899;">${resetUrl}</a>
-            </p>
-            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-            <p style="color: #9ca3af; font-size: 12px;">If you didn't request this password reset, you can safely ignore this email.</p>
-          </div>
+          </body>
+          </html>
+        `,
+        text: `
+Password Reset - Show Up or Else
+
+Hi there,
+
+We received a request to reset your password for your Show Up or Else account. Click the link below to create a new password.
+
+Reset your password: ${resetUrl}
+
+If the link above doesn't work, copy and paste it into your browser.
+
+Security Note: This link will expire in 1 hour for your security. If you didn't request this password reset, you can safely ignore this email and your password will remain unchanged.
+
+Show Up or Else - Making sure your friends show up
+© 2024 Show Up or Else. All rights reserved.
         `
       });
     }

@@ -379,7 +379,7 @@ const isAdminCredentials = (username, password) => {
  * @returns {User} Logged in user (without password)
  * @throws {Error} If credentials are invalid
  */
-const loginUser = (email, password) => {
+const loginUser = async (email, password) => {
   if (!email?.trim()) {
     throw new Error('Email is required');
   }
@@ -438,6 +438,8 @@ const loginUser = (email, password) => {
   // Set current user
   const { passwordHash, ...userWithoutPassword } = user;
   setCurrentUser(userWithoutPassword);
+
+  // Events are now stored in Supabase, no need to clear localStorage
 
   return userWithoutPassword;
 };

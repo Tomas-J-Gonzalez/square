@@ -80,8 +80,8 @@ const ViewEvent = () => {
         setLoading(true);
         setError(null);
         
-        // First try to find event in local events (user is organizer)
-        const events = eventService.getEvents();
+        // First try to find event in Supabase (user is organizer)
+        const events = await eventService.getEvents();
         let foundEvent = events.find(e => e.id === eventId);
         
         if (foundEvent) {
@@ -309,7 +309,7 @@ const ViewEvent = () => {
       onConfirm: async () => {
         setIsCancelling(true);
         try {
-          eventService.cancelEvent(eventId);
+          await eventService.cancelEvent(eventId);
           showModal({
             title: 'Event Cancelled',
             message: 'Event cancelled successfully!',
@@ -377,7 +377,7 @@ const ViewEvent = () => {
       onConfirm: async () => {
         setIsProcessing(true);
         try {
-          eventService.completeEvent(eventId, attendanceStatus);
+          await eventService.completeEvent(eventId);
           showModal({
             title: 'Event Completed',
             message: 'Event completed successfully! You can view the results in Past Events.',

@@ -137,11 +137,11 @@ const CreateEvent = () => {
             invited_by: (JSON.parse(localStorage.getItem('show-up-or-else-current-user')||'{}').name) || 'Organizer'
           });
         }
-          const newEvent = eventService.createNewEvent(eventData);
+          const newEvent = await eventService.createNewEvent(eventData);
           router.push(`/event/${newEvent.id}`);
       } catch (_) {
         // Fallback to local only if supabase not configured
-        const newEvent = eventService.createNewEvent(eventData);
+        const newEvent = await eventService.createNewEvent(eventData);
         router.push(`/event/${newEvent.id}`);
       }
     } catch (error) {
