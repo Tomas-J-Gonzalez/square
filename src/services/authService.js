@@ -440,6 +440,7 @@ const loginUser = async (email, password) => {
   setCurrentUser(userWithoutPassword);
 
   // Events are now stored in Supabase, no need to clear localStorage
+  // Removed the problematic async import that was causing compilation errors
 
   return userWithoutPassword;
 };

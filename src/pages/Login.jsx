@@ -28,7 +28,7 @@ const Login = () => {
   useEffect(() => {
     try {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const enabledFlag = localStorage.getItem('enable-admin-login') === '1';
+      const enabledFlag = localStorage.getItem('show-up-or-else-admin-login-enabled') === 'true';
       setShowAdminButton(isLocal || enabledFlag);
     } catch (_) {
       setShowAdminButton(false);
