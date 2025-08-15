@@ -24,11 +24,35 @@ export default async function handler(req, res) {
     const resetUrl = `${base}/reset-password?token=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
 
     if (process.env.RESEND_API_KEY) {
+      const logoUrl = `${base}/logo.svg`;
       await resend.emails.send({
-        from: 'Be There or Be Square <no-reply@be-square.app>',
+        from: 'Be There or Be Square <onboarding@resend.dev>',
         to: email,
-        subject: 'Reset your password',
-        html: `<p>Click to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`
+        subject: 'Reset your password - Be There or Be Square',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
+            <div style="margin-bottom: 20px;">
+              <img src="${logoUrl}" alt="Be There or Be Square" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
+            </div>
+            <h1 style="color: #1f2937; margin-bottom: 10px;">Reset Your Password</h1>
+            <p style="color: #6b7280; margin-bottom: 30px;">Hi there,</p>
+            <p style="color: #374151; line-height: 1.6; margin-bottom: 30px;">
+              We received a request to reset your password for your Be There or Be Square account.
+            </p>
+            <div style="margin-bottom: 30px;">
+              <a href="${resetUrl}"
+                 style="background-color: #ec4899; color: white; padding: 12px 24px; text-decoration: none; border-radius: 9999px; display: inline-block; font-weight: 500;">
+                Reset Password
+              </a>
+            </div>
+            <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;">If the button doesn't work, copy and paste this link:</p>
+            <p style="color: #6b7280; font-size: 14px; word-break: break-all; margin-bottom: 30px;">
+              <a href="${resetUrl}" style="color: #ec4899;">${resetUrl}</a>
+            </p>
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            <p style="color: #9ca3af; font-size: 12px;">If you didn't request this password reset, you can safely ignore this email.</p>
+          </div>
+        `
       });
     }
 

@@ -39,16 +39,16 @@ export default async function handler(req, res) {
       to: email,
       subject: 'Confirm your Be There or Be Square account',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="text-align: center; margin-bottom: 20px;">
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
+          <div style="margin-bottom: 20px;">
             <img src="${logoUrl}" alt="Be There or Be Square" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
           </div>
-          <h1 style="color: #1f2937; text-align: center; margin-bottom: 10px;">Welcome to Be There or Be Square!</h1>
-          <p style="color: #6b7280; text-align: center; margin-bottom: 30px;">Hi ${name},</p>
+          <h1 style="color: #1f2937; margin-bottom: 10px;">Welcome to Be There or Be Square!</h1>
+          <p style="color: #6b7280; margin-bottom: 30px;">Hi ${name},</p>
           <p style="color: #374151; line-height: 1.6; margin-bottom: 30px;">
             Please confirm your email address by clicking the button below.
           </p>
-          <div style="text-align: center; margin-bottom: 30px;">
+          <div style="margin-bottom: 30px;">
             <a href="${confirmationUrl}"
                style="background-color: #ec4899; color: white; padding: 12px 24px; text-decoration: none; border-radius: 9999px; display: inline-block; font-weight: 500;">
               Confirm Email Address
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
             <a href="${confirmationUrl}" style="color: #ec4899;">${confirmationUrl}</a>
           </p>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
-          <p style="color: #9ca3af; font-size: 12px; text-align: center;">If you didn't create an account, you can safely ignore this email.</p>
+          <p style="color: #9ca3af; font-size: 12px;">If you didn't create an account, you can safely ignore this email.</p>
         </div>
       `
     });

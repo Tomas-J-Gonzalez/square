@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { setPasswordForEmail } from '../src/services/authService';
 
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -20,7 +19,7 @@ export default function ResetPasswordPage() {
     setError('');
     setLoading(true);
     try {
-      // Validate token server-side first
+      // Validate token and update password server-side
       const token = new URLSearchParams(window.location.search).get('token');
       const resp = await fetch('/api/password-reset', {
         method: 'POST',
@@ -30,8 +29,6 @@ export default function ResetPasswordPage() {
       const json = await resp.json();
       if (!resp.ok) throw new Error(json.error || 'Failed to reset');
 
-      // Update local user store
-      setPasswordForEmail(email, password);
       setSuccess(true);
       setTimeout(() => router.push('/login'), 1500);
     } catch (err) {

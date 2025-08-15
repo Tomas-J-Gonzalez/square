@@ -1,4 +1,29 @@
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
+
+// Helper functions to manage local user storage (similar to authService)
+const getUsersFilePath = () => path.join(process.cwd(), 'users.json');
+
+const getUsers = () => {
+  try {
+    if (!fs.existsSync(getUsersFilePath())) return [];
+    const data = fs.readFileSync(getUsersFilePath(), 'utf8');
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error reading users file:', error);
+    return [];
+  }
+};
+
+const saveUsers = (users) => {
+  try {
+    fs.writeFileSync(getUsersFilePath(), JSON.stringify(users, null, 2));
+  } catch (error) {
+    console.error('Error saving users file:', error);
+    throw new Error('Failed to save users');
+  }
+};
 
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -24,11 +49,32 @@ export default async function handler(req, res) {
     if (error) return res.status(500).json({ success: false, error: `Token lookup failed: ${error.message || 'unknown error'}` });
     if (!data || data.used === true) return res.status(400).json({ success: false, error: 'Invalid or expired confirmation token' });
 
-    // Mark as used
+    // Update local user storage to mark email as confirmed
+    const users = getUsers();
+    let userFound = false;
+    
+    for (let i = 0; i < users.length; i++) {
+      if (users[i].emailConfirmationToken === token) {
+        users[i].emailConfirmed = true;
+        users[i].updatedAt = new Date().toISOString();
+        userFound = true;
+        break;
+      }
+    }
+
+    if (!userFound) {
+      return res.status(404).json({ success: false, error: 'User not found for this confirmation token' });
+    }
+
+    // Save updated users
+    saveUsers(users);
+
+    // Mark token as used in Supabase
     await supabase.from('email_confirmations').update({ used: true }).eq('id', data.id);
 
-    return res.status(200).json({ success: true, message: 'Email confirmed' });
+    return res.status(200).json({ success: true, message: 'Email confirmed successfully! You can now log in.' });
   } catch (e) {
+    console.error('Email confirmation error:', e);
     return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 }
