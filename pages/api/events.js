@@ -10,7 +10,18 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(req, res) {
-  if (req.method === 'OPTIONS') return res.status(200).end();
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+  
+  // Only allow POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ success: false, error: 'Method not allowed. Use POST.' });
+  }
   
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
