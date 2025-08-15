@@ -118,7 +118,6 @@ const CreateEvent = () => {
         id: generatedId,
         ...formData,
         punishment: formData.punishment === '__custom__' ? (formData.customPunishment || '').trim() : formData.punishment,
-        dateTime: `${formData.date}T${formData.time}`,
         participants: [],
         status: 'active',
         createdAt: new Date().toISOString()

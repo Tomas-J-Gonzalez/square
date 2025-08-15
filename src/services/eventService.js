@@ -32,7 +32,28 @@ const callEventsAPI = async (action, data = {}, userEmail = null) => {
     })
   });
 
-  const result = await response.json();
+  console.log('Event service - API response status:', response.status);
+  console.log('Event service - API response headers:', response.headers);
+
+  // Check if response is ok
+  if (!response.ok) {
+    console.error('Event service - API response not ok:', response.status, response.statusText);
+    throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+  }
+
+  // Get response text first to debug
+  const responseText = await response.text();
+  console.log('Event service - API response text:', responseText);
+
+  // Try to parse JSON
+  let result;
+  try {
+    result = JSON.parse(responseText);
+  } catch (parseError) {
+    console.error('Event service - JSON parse error:', parseError);
+    console.error('Event service - Response text that failed to parse:', responseText);
+    throw new Error(`Invalid JSON response from API: ${responseText}`);
+  }
   
   if (!result.success) {
     throw new Error(result.error || 'API call failed');
@@ -99,7 +120,6 @@ const createEvent = (eventData) => {
     title: eventData.title.trim(),
     date: eventData.date,
     time: eventData.time,
-    dateTime: eventData.dateTime,
     location: eventData.location?.trim() || '',
     decisionMode: eventData.decisionMode,
     punishment: eventData.punishment.trim(),
@@ -128,12 +148,11 @@ const getEvents = async (userEmail = null) => {
       title: event.title,
       date: event.date,
       time: event.time,
-      dateTime: event.dateTime,
       location: event.location,
       decisionMode: event.decision_mode,
       punishment: event.punishment,
       participants: [], // Will be fetched separately
-      status: event.status || 'active',
+      status: 'active', // Default status since it's not in database
       createdAt: event.created_at,
       updatedAt: event.updated_at,
       flakes: [],
@@ -202,12 +221,11 @@ const updateEvent = async (eventId, updates, userEmail = null) => {
       title: result.event.title,
       date: result.event.date,
       time: result.event.time,
-      dateTime: result.event.dateTime,
       location: result.event.location,
       decisionMode: result.event.decision_mode,
       punishment: result.event.punishment,
       participants: [],
-      status: result.event.status,
+      status: 'active', // Default status since it's not in database
       createdAt: result.event.created_at,
       updatedAt: result.event.updated_at,
       flakes: [],

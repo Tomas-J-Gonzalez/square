@@ -12,8 +12,23 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   
+  // Add CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
   try {
+    console.log('Events API - Request method:', req.method);
+    console.log('Events API - Request body:', req.body);
+    
     const { action, eventData, eventId, updates } = req.body;
+
+    if (!action) {
+      console.error('Events API - No action provided');
+      return res.status(400).json({ success: false, error: 'Action is required' });
+    }
+
+    console.log('Events API - Processing action:', action);
 
     switch (action) {
       case 'getEvents':
@@ -29,10 +44,11 @@ export default async function handler(req, res) {
       case 'completeEvent':
         return await completeEvent(req, res);
       default:
+        console.error('Events API - Invalid action:', action);
         return res.status(400).json({ success: false, error: 'Invalid action' });
     }
   } catch (error) {
-    console.error('Events API error:', error);
+    console.error('Events API - Unhandled error:', error);
     return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 }
@@ -65,22 +81,28 @@ async function getEvents(req, res) {
 
 async function createEvent(req, res) {
   try {
+    console.log('Events API - createEvent - Request body:', req.body);
+    
     const { eventData, userEmail } = req.body;
     
     if (!userEmail) {
+      console.error('Events API - createEvent - No user email provided');
       return res.status(400).json({ success: false, error: 'User email required' });
     }
 
     if (!eventData) {
+      console.error('Events API - createEvent - No event data provided');
       return res.status(400).json({ success: false, error: 'Event data required' });
     }
 
-    // Check if there's already an active event
+    console.log('Events API - createEvent - User email:', userEmail);
+    console.log('Events API - createEvent - Event data:', eventData);
+
+    // Check if there's already an active event (since status column doesn't exist, we'll check for any events)
     const { data: existingEvents, error: checkError } = await supabase
       .from('events')
       .select('id, title')
-      .eq('invited_by', userEmail)
-      .eq('status', 'active');
+      .eq('invited_by', userEmail);
 
     if (checkError) {
       console.error('Error checking existing events:', checkError);
@@ -93,30 +115,35 @@ async function createEvent(req, res) {
     }
 
     // Create the event
+    console.log('Events API - createEvent - Inserting event into Supabase...');
+    
+    const insertData = {
+      id: eventData.id,
+      title: eventData.title,
+      date: eventData.date,
+      time: eventData.time,
+      location: eventData.location,
+      decision_mode: eventData.decisionMode,
+      punishment: eventData.punishment,
+      invited_by: userEmail,
+      created_at: eventData.createdAt,
+      updated_at: eventData.updatedAt
+    };
+    
+    console.log('Events API - createEvent - Insert data:', insertData);
+    
     const { data, error } = await supabase
       .from('events')
-      .insert({
-        id: eventData.id,
-        title: eventData.title,
-        date: eventData.date,
-        time: eventData.time,
-        dateTime: eventData.dateTime,
-        location: eventData.location,
-        decision_mode: eventData.decisionMode,
-        punishment: eventData.punishment,
-        status: eventData.status || 'active',
-        invited_by: userEmail,
-        created_at: eventData.createdAt,
-        updated_at: eventData.updatedAt
-      })
+      .insert(insertData)
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating event:', error);
-      return res.status(500).json({ success: false, error: 'Failed to create event' });
+      console.error('Events API - createEvent - Supabase error:', error);
+      return res.status(500).json({ success: false, error: `Failed to create event: ${error.message}` });
     }
 
+    console.log('Events API - createEvent - Success, created event:', data);
     return res.status(201).json({ success: true, event: data });
   } catch (error) {
     console.error('Error in createEvent:', error);
