@@ -1,22 +1,25 @@
 // Event Service for managing events with Supabase persistence
 // Provides CRUD operations for events with proper error handling and validation
 
-// Get current user
-const getCurrentUser = () => {
-  try {
-    const user = localStorage.getItem('show-up-or-else-current-user');
-    return user ? JSON.parse(user) : null;
-  } catch (error) {
-    console.error('Error reading current user:', error);
-    return null;
-  }
-};
-
 // API helper function
-const callEventsAPI = async (action, data = {}) => {
-  const user = getCurrentUser();
-  if (!user || !user.email) {
-    throw new Error('User not authenticated');
+const callEventsAPI = async (action, data = {}, userEmail = null) => {
+  // Try to get user email from parameter first, then localStorage
+  let email = userEmail;
+  
+  if (!email) {
+    try {
+      const user = localStorage.getItem('show-up-or-else-current-user');
+      if (user) {
+        const userData = JSON.parse(user);
+        email = userData.email;
+      }
+    } catch (error) {
+      console.error('Error reading current user:', error);
+    }
+  }
+  
+  if (!email) {
+    throw new Error('User not authenticated - please log in again');
   }
 
   const response = await fetch('/api/events', {
@@ -24,7 +27,7 @@ const callEventsAPI = async (action, data = {}) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       action,
-      userEmail: user.email,
+      userEmail: email,
       ...data
     })
   });
@@ -112,11 +115,12 @@ const createEvent = (eventData) => {
 
 /**
  * Gets all events from the API for the current user
+ * @param {string} userEmail - Optional user email (will be retrieved from localStorage if not provided)
  * @returns {Promise<Array<Event>>} Array of events
  */
-const getEvents = async () => {
+const getEvents = async (userEmail = null) => {
   try {
-    const result = await callEventsAPI('getEvents');
+    const result = await callEventsAPI('getEvents', {}, userEmail);
     
     // Convert API format to event format
     return (result.events || []).map(event => ({
@@ -159,14 +163,15 @@ const getActiveEvent = async () => {
 /**
  * Creates a new event via the API
  * @param {Object} eventData - Event data
+ * @param {string} userEmail - Optional user email (will be retrieved from localStorage if not provided)
  * @returns {Promise<Event>} Created event
  * @throws {Error} If there's already an active event
  */
-const createNewEvent = async (eventData) => {
+const createNewEvent = async (eventData, userEmail = null) => {
   try {
     const newEvent = createEvent(eventData);
     
-    const result = await callEventsAPI('createEvent', { eventData: newEvent });
+    const result = await callEventsAPI('createEvent', { eventData: newEvent }, userEmail);
     
     return newEvent;
   } catch (error) {
@@ -179,16 +184,17 @@ const createNewEvent = async (eventData) => {
  * Updates an event via the API
  * @param {string} eventId - Event ID
  * @param {Object} updates - Updates to apply
+ * @param {string} userEmail - Optional user email (will be retrieved from localStorage if not provided)
  * @returns {Promise<Event>} Updated event
  * @throws {Error} If event not found
  */
-const updateEvent = async (eventId, updates) => {
+const updateEvent = async (eventId, updates, userEmail = null) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
 
   try {
-    const result = await callEventsAPI('updateEvent', { eventId, updates });
+    const result = await callEventsAPI('updateEvent', { eventId, updates }, userEmail);
     
     // Convert back to event format
     return {
@@ -217,16 +223,17 @@ const updateEvent = async (eventId, updates) => {
 /**
  * Deletes an event completely via the API
  * @param {string} eventId - Event ID
+ * @param {string} userEmail - Optional user email (will be retrieved from localStorage if not provided)
  * @returns {Promise<boolean>} Success status
  * @throws {Error} If event not found
  */
-const deleteEvent = async (eventId) => {
+const deleteEvent = async (eventId, userEmail = null) => {
   if (!eventId) {
     throw new Error('Event ID is required');
   }
 
   try {
-    await callEventsAPI('deleteEvent', { eventId });
+    await callEventsAPI('deleteEvent', { eventId }, userEmail);
     return true;
   } catch (error) {
     console.error('Error in deleteEvent:', error);
@@ -237,21 +244,23 @@ const deleteEvent = async (eventId) => {
 /**
  * Cancels an event via the API
  * @param {string} eventId - Event ID
+ * @param {string} userEmail - Optional user email (will be retrieved from localStorage if not provided)
  * @returns {Promise<Event>} Cancelled event
  * @throws {Error} If event not found
  */
-const cancelEvent = async (eventId) => {
-  return updateEvent(eventId, { status: 'cancelled' });
+const cancelEvent = async (eventId, userEmail = null) => {
+  return updateEvent(eventId, { status: 'cancelled' }, userEmail);
 };
 
 /**
  * Completes an event via the API
  * @param {string} eventId - Event ID
+ * @param {string} userEmail - Optional user email (will be retrieved from localStorage if not provided)
  * @returns {Promise<Event>} Completed event
  * @throws {Error} If event not found
  */
-const completeEvent = async (eventId) => {
-  return updateEvent(eventId, { status: 'completed' });
+const completeEvent = async (eventId, userEmail = null) => {
+  return updateEvent(eventId, { status: 'completed' }, userEmail);
 };
 
 /**

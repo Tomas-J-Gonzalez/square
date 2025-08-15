@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
+import { useAuth } from '../contexts/AuthContext';
 import Icon from '../components/Icon';
 
 const CreateEvent = () => {
   const router = useRouter();
+  const { currentUser } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     date: '',
@@ -122,28 +124,9 @@ const CreateEvent = () => {
         createdAt: new Date().toISOString()
       };
       
-      // Persist server-side for invite workflows (best-effort, non-fatal)
-      try {
-        const { supabase } = await import('../../lib/supabaseClient');
-        if (supabase) {
-          await supabase.from('events').upsert({
-            id: eventData.id, // Use the same ID for both local and server
-            title: eventData.title,
-            date: formData.date,
-            time: formData.time,
-            location: formData.location || null,
-            decision_mode: formData.decisionMode,
-            punishment: eventData.punishment,
-            invited_by: (JSON.parse(localStorage.getItem('show-up-or-else-current-user')||'{}').name) || 'Organizer'
-          });
-        }
-          const newEvent = await eventService.createNewEvent(eventData);
-          router.push(`/event/${newEvent.id}`);
-      } catch (_) {
-        // Fallback to local only if supabase not configured
-        const newEvent = await eventService.createNewEvent(eventData);
-        router.push(`/event/${newEvent.id}`);
-      }
+      // Create event using the API
+      const newEvent = await eventService.createNewEvent(eventData, currentUser?.email);
+      router.push(`/event/${newEvent.id}`);
     } catch (error) {
       setError(error.message);
     } finally {

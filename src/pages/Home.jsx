@@ -23,7 +23,7 @@ const Home = () => {
         setLoading(true);
         
         // Load active event (events user is organizing)
-        const event = await eventService.getActiveEvent();
+        const event = await eventService.getActiveEvent(currentUser?.email);
         setActiveEvent(event);
         
         // Load events user is participating in
@@ -54,7 +54,7 @@ const Home = () => {
       async () => {
         setIsCancelling(true);
         try {
-          await eventService.cancelEvent(activeEvent.id);
+          await eventService.cancelEvent(activeEvent.id, currentUser?.email);
           setActiveEvent(null);
           showSuccessModal(
             'Event Cancelled',

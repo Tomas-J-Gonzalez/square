@@ -17,7 +17,7 @@ const PastEvents = () => {
         setLoading(true);
         
         // Load hosted events (events user organized)
-        const hosted = await eventService.getPastEvents();
+        const hosted = await eventService.getPastEvents(currentUser?.email);
         setHostedEvents(hosted);
         
         // Load joined events (events user participated in)
