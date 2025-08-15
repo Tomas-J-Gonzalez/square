@@ -1,4 +1,4 @@
-# Be There or Be Square - Anti-Flake App
+# Show Up or Else - Anti-Flake App
 
 A fun, social web application designed to prevent people from flaking on events. Built with React, Vite, Tailwind CSS, and Resend for email handling.
 

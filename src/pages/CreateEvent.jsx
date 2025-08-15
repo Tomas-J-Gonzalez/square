@@ -134,7 +134,7 @@ const CreateEvent = () => {
             location: formData.location || null,
             decision_mode: formData.decisionMode,
             punishment: eventData.punishment,
-            invited_by: (JSON.parse(localStorage.getItem('be-there-or-be-square-current-user')||'{}').name) || 'Organizer'
+            invited_by: (JSON.parse(localStorage.getItem('show-up-or-else-current-user')||'{}').name) || 'Organizer'
           });
         }
           const newEvent = eventService.createNewEvent(eventData);

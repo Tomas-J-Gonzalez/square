@@ -26,18 +26,18 @@ export default async function handler(req, res) {
     if (process.env.RESEND_API_KEY) {
       const logoUrl = `${base}/logo.svg`;
       await resend.emails.send({
-        from: 'Be There or Be Square <onboarding@resend.dev>',
+        from: 'Show Up or Else <noreply@showuporelse.com>',
         to: email,
-        subject: 'Reset your password - Be There or Be Square',
+        subject: 'Reset your password - Show Up or Else',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
             <div style="margin-bottom: 20px;">
-              <img src="${logoUrl}" alt="Be There or Be Square" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
+              <img src="${logoUrl}" alt="Show Up or Else" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
             </div>
             <h1 style="color: #1f2937; margin-bottom: 10px;">Reset Your Password</h1>
             <p style="color: #6b7280; margin-bottom: 30px;">Hi there,</p>
             <p style="color: #374151; line-height: 1.6; margin-bottom: 30px;">
-              We received a request to reset your password for your Be There or Be Square account.
+              We received a request to reset your password for your Show Up or Else account.
             </p>
             <div style="margin-bottom: 30px;">
               <a href="${resetUrl}"

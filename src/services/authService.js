@@ -1,8 +1,8 @@
 // Authentication Service for user management
 // Provides user authentication, registration, and profile management
 
-const USERS_STORAGE_KEY = 'be-there-or-be-square-users';
-const CURRENT_USER_KEY = 'be-there-or-be-square-current-user';
+const USERS_STORAGE_KEY = 'show-up-or-else-users';
+const CURRENT_USER_KEY = 'show-up-or-else-current-user';
 
 // Email validation - now allows any valid email domain
 
@@ -16,7 +16,7 @@ const ADMIN_CREDENTIALS = {
 };
 
 // Email confirmation tokens storage
-const EMAIL_CONFIRMATION_TOKENS_KEY = 'be-there-or-be-square-email-confirmations';
+const EMAIL_CONFIRMATION_TOKENS_KEY = 'show-up-or-else-email-confirmations';
 
 import { sendConfirmationEmail as sendEmail } from './emailService.js';
 
@@ -180,7 +180,7 @@ const sendConfirmationEmail = async (email, token, name, userId) => {
       const confirmationUrl = `${window.location.origin}/confirm-email?token=${token}`;
       console.log('=== EMAIL CONFIRMATION (FALLBACK) ===');
       console.log(`To: ${email}`);
-      console.log(`Subject: Confirm your Be There or Be Square account`);
+      console.log(`Subject: Confirm your Show Up or Else account`);
       console.log(`Hi ${name},`);
       console.log(`Please click the following link to confirm your account:`);
       console.log(confirmationUrl);
@@ -208,7 +208,7 @@ const sendConfirmationEmail = async (email, token, name, userId) => {
     const confirmationUrl = `${window.location.origin}/confirm-email?token=${token}`;
     console.log('=== EMAIL CONFIRMATION (FALLBACK) ===');
     console.log(`To: ${email}`);
-    console.log(`Subject: Confirm your Be There or Be Square account`);
+          console.log(`Subject: Confirm your Show Up or Else account`);
     console.log(`Hi ${name},`);
     console.log(`Please click the following link to confirm your account:`);
     console.log(confirmationUrl);
@@ -796,9 +796,11 @@ export const authService = {
   confirmEmail,
   resendConfirmationEmail,
   isAdminCredentials,
-  listUsers,
-  isValidEmail
+  listUsers
 };
+
+// Export isValidEmail function directly for use in other files
+export { isValidEmail };
 
 /**
  * Sets a new password for a user identified by email (used by reset flow)

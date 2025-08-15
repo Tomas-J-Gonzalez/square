@@ -1,6 +1,6 @@
-# Vercel Backend for Be There or Be Square
+# Vercel Backend for Show Up or Else
 
-This is a serverless backend deployed on Vercel that provides API endpoints for the Be There or Be Square app.
+This is a serverless backend deployed on Vercel that provides API endpoints for the Show Up or Else app.
 
 ## 🏗️ Architecture
 

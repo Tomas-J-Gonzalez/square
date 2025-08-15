@@ -417,10 +417,10 @@ const Profile = () => {
                   <Button variant="danger" onClick={() => {
                     try {
                       const keys = [
-                        'be-there-or-be-square-users',
-                        'be-there-or-be-square-current-user',
-                        'be-there-or-be-square-email-confirmations',
-                        'be-there-or-be-square-events'
+                                'show-up-or-else-users',
+        'show-up-or-else-current-user',
+        'show-up-or-else-email-confirmations',
+        'show-up-or-else-events'
                       ];
                       keys.forEach(k => localStorage.removeItem(k));
                       showSuccessModal('Cleared', 'All local data was cleared for this site.');
@@ -438,9 +438,9 @@ const Profile = () => {
                   <Button variant="secondary" onClick={() => window.open('/seed-demo.html', '_blank')}>Open Seed Demo</Button>
                   <Button variant="primary" onClick={() => {
                     try {
-                      const usersKey = 'be-there-or-be-square-users';
-                      const eventsKey = 'be-there-or-be-square-events';
-                      const confirmationsKey = 'be-there-or-be-square-email-confirmations';
+                            const usersKey = 'show-up-or-else-users';
+      const eventsKey = 'show-up-or-else-events';
+      const confirmationsKey = 'show-up-or-else-email-confirmations';
                       const userId = `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
                       const demoUsers = [{
                         id: userId,

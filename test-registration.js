@@ -11,12 +11,11 @@ dotenv.config();
 async function testRegistration() {
   console.log('🧪 Testing Registration API...\n');
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  // Test the registration API endpoint
+  console.log('📋 Test 1: Checking API endpoint accessibility...');
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://showuporelse.com';
   
   try {
-    // Test 1: Check if the API endpoint is accessible
-    console.log('📋 Test 1: Checking API endpoint accessibility...');
-    
     const testData = {
       name: 'Test User',
       email: `test-${Date.now()}@example.com`,

@@ -1,7 +1,7 @@
 // Event Service for managing events with localStorage persistence
 // Provides CRUD operations for events with proper error handling and validation
 
-const STORAGE_KEY = 'be-there-or-be-square-events';
+const STORAGE_KEY = 'show-up-or-else-events';
 
 /**
  * Event structure

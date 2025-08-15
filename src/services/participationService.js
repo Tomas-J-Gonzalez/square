@@ -1,7 +1,7 @@
 // Participation Service for managing events that users are participating in
 // This handles events from server RSVPs and local participation
 
-const PARTICIPATION_STORAGE_KEY = 'be-there-or-be-square-participations';
+const PARTICIPATION_STORAGE_KEY = 'show-up-or-else-participations';
 
 /**
  * Participation structure

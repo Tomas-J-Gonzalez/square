@@ -26,8 +26,13 @@ const ConfirmEmail = () => {
 
     const confirm = async () => {
       try {
+        console.log('🔍 ConfirmEmail: Calling API with token:', token);
         const resp = await fetch(`/api/confirm-email?token=${encodeURIComponent(token)}`);
+        console.log('🔍 ConfirmEmail: API response status:', resp.status);
+        
         const json = await resp.json();
+        console.log('🔍 ConfirmEmail: API response:', json);
+        
         if (resp.ok && json.success) {
           // Email confirmation is now handled entirely by the server
           // The user's email_confirmed status is updated in Supabase
@@ -41,14 +46,19 @@ const ConfirmEmail = () => {
             () => router.push('/login')
           );
         } else {
-          setError(json.error || 'Invalid or expired confirmation token');
+          console.log('❌ Email confirmation failed:', json.message || json.error);
+          setError(json.message || json.error || 'Invalid or expired confirmation token');
         }
       } catch (e) {
-        setError('Unable to confirm email');
+        console.error('❌ Email confirmation error:', e);
+        setError('Unable to confirm email. Please try again.');
       } finally {
         setLoading(false);
       }
     };
+
+    // Actually call the confirm function
+    confirm();
   }, [router, showSuccessModal]);
 
   if (loading) {

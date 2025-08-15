@@ -27,15 +27,15 @@ export default async function handler(req, res) {
     // The token should already exist in the email_confirmations table
 
     const { data, error } = await resend.emails.send({
-      from: 'Be There or Be Square <onboarding@resend.dev>',
+      from: 'Show Up or Else <noreply@showuporelse.com>',
       to: email,
-      subject: 'Confirm your Be There or Be Square account',
+      subject: 'Confirm your Show Up or Else account',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; text-align: center;">
           <div style="margin-bottom: 20px;">
-            <img src="${logoUrl}" alt="Be There or Be Square" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
+            <img src="${logoUrl}" alt="Show Up or Else" width="64" height="64" style="display: inline-block; width: 64px; height: 64px;" />
           </div>
-          <h1 style="color: #1f2937; margin-bottom: 10px;">Welcome to Be There or Be Square!</h1>
+                      <h1 style="color: #1f2937; margin-bottom: 10px;">Welcome to Show Up or Else!</h1>
           <p style="color: #6b7280; margin-bottom: 30px;">Hi ${name},</p>
           <p style="color: #374151; line-height: 1.6; margin-bottom: 30px;">
             Please confirm your email address by clicking the button below.

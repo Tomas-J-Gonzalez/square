@@ -1,4 +1,4 @@
--- Supabase Schema for Be There or Be Square
+-- Supabase Schema for Show Up or Else
 -- Run this in your Supabase SQL editor
 
 -- Users table (replaces localStorage user storage)

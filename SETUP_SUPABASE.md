@@ -1,6 +1,6 @@
 # Supabase Setup Guide
 
-This guide will help you set up Supabase for your "Be there or be square" app.
+This guide will help you set up Supabase for your "Show up or else" app.
 
 ## 🔧 Step 1: Create a Supabase Project
 
@@ -9,7 +9,7 @@ This guide will help you set up Supabase for your "Be there or be square" app.
 3. Click "New Project"
 4. Choose your organization
 5. Enter project details:
-   - **Name**: `be-there-or-be-square` (or your preferred name)
+   - **Name**: `show-up-or-else` (or your preferred name)
    - **Database Password**: Choose a strong password
    - **Region**: Choose closest to your users
 6. Click "Create new project"
