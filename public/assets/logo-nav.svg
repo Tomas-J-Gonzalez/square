@@ -1,0 +1,8 @@
+<svg width="120" height="32" viewBox="0 0 120 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simplified logo for nav bar -->
+  <text x="60" y="20" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#111111" text-anchor="middle">
+    Show up or Else
+  </text>
+  <!-- Pink accent dot -->
+  <circle cx="110" cy="8" r="4" fill="#EB4C6F"/>
+</svg>

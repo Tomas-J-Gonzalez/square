@@ -107,15 +107,24 @@ export async function POST(request) {
     // Send confirmation email
     const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/confirm-email?token=${confirmationToken}`;
     
-    const { error: emailError } = await supabase.functions.invoke('send-confirmation-email', {
-      body: {
-        email: user.email,
-        name: user.name,
-        confirmationUrl
-      }
-    });
+    try {
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/send-confirmation-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          name: user.name,
+          confirmationUrl
+        })
+      });
 
-    if (emailError) {
+      const emailData = await emailResponse.json();
+      if (!emailData.success) {
+        console.error('Error sending confirmation email:', emailData.error);
+      } else {
+        console.log('Confirmation email sent successfully');
+      }
+    } catch (emailError) {
       console.error('Error sending confirmation email:', emailError);
       // Don't fail registration if email fails, just log it
     }

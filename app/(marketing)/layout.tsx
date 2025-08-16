@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 interface MarketingLayoutProps {
   children: ReactNode;
 }
 
 export default function MarketingLayout({ children }: MarketingLayoutProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   return (
     <div className="min-h-screen bg-white">
       {/* Marketing Header */}
@@ -14,9 +15,9 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <img 
-                src="/assets/Logo.svg" 
+                src="/assets/logo-nav.svg" 
                 alt="Show up or Else" 
-                className="h-6 sm:h-8 w-auto max-w-[120px] sm:max-w-[160px]"
+                className="h-6 sm:h-8 w-auto"
               />
             </Link>
           </div>
@@ -31,13 +32,39 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           </nav>
 
           {/* Mobile menu button */}
-          <button className="md:hidden text-gray-600 hover:text-gray-900">
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden text-gray-600 hover:text-gray-900"
+            aria-label="Toggle mobile menu"
+          >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
         </div>
       </header>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 shadow-lg">
+          <div className="px-4 py-4 space-y-3">
+            <Link 
+              href="/login" 
+              className="block w-full text-center btn btn-secondary border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white px-6 py-3"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
+            <Link 
+              href="/signup" 
+              className="block w-full text-center btn btn-primary px-6 py-3 font-semibold shadow-md hover:shadow-lg"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Sign Up
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="px-4 sm:px-0">
