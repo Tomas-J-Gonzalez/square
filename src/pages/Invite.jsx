@@ -22,16 +22,32 @@ const Invite = () => {
       try {
         // Public route: do not force login; if logged in we still allow the page without redirect
 
+        // Get eventId from router.query or extract from URL path
+        const eventIdFromQuery = router.query.eventId;
+        const eventIdFromPath = window.location.pathname.split('/').pop();
+        const finalEventId = eventIdFromQuery || eventIdFromPath;
+        
+        console.log('🔍 Invite page - Event ID from query:', eventIdFromQuery);
+        console.log('🔍 Invite page - Event ID from path:', eventIdFromPath);
+        console.log('🔍 Invite page - Final event ID:', finalEventId);
+        
+        if (!finalEventId) {
+          console.log('🔍 Invite page - No event ID found');
+          setError('Event not found');
+          setLoading(false);
+          return;
+        }
+
         // Try API first to get event data
         let data = null;
         try {
-          console.log('🔍 Invite page - Fetching event with ID:', eventId);
+          console.log('🔍 Invite page - Fetching event with ID:', finalEventId);
           const response = await fetch('/api/events', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               action: 'getEvent',
-              eventId
+              eventId: finalEventId
             })
           });
           
@@ -80,7 +96,7 @@ const Invite = () => {
           const invited_by = params.get('invited_by');
           if (title && date && time && punishment) {
             setEvent({
-              id: eventId,
+              id: finalEventId,
               title,
               date,
               time,
@@ -124,7 +140,7 @@ const Invite = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          eventId,
+          eventId: event.id,
           name: form.name.trim(),
           email: form.email.trim() || null,
           willAttend: form.willAttend === 'yes',
