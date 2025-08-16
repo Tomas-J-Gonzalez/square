@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Button from '../../../components/Button';
-import Icon from '../../../components/Icon';
+import Link from 'next/link';
 
 interface Event {
   id: string;
@@ -10,68 +9,119 @@ interface Event {
   date: string;
   time: string;
   location: string;
+  participant_count: number;
   status: string;
-  flakes: Array<{
-    id: string;
-    name: string;
-    email: string;
-    message: string;
-  }>;
+  host_email: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
+type EventTab = 'hosted' | 'cancelled' | 'completed';
+
 export default function PastEventsPage() {
+  const [user, setUser] = useState<User | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<EventTab>('hosted');
 
   useEffect(() => {
-    fetchPastEvents();
+    // Get user from localStorage
+    const userData = localStorage.getItem('currentUser');
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      fetchEvents(parsedUser.email);
+    } else {
+      // Redirect to login if no user
+      window.location.href = '/login';
+    }
   }, []);
 
-  const fetchPastEvents = async () => {
+  const fetchEvents = async (userEmail: string) => {
     try {
-      const userData = localStorage.getItem('currentUser');
-      if (!userData) {
-        window.location.href = '/login';
-        return;
-      }
-
-      const user = JSON.parse(userData);
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'getPastEvents', userEmail: user.email }),
+        body: JSON.stringify({ action: 'getEvents', userEmail }),
       });
 
       const data = await response.json();
       if (data.success) {
         setEvents(data.events || []);
-      } else {
-        setError(data.error || 'Failed to fetch past events');
       }
     } catch (error) {
-      setError('Network error. Please try again.');
+      console.error('Error fetching events:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  const getFilteredEvents = () => {
+    switch (activeTab) {
+      case 'hosted':
+        return events.filter(event => event.host_email === user?.email && event.status === 'active');
+      case 'cancelled':
+        return events.filter(event => event.host_email === user?.email && event.status === 'cancelled');
+      case 'completed':
+        return events.filter(event => event.host_email === user?.email && event.status === 'completed');
+      default:
+        return [];
+    }
   };
 
-  const formatTime = (timeString: string) => {
-    const [hours, minutes] = timeString.split(':');
-    const hour = parseInt(hours);
-    const ampm = hour >= 12 ? 'PM' : 'AM';
-    const displayHour = hour % 12 || 12;
-    return `${displayHour}:${minutes} ${ampm}`;
+  const getTabCount = (tab: EventTab) => {
+    switch (tab) {
+      case 'hosted':
+        return events.filter(event => event.host_email === user?.email && event.status === 'active').length;
+      case 'cancelled':
+        return events.filter(event => event.host_email === user?.email && event.status === 'cancelled').length;
+      case 'completed':
+        return events.filter(event => event.host_email === user?.email && event.status === 'completed').length;
+      default:
+        return 0;
+    }
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'active':
+        return (
+          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      case 'cancelled':
+        return (
+          <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        );
+      case 'completed':
+        return (
+          <svg className="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>;
+      case 'cancelled':
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">Cancelled</span>;
+      case 'completed':
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Completed</span>;
+      default:
+        return null;
+    }
   };
 
   if (loading) {
@@ -85,86 +135,102 @@ export default function PastEventsPage() {
     );
   }
 
+  const filteredEvents = getFilteredEvents();
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Past Events</h1>
-          <p className="mt-2 text-gray-600">View your completed and cancelled events</p>
-        </div>
+    <div className="px-8 sm:px-16 lg:px-32 space-y-8">
+      {/* Header */}
+      <div className="text-left">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">Past Events</h1>
+        <p className="text-lg text-gray-600">
+          View and manage your event history.
+        </p>
+      </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-6">
-            {error}
-          </div>
-        )}
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="-mb-px flex space-x-8">
+          {[
+            { key: 'hosted' as EventTab, label: 'Events I Hosted', icon: 'calendar' },
+            { key: 'cancelled' as EventTab, label: 'Cancelled Events', icon: 'x-circle' },
+            { key: 'completed' as EventTab, label: 'Completed Events', icon: 'check-circle' },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+                activeTab === tab.key
+                  ? 'border-pink-500 text-pink-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+            >
+              <span>{tab.label}</span>
+              <span className="bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs font-medium">
+                {getTabCount(tab.key)}
+              </span>
+            </button>
+          ))}
+        </nav>
+      </div>
 
-        {events.length === 0 ? (
-          <div className="bg-white shadow rounded-lg p-8 text-center">
-            <Icon name="calendar" size="xl" className="mx-auto text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No past events</h3>
-            <p className="text-gray-600 mb-6">
-              You haven't completed or cancelled any events yet.
+      {/* Events List */}
+      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+        {filteredEvents.length === 0 ? (
+          <div className="px-6 py-12 text-center">
+            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h3 className="mt-2 text-sm font-medium text-gray-900">
+              No {activeTab} events
+            </h3>
+            <p className="mt-1 text-sm text-gray-500">
+              {activeTab === 'hosted' && "You haven't hosted any events yet."}
+              {activeTab === 'cancelled' && "You haven't cancelled any events."}
+              {activeTab === 'completed' && "You haven't completed any events yet."}
             </p>
-            <Button onClick={() => window.location.href = '/dashboard'}>
-              Back to Dashboard
-            </Button>
+            {activeTab === 'hosted' && (
+              <div className="mt-6">
+                <Link
+                  href="/dashboard/create-event"
+                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700"
+                >
+                  Create Event
+                </Link>
+              </div>
+            )}
           </div>
         ) : (
-          <div className="space-y-6">
-            {events.map((event) => (
-              <div key={event.id} className="bg-white shadow rounded-lg overflow-hidden">
-                {/* Event Header */}
-                <div className="px-6 py-4 border-b border-gray-200">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-xl font-semibold text-gray-900">{event.title}</h3>
-                      <p className="text-gray-600">
-                        {formatDate(event.date)} at {formatTime(event.time)}
-                      </p>
-                      <p className="text-gray-600">{event.location}</p>
+          <div className="divide-y divide-gray-200">
+            {filteredEvents.map((event) => (
+              <div key={event.id} className="px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-pink-500 rounded-md flex items-center justify-center">
+                        {getStatusIcon(event.status)}
+                      </div>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        event.status === 'completed' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
-                        {event.status === 'completed' ? 'Completed' : 'Cancelled'}
-                      </span>
+                    <div className="ml-4">
+                      <div className="flex items-center space-x-2">
+                        <h4 className="text-lg font-medium text-gray-900">{event.title}</h4>
+                        {getStatusBadge(event.status)}
+                      </div>
+                      <p className="text-sm text-gray-500">
+                        {event.date} at {event.time} • {event.location}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {event.participant_count} participants
+                      </p>
                     </div>
                   </div>
-                </div>
-
-                {/* Flakes Section */}
-                <div className="px-6 py-4">
-                  <h4 className="text-lg font-medium text-gray-900 mb-3">
-                    Flakes ({event.flakes.length})
-                  </h4>
-                  
-                  {event.flakes.length === 0 ? (
-                    <p className="text-gray-500 italic">No flakes! Everyone showed up.</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {event.flakes.map((flake) => (
-                        <div key={flake.id} className="flex items-start space-x-3 p-3 bg-red-50 rounded-lg">
-                          <div className="flex-shrink-0">
-                            <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                              <Icon name="x" size="sm" className="text-red-600" />
-                            </div>
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-gray-900">{flake.name}</p>
-                            <p className="text-sm text-gray-500">{flake.email}</p>
-                            {flake.message && (
-                              <p className="text-sm text-gray-600 mt-1">"{flake.message}"</p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex space-x-2">
+                    <Link
+                      href={`/dashboard/event/${event.id}`}
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-pink-700 bg-pink-100 hover:bg-pink-200"
+                    >
+                      View Details
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

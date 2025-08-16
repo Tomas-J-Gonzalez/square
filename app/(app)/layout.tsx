@@ -124,9 +124,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   alt="Show up or Else" 
                   className="h-10 w-10 transition-transform group-hover:scale-105"
                 />
-                <span className="ml-3 text-xl font-bold text-gray-900 hidden sm:block">
-                  Dashboard
-                </span>
               </Link>
             </div>
             

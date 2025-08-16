@@ -75,11 +75,11 @@ export default function DashboardPage() {
   return (
     <div className="px-8 sm:px-16 lg:px-32 space-y-8">
       {/* Welcome Section - No Card Background */}
-      <div className="text-center">
+      <div className="text-left">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">
           Welcome back, {firstName}! 👋
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-600 max-w-2xl">
           Manage your events and keep track of your participants.
         </p>
       </div>
@@ -101,7 +101,7 @@ export default function DashboardPage() {
 
         {/* Past Events Card */}
         <Card href="/dashboard/past-events">
-          <CardIcon backgroundColor="#3b82f6">
+          <CardIcon backgroundColor="#ec4899">
             <Icon name="calendar" size="lg" />
           </CardIcon>
           <CardTitle>Past Events</CardTitle>
@@ -114,7 +114,7 @@ export default function DashboardPage() {
 
         {/* Events I'm Hosting Card - Smaller */}
         <Card href="/dashboard/events">
-          <CardIcon backgroundColor="#10b981">
+          <CardIcon backgroundColor="#ec4899">
             <Icon name="users" size="lg" />
           </CardIcon>
           <CardTitle>My Events</CardTitle>
