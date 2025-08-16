@@ -75,19 +75,19 @@ export async function POST(request) {
     }
 
     // Verify password
-    if (!user.password) {
+    if (!user.password_hash) {
       console.error('No password hash found for user:', email);
       return NextResponse.json({ success: false, error: 'Invalid email or password' }, { status: 401 });
     }
     
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
     if (!isValidPassword) {
       console.error('Invalid password for user:', email);
       return NextResponse.json({ success: false, error: 'Invalid email or password' }, { status: 401 });
     }
 
-    // Remove password from user object before sending
-    const { password: _, ...userWithoutPassword } = user;
+    // Remove password_hash from user object before sending
+    const { password_hash: _, ...userWithoutPassword } = user;
 
     console.log('Login successful for user:', email);
     return NextResponse.json({ 

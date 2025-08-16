@@ -74,7 +74,7 @@ export async function POST(request) {
       .from('users')
       .insert({
         email,
-        password: hashedPassword,
+        password_hash: hashedPassword,
         name,
         email_confirmed: false
       })
