@@ -4,24 +4,22 @@ export default function MarketingPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gray-900 text-white py-20 px-8">
+      <section className="bg-gray-900 text-white py-20 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-12">
             <div className="mb-6">
-              <img 
-                src="/logo-curve.svg" 
-                alt="Show up or Else" 
-                className="h-24 mx-auto"
-              />
+              <h1 className="text-4xl sm:text-6xl font-bold text-white marketing-heading">
+                Be there or be square
+              </h1>
             </div>
-            <p className="text-xl text-gray-300">
+            <p className="text-lg sm:text-xl text-gray-300">
               Make event planning fun, collaborative, and flake-proof
             </p>
           </div>
           
           <Link 
             href="/signup" 
-            className="inline-flex items-center gap-2 bg-pink-500 text-white px-32 py-3 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors"
+            className="inline-flex items-center gap-2 bg-pink-500 text-white px-8 sm:px-32 py-4 sm:py-3 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors"
           >
             Create your event
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -32,7 +30,7 @@ export default function MarketingPage() {
       </section>
 
       {/* Feature Ribbon - Moving Ticker */}
-      <section className="bg-white py-10 px-8 overflow-hidden">
+      <section className="bg-white py-10 px-4 sm:px-8 overflow-hidden">
         <div className="relative">
           <div className="flex items-center gap-12 animate-scroll whitespace-nowrap">
             {/* First set of items */}
@@ -102,12 +100,12 @@ export default function MarketingPage() {
       </section>
 
       {/* Main Content */}
-      <section className="bg-white py-20 px-8">
+      <section className="bg-white py-20 px-4 sm:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-8 marketing-heading">
+          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-8 marketing-heading">
             Make event planning "funner"
           </h2>
-          <p className="text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-lg sm:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
             Tired of flaky friends ruining your plans? We make event planning fun, collaborative, and flake-proof. 
             Create events, collect RSVPs, and keep everyone accountable with playful punishments and rewards. 
             Finally — planning hangouts that people actually show up to.

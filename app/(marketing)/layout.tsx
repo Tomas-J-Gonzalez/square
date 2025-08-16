@@ -9,16 +9,16 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
   return (
     <div className="min-h-screen bg-white">
       {/* Marketing Header */}
-      <header className="bg-white px-32 py-4 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white px-4 sm:px-32 py-4 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
-                                  <Link href="/" className="flex items-center">
-                        <img 
-                          src="/logo-stacked.svg" 
-                          alt="Show up or Else" 
-                          className="h-12 w-auto"
-                        />
-                      </Link>
+            <Link href="/" className="flex items-center">
+              <img 
+                src="/logo-stacked.svg" 
+                alt="Show up or Else" 
+                className="h-8 sm:h-12 w-auto"
+              />
+            </Link>
           </div>
           
           <nav className="hidden md:flex items-center space-x-12">
@@ -40,15 +40,15 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main>
+      <main className="px-4 sm:px-0">
         {children}
       </main>
 
       {/* Marketing Footer */}
-      <footer className="bg-pink-600 text-white py-16 px-32">
+      <footer className="bg-pink-600 text-white py-16 px-4 sm:px-32">
         <div className="max-w-7xl mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-4 marketing-heading">Be there or be square</h3>
-          <div className="flex items-center justify-center gap-6 text-sm">
+          <h3 className="text-xl sm:text-2xl font-bold mb-4 marketing-heading">Be there or be square</h3>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-sm">
             <span>Show Up or Else © 2025</span>
             <Link href="/privacy" className="hover:underline">Privacy Policy</Link>
             <Link href="/terms" className="hover:underline">Terms & Conditions</Link>
