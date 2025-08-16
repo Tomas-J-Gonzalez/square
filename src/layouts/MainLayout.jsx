@@ -88,6 +88,15 @@ const MainLayout = ({ children }) => {
               <ul className="flex items-center justify-center gap-32 list-none m-0 p-0">
                 <li>
                   <Link
+                    href="/landing"
+                    className={`nav-link ${isActive('/landing') ? 'active' : ''}`}
+                    aria-current={isActive('/landing') ? 'page' : undefined}
+                  >
+                    Landing
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/"
                     className={`nav-link ${isActive('/') ? 'active' : ''}`}
                     aria-current={isActive('/') ? 'page' : undefined}
@@ -204,6 +213,16 @@ const MainLayout = ({ children }) => {
             aria-hidden={!isMobileMenuOpen}
           >
             <ul className="nav-mobile-content list-none m-0 p-0">
+              <li>
+                <Link
+                  href="/landing"
+                  className={`nav-link ${isActive('/landing') ? 'active' : ''}`}
+                  aria-current={isActive('/landing') ? 'page' : undefined}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  Landing
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/"
