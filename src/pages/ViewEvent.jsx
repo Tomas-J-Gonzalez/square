@@ -383,65 +383,88 @@ const ViewEvent = () => {
 
   // Simple copy function that works reliably
   const copyToClipboard = (text) => {
-    const input = document.getElementById('invitation-link-input');
-    
-    // Always select the input first
-    if (input) {
-      input.select();
-      input.setSelectionRange(0, 99999);
-    }
-    
-    // Try clipboard API first (with better error handling)
-    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
-      return navigator.clipboard.writeText(text)
-        .then(() => {
-          showModal({
-            title: 'Link Copied!',
-            message: 'The invitation link has been copied to your clipboard.',
-            type: 'success'
-          });
-          return true;
-        })
-        .catch((err) => {
-          console.error('Clipboard API failed:', err);
-          // Try document.execCommand as fallback
-          try {
-            const success = document.execCommand('copy');
-            if (success) {
-              showModal({
-                title: 'Link Copied!',
-                message: 'The invitation link has been copied to your clipboard.',
-                type: 'success'
-              });
-              return true;
-            }
-          } catch (execError) {
-            console.error('execCommand failed:', execError);
-          }
-          // Final fallback to manual copy instructions
-          showModal({
-            title: 'Copy Link',
-            message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
-            type: 'info'
-          });
-          return false;
-        });
-    } else {
-      // Try document.execCommand for older browsers
-      try {
-        const success = document.execCommand('copy');
-        if (success) {
-          showModal({
-            title: 'Link Copied!',
-            message: 'The invitation link has been copied to your clipboard.',
-            type: 'success'
-          });
-          return Promise.resolve(true);
-        }
-      } catch (execError) {
-        console.error('execCommand failed:', execError);
+    try {
+      console.log('🔍 Copy function called with text:', text);
+      
+      const input = document.getElementById('invitation-link-input');
+      console.log('🔍 Input element found:', !!input);
+      
+      // Always select the input first
+      if (input) {
+        input.select();
+        input.setSelectionRange(0, 99999);
+        console.log('🔍 Input selected');
       }
-      // Final fallback to manual copy instructions
+      
+      // Try clipboard API first (with better error handling)
+      if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+        console.log('🔍 Using modern clipboard API');
+        return navigator.clipboard.writeText(text)
+          .then(() => {
+            console.log('🔍 Clipboard API success');
+            showModal({
+              title: 'Link Copied!',
+              message: 'The invitation link has been copied to your clipboard.',
+              type: 'success'
+            });
+            return true;
+          })
+          .catch((err) => {
+            console.error('🔍 Clipboard API failed:', err);
+            // Try document.execCommand as fallback
+            try {
+              console.log('🔍 Trying document.execCommand fallback');
+              const success = document.execCommand('copy');
+              if (success) {
+                console.log('🔍 execCommand success');
+                showModal({
+                  title: 'Link Copied!',
+                  message: 'The invitation link has been copied to your clipboard.',
+                  type: 'success'
+                });
+                return true;
+              }
+            } catch (execError) {
+              console.error('🔍 execCommand failed:', execError);
+            }
+            // Final fallback to manual copy instructions
+            console.log('🔍 Using manual copy fallback');
+            showModal({
+              title: 'Copy Link',
+              message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+              type: 'info'
+            });
+            return false;
+          });
+      } else {
+        console.log('🔍 Modern clipboard API not available, trying execCommand');
+        // Try document.execCommand for older browsers
+        try {
+          const success = document.execCommand('copy');
+          if (success) {
+            console.log('🔍 execCommand success');
+            showModal({
+              title: 'Link Copied!',
+              message: 'The invitation link has been copied to your clipboard.',
+              type: 'success'
+            });
+            return Promise.resolve(true);
+          }
+        } catch (execError) {
+          console.error('🔍 execCommand failed:', execError);
+        }
+        // Final fallback to manual copy instructions
+        console.log('🔍 Using manual copy fallback');
+        showModal({
+          title: 'Copy Link',
+          message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+          type: 'info'
+        });
+        return Promise.resolve(false);
+      }
+    } catch (error) {
+      console.error('🔍 Copy function error:', error);
+      // Ultimate fallback - just show manual copy instructions
       showModal({
         title: 'Copy Link',
         message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
@@ -873,6 +896,23 @@ const ViewEvent = () => {
                   className="btn btn-primary btn-sm"
                 >
                   Copy Link
+                </button>
+                <button
+                  onClick={() => {
+                    const input = document.getElementById('invitation-link-input');
+                    if (input) {
+                      input.select();
+                      input.setSelectionRange(0, 99999);
+                      showModal({
+                        title: 'Link Selected',
+                        message: 'The invitation link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+                        type: 'info'
+                      });
+                    }
+                  }}
+                  className="btn btn-secondary btn-sm"
+                >
+                  Select Link
                 </button>
               </div>
               <div className="mt-16 flex gap-8">
