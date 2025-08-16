@@ -68,7 +68,10 @@ export async function POST(request) {
     // Check if email is confirmed
     if (!user.email_confirmed) {
       console.error('Email not confirmed for user:', email);
-      return NextResponse.json({ success: false, error: 'Please confirm your email before logging in' }, { status: 401 });
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Please check your email and click the confirmation link before logging in. If you didn\'t receive the email, please check your spam folder or contact support.' 
+      }, { status: 401 });
     }
 
     // Verify password
