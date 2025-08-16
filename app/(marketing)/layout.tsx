@@ -17,7 +17,6 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
                 src="/logo.svg" 
                 alt="Show up or Else" 
                 className="h-10 w-auto"
-                onError={(e) => { e.currentTarget.src='/favicon.png?v=1'; }}
               />
               <span className="ml-3 text-xl font-bold text-gray-900">Show up or Else</span>
             </Link>

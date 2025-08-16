@@ -55,7 +55,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   src="/logo.svg" 
                   alt="Show up or Else" 
                   className="h-8 w-auto"
-                  onError={(e) => { e.currentTarget.src='/favicon.png?v=1'; }}
                 />
                 <span className="ml-3 text-lg font-bold text-gray-900">Dashboard</span>
               </Link>
