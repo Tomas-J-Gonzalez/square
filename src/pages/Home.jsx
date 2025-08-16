@@ -7,12 +7,14 @@ import { useAuth } from '../contexts/AuthContext';
 import { useModal } from '../hooks/useModal';
 import Icon from '../components/Icon';
 import Modal from '../components/Modal';
+import DexVexGame from '../components/DexVexGame';
 
 const Home = () => {
   const [activeEvent, setActiveEvent] = useState(null);
   const [participatingEvents, setParticipatingEvents] = useState([]);
   const [isCancelling, setIsCancelling] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showGame, setShowGame] = useState(false);
   const router = useRouter();
   const { currentUser } = useAuth();
   const { modal, showConfirmModal, showSuccessModal, showErrorModal } = useModal();
@@ -199,7 +201,29 @@ const Home = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-32">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-32">
+          {/* Fun Card */}
+          <div className="card">
+            <button 
+              onClick={() => setShowGame(true)}
+              className="card-link w-full text-left"
+            >
+              <div className="card-content">
+                <div className="card-icon" style={{ backgroundColor: '#10b981' }}>
+                  <Icon name="gamepad" style="solid" size="xl" />
+                </div>
+                <h3 className="card-title">Fun</h3>
+                <p className="card-description">
+                  Play Dex Vex - a fun puzzle game to pass the time!
+                </p>
+                <div className="card-action">
+                  Play Game
+                  <Icon name="arrow-right" style="solid" size="sm" className="card-action-icon" />
+                </div>
+              </div>
+            </button>
+          </div>
+
           {/* Past Events Card */}
           <div className="card">
             <Link href="/past" className="card-link">
@@ -222,6 +246,7 @@ const Home = () => {
       </div>
       
       <Modal {...modal} />
+      {showGame && <DexVexGame onClose={() => setShowGame(false)} />}
     </div>
   );
 };

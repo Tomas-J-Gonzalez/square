@@ -11,7 +11,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white px-8 py-4">
+      <header className="bg-white px-8 py-4 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
             <img 
@@ -67,10 +67,32 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Feature Ribbon */}
-      <section className="bg-white py-10 px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap justify-center items-center gap-12 text-center">
+      {/* Feature Ribbon - Moving Ticker */}
+      <section className="bg-white py-10 px-8 overflow-hidden">
+        <div className="relative">
+          <div className="flex items-center gap-12 animate-scroll whitespace-nowrap">
+            {/* First set of items */}
+            <div className="flex items-center gap-4">
+              <Icon name="smile" style="regular" size="lg" className="text-pink-500" />
+              <span className="font-medium text-gray-900 uppercase tracking-wide">Make Events Fun</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Icon name="calendar-plus" style="solid" size="lg" className="text-pink-500" />
+              <span className="font-medium text-gray-900 uppercase tracking-wide">Easy Event Creation</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Icon name="users" style="solid" size="lg" className="text-pink-500" />
+              <span className="font-medium text-gray-900 uppercase tracking-wide">Collaborative Planning</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Icon name="exclamation-triangle" style="solid" size="lg" className="text-pink-500" />
+              <span className="font-medium text-gray-900 uppercase tracking-wide">Punish Flakers</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <Icon name="heart" style="solid" size="lg" className="text-pink-500" />
+              <span className="font-medium text-gray-900 uppercase tracking-wide">Create Memories</span>
+            </div>
+            {/* Duplicate set for seamless loop */}
             <div className="flex items-center gap-4">
               <Icon name="smile" style="regular" size="lg" className="text-pink-500" />
               <span className="font-medium text-gray-900 uppercase tracking-wide">Make Events Fun</span>
