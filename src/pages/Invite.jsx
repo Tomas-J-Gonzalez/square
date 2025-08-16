@@ -22,20 +22,26 @@ const Invite = () => {
       try {
         // Public route: do not force login; if logged in we still allow the page without redirect
 
-        // Try server first (lazy import so missing env doesn't crash app)
+        // Try API first to get event data
         let data = null;
         try {
-          const { supabase } = await import('../../lib/supabaseClient');
-          if (supabase) {
-            const resp = await supabase
-              .from('events')
-              .select('id,title,date,time,location,decision_mode,punishment,invited_by,created_at')
-              .eq('id', eventId)
-              .single();
-            if (!resp.error) data = resp.data;
+          const response = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'getEvent',
+              eventId
+            })
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            if (result.success && result.event) {
+              data = result.event;
+            }
           }
-        } catch (_) {
-          // ignore if supabase not configured
+        } catch (error) {
+          console.error('Error fetching event from API:', error);
         }
 
         if (data) {

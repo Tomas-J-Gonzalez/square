@@ -56,6 +56,8 @@ export default async function handler(req, res) {
     switch (action) {
       case 'getEvents':
         return await getEvents(req, res);
+      case 'getEvent':
+        return await getEvent(req, res);
       case 'createEvent':
         return await createEvent(req, res);
       case 'updateEvent':
@@ -105,6 +107,33 @@ async function getEvents(req, res) {
     return res.status(200).json({ success: true, events: data || [] });
   } catch (error) {
     console.error('Error in getEvents:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+}
+
+async function getEvent(req, res) {
+  try {
+    const { eventId } = req.body;
+    
+    if (!eventId) {
+      return res.status(400).json({ success: false, error: 'Event ID required' });
+    }
+
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('id', eventId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching event:', error);
+      return res.status(404).json({ success: false, error: 'Event not found' });
+    }
+
+    return res.status(200).json({ success: true, event: data });
+  } catch (error) {
+    console.error('Error in getEvent:', error);
     return res.status(500).json({ success: false, error: 'Internal server error' });
   }
 }

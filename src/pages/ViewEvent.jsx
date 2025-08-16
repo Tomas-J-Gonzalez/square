@@ -391,7 +391,7 @@ const ViewEvent = () => {
       input.setSelectionRange(0, 99999);
     }
     
-    // Try clipboard API first
+    // Try clipboard API first (with better error handling)
     if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
       return navigator.clipboard.writeText(text)
         .then(() => {
@@ -404,7 +404,21 @@ const ViewEvent = () => {
         })
         .catch((err) => {
           console.error('Clipboard API failed:', err);
-          // Fallback to manual copy instructions
+          // Try document.execCommand as fallback
+          try {
+            const success = document.execCommand('copy');
+            if (success) {
+              showModal({
+                title: 'Link Copied!',
+                message: 'The invitation link has been copied to your clipboard.',
+                type: 'success'
+              });
+              return true;
+            }
+          } catch (execError) {
+            console.error('execCommand failed:', execError);
+          }
+          // Final fallback to manual copy instructions
           showModal({
             title: 'Copy Link',
             message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
@@ -413,7 +427,21 @@ const ViewEvent = () => {
           return false;
         });
     } else {
-      // Fallback for older browsers or non-HTTPS
+      // Try document.execCommand for older browsers
+      try {
+        const success = document.execCommand('copy');
+        if (success) {
+          showModal({
+            title: 'Link Copied!',
+            message: 'The invitation link has been copied to your clipboard.',
+            type: 'success'
+          });
+          return Promise.resolve(true);
+        }
+      } catch (execError) {
+        console.error('execCommand failed:', execError);
+      }
+      // Final fallback to manual copy instructions
       showModal({
         title: 'Copy Link',
         message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
