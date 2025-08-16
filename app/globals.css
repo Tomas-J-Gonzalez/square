@@ -26,3 +26,179 @@ body {
   line-height: 1.6;
   color: #374151;
 }
+
+/* Card styles */
+.card {
+  @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+}
+
+.card-link {
+  @apply block transition-all duration-200 hover:shadow-md hover:border-gray-300;
+}
+
+.card-content {
+  @apply space-y-4;
+}
+
+.card-icon {
+  @apply w-12 h-12 rounded-lg flex items-center justify-center text-white;
+}
+
+.card-title {
+  @apply text-xl font-semibold text-gray-900;
+}
+
+.card-description {
+  @apply text-gray-600;
+}
+
+.card-action {
+  @apply flex items-center justify-between text-pink-600 font-medium;
+}
+
+.card-action-icon {
+  @apply transition-transform duration-200;
+}
+
+.card-link:hover .card-action-icon {
+  @apply transform translate-x-1;
+}
+
+/* Button styles */
+.btn {
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors duration-200;
+}
+
+.btn-primary {
+  @apply bg-pink-600 text-white hover:bg-pink-700 focus:ring-2 focus:ring-offset-2 focus:ring-pink-500;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 focus:ring-2 focus:ring-offset-2 focus:ring-gray-500;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-offset-2 focus:ring-red-500;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700 focus:ring-2 focus:ring-offset-2 focus:ring-green-500;
+}
+
+/* Form styles */
+.form-group {
+  @apply space-y-2;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700;
+}
+
+.form-input {
+  @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500;
+}
+
+.form-error {
+  @apply text-red-600 text-sm;
+}
+
+/* Modal styles */
+.modal-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50;
+}
+
+.modal-content {
+  @apply bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6;
+}
+
+.modal-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.modal-title {
+  @apply text-lg font-semibold text-gray-900;
+}
+
+.modal-close {
+  @apply text-gray-400 hover:text-gray-600 transition-colors;
+}
+
+.modal-body {
+  @apply space-y-4;
+}
+
+.modal-footer {
+  @apply flex justify-end space-x-3 mt-6;
+}
+
+/* Section styles */
+.section {
+  @apply py-12 px-4 sm:px-6 lg:px-8;
+}
+
+.section-title {
+  @apply text-3xl font-bold text-gray-900 mb-8 text-center;
+}
+
+.section-subtitle {
+  @apply text-xl text-gray-600 mb-12 text-center max-w-3xl mx-auto;
+}
+
+/* Grid layouts */
+.grid-cards {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.grid-cards-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+/* Utility classes */
+.text-gradient {
+  @apply bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent;
+}
+
+.bg-gradient {
+  @apply bg-gradient-to-r from-pink-600 to-purple-600;
+}
+
+/* Responsive utilities */
+.container-custom {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Animation utilities */
+.fade-in {
+  @apply opacity-0 animate-pulse;
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+.slide-up {
+  @apply transform translate-y-4 opacity-0;
+  animation: slideUp 0.5s ease-out forwards;
+}
+
+.scale-in {
+  @apply transform scale-95 opacity-0;
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

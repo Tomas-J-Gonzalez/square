@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Card, { CardIcon, CardTitle, CardDescription, CardAction } from '../../components/Card';
+import Icon from '../../components/Icon';
+import DexVexGame from '../../components/DexVexGame';
 
 interface Event {
   id: string;
@@ -23,6 +26,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showGame, setShowGame] = useState(false);
 
   useEffect(() => {
     // Get user from localStorage
@@ -115,87 +119,45 @@ export default function DashboardPage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid-cards mb-8">
             {/* Create Event Card */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-pink-500 rounded-md flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900">Create New Event</h3>
-                    <p className="text-sm text-gray-500">Plan your next gathering</p>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <Link
-                    href="/dashboard/create-event"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700"
-                  >
-                    Create Event
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <Card href="/dashboard/create-event">
+              <CardIcon backgroundColor="#ec4899">
+                <Icon name="plus" size="lg" />
+              </CardIcon>
+              <CardTitle>Create New Event</CardTitle>
+              <CardDescription>Plan your next gathering</CardDescription>
+              <CardAction>
+                Create Event
+                <Icon name="arrow-right" size="sm" className="card-action-icon" />
+              </CardAction>
+            </Card>
 
             {/* Past Events Card */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900">Past Events</h3>
-                    <p className="text-sm text-gray-500">View completed events</p>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <Link
-                    href="/dashboard/past-events"
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                  >
-                    View Past Events
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <Card href="/dashboard/past-events">
+              <CardIcon backgroundColor="#3b82f6">
+                <Icon name="calendar" size="lg" />
+              </CardIcon>
+              <CardTitle>Past Events</CardTitle>
+              <CardDescription>View completed events</CardDescription>
+              <CardAction>
+                View Past Events
+                <Icon name="arrow-right" size="sm" className="card-action-icon" />
+              </CardAction>
+            </Card>
 
             {/* Fun Card */}
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-6">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
-                      <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-medium text-gray-900">Fun</h3>
-                    <p className="text-sm text-gray-500">Play Dex Vex game</p>
-                  </div>
-                </div>
-                <div className="mt-4">
-                  <Link
-                    href="/dashboard/fun"
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-                  >
-                    Play Game
-                  </Link>
-                </div>
-              </div>
-            </div>
+            <Card onClick={() => setShowGame(true)}>
+              <CardIcon backgroundColor="#8b5cf6">
+                <Icon name="gamepad" size="lg" />
+              </CardIcon>
+              <CardTitle>Fun</CardTitle>
+              <CardDescription>Play Dex Vex game</CardDescription>
+              <CardAction>
+                Play Game
+                <Icon name="arrow-right" size="sm" className="card-action-icon" />
+              </CardAction>
+            </Card>
           </div>
 
           {/* Current Events */}
@@ -267,6 +229,9 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+      
+      {/* Game Modal */}
+      {showGame && <DexVexGame onClose={() => setShowGame(false)} />}
     </div>
   );
 }
