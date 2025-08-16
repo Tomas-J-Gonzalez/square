@@ -56,9 +56,9 @@ export default function LoginPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex justify-center">
           <img 
-            src="/assets/Logo.svg" 
+            src="/assets/circle-pink.svg" 
             alt="Show up or Else" 
-            className="h-12 w-auto"
+            className="h-16 w-16"
           />
         </Link>
         <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900 marketing-heading">
