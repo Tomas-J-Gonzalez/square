@@ -823,7 +823,7 @@ const ViewEvent = () => {
       </div>
       
       {/* Modals */}
-      {modal.isOpen && <Modal {...modal} />}
+      {modal.isOpen && <Modal {...modal} onClose={hideModal} />}
       
       {/* Share Modal */}
       {showShareModal && (
@@ -856,11 +856,10 @@ const ViewEvent = () => {
                   onClick={(e) => {
                     e.target.select();
                     e.target.setSelectionRange(0, 99999);
-                    showModal({
-                      title: 'Link Selected',
-                      message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
-                      type: 'info'
-                    });
+                    showSuccessModal(
+                      'Link Selected',
+                      'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.'
+                    );
                   }}
                   onKeyDown={(e) => {
                     if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
@@ -882,11 +881,10 @@ const ViewEvent = () => {
                     if (input) {
                       input.select();
                       input.setSelectionRange(0, 99999);
-                      showModal({
-                        title: 'Link Selected',
-                        message: 'The invitation link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
-                        type: 'info'
-                      });
+                      showSuccessModal(
+                        'Link Selected',
+                        'The invitation link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.'
+                      );
                     }
                   }}
                   className="btn btn-secondary btn-sm"
