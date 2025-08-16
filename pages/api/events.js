@@ -128,12 +128,13 @@ async function createEvent(req, res) {
     console.log('Events API - createEvent - User email:', userEmail);
     console.log('Events API - createEvent - Event data:', eventData);
 
-    // Check if there's already an active event (since status column doesn't exist, we'll check for any events)
+    // Check if there's already an active event (only check for active events)
     const supabase = getSupabaseClient();
     const { data: existingEvents, error: checkError } = await supabase
       .from('events')
-      .select('id, title')
-      .eq('invited_by', userEmail);
+      .select('id, title, status')
+      .eq('invited_by', userEmail)
+      .eq('status', 'active');
 
     if (checkError) {
       console.error('Error checking existing events:', checkError);
@@ -157,6 +158,7 @@ async function createEvent(req, res) {
       decision_mode: eventData.decisionMode,
       punishment: eventData.punishment,
       invited_by: userEmail,
+      status: 'active', // Set status to active for new events
       created_at: eventData.createdAt,
       updated_at: eventData.updatedAt
     };

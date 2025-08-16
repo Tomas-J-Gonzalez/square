@@ -175,11 +175,25 @@ const getActiveEvent = async (userEmail) => {
  */
 const createNewEvent = async (eventData, userEmail) => {
   try {
-    const newEvent = createEvent(eventData);
+    const result = await callEventsAPI('createEvent', { eventData }, userEmail);
     
-    const result = await callEventsAPI('createEvent', { eventData: newEvent }, userEmail);
-    
-    return newEvent;
+    // Convert from API response to event format
+    return {
+      id: result.event.id,
+      title: result.event.title,
+      date: result.event.date,
+      time: result.event.time,
+      location: result.event.location,
+      decisionMode: result.event.decision_mode,
+      punishment: result.event.punishment,
+      participants: [],
+      status: result.event.status || 'active',
+      createdAt: result.event.created_at,
+      updatedAt: result.event.updated_at,
+      flakes: [],
+      winner: null,
+      loser: null
+    };
   } catch (error) {
     console.error('Error in createNewEvent:', error);
     throw error;
