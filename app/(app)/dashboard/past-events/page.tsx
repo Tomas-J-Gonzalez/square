@@ -11,7 +11,7 @@ interface Event {
   location: string;
   participant_count: number;
   status: string;
-  host_email: string;
+  invited_by: string;
 }
 
 interface User {
@@ -26,6 +26,7 @@ export default function PastEventsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<EventTab>('hosted');
 
   useEffect(() => {
@@ -60,14 +61,21 @@ export default function PastEventsPage() {
     }
   };
 
+  const refreshEvents = async () => {
+    if (!user?.email) return;
+    setRefreshing(true);
+    await fetchEvents(user.email);
+    setRefreshing(false);
+  };
+
   const getFilteredEvents = () => {
     switch (activeTab) {
       case 'hosted':
-        return events.filter(event => event.host_email === user?.email && event.status === 'active');
+        return events.filter(event => event.invited_by === user?.email && event.status === 'active');
       case 'cancelled':
-        return events.filter(event => event.host_email === user?.email && event.status === 'cancelled');
+        return events.filter(event => event.invited_by === user?.email && event.status === 'cancelled');
       case 'completed':
-        return events.filter(event => event.host_email === user?.email && event.status === 'completed');
+        return events.filter(event => event.invited_by === user?.email && event.status === 'completed');
       default:
         return [];
     }
@@ -76,11 +84,11 @@ export default function PastEventsPage() {
   const getTabCount = (tab: EventTab) => {
     switch (tab) {
       case 'hosted':
-        return events.filter(event => event.host_email === user?.email && event.status === 'active').length;
+        return events.filter(event => event.invited_by === user?.email && event.status === 'active').length;
       case 'cancelled':
-        return events.filter(event => event.host_email === user?.email && event.status === 'cancelled').length;
+        return events.filter(event => event.invited_by === user?.email && event.status === 'cancelled').length;
       case 'completed':
-        return events.filter(event => event.host_email === user?.email && event.status === 'completed').length;
+        return events.filter(event => event.invited_by === user?.email && event.status === 'completed').length;
       default:
         return 0;
     }
@@ -140,11 +148,35 @@ export default function PastEventsPage() {
   return (
     <div className="px-8 sm:px-16 lg:px-32 space-y-8">
       {/* Header */}
-      <div className="text-left">
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Past Events</h1>
-        <p className="text-lg text-gray-600">
-          View and manage your event history.
-        </p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-3">Past Events</h1>
+          <p className="text-lg text-gray-600">
+            View and manage your event history.
+          </p>
+        </div>
+        <button
+          onClick={refreshEvents}
+          disabled={refreshing}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 disabled:opacity-50"
+        >
+          {refreshing ? (
+            <>
+              <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Refreshing...
+            </>
+          ) : (
+            <>
+              <svg className="-ml-1 mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh
+            </>
+          )}
+        </button>
       </div>
 
       {/* Tabs */}
