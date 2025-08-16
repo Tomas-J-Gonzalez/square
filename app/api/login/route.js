@@ -36,6 +36,21 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Email and password are required' }, { status: 400 });
     }
 
+    // Check environment variables
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing environment variables for login:');
+      console.error('  NEXT_PUBLIC_SUPABASE_URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+      console.error('  SUPABASE_URL:', !!process.env.SUPABASE_URL);
+      console.error('  SUPABASE_SERVICE_ROLE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Server configuration error. Please contact support.' 
+      }, { status: 500 });
+    }
+
     const supabase = getSupabaseClient();
     
     // Get user from database
