@@ -1,8 +1,10 @@
 'use client';
 
+import React from 'react';
 import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import ProfileDropdown from '../components/ProfileDropdown';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -114,14 +116,14 @@ export default function AppLayout({ children }: AppLayoutProps) {
       {/* Top Navigation */}
       <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20 py-2">
             {/* Logo and Brand */}
             <div className="flex items-center">
               <Link href="/dashboard" className="flex items-center group">
                 <img 
                   src="/assets/circle-pink.svg" 
                   alt="Show up or Else" 
-                  className="h-8 w-8 transition-transform group-hover:scale-105"
+                  className="h-10 w-10 transition-transform group-hover:scale-105"
                 />
                 <span className="ml-3 text-xl font-bold text-gray-900 hidden sm:block">
                   Dashboard
@@ -153,24 +155,12 @@ export default function AppLayout({ children }: AppLayoutProps) {
 
             {/* User Menu */}
             <div className="flex items-center space-x-4">
-              {/* Welcome Message */}
-              <div className="hidden sm:flex items-center">
-                <span className="text-sm text-gray-700">
-                  Welcome, <span className="font-medium text-gray-900">{firstName}</span>
-                </span>
-              </div>
-
-              {/* Logout Button */}
-              <button 
-                onClick={handleLogout}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-pink-500 transition-colors"
-                aria-label="Logout from account"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                <span className="hidden sm:inline">Logout</span>
-              </button>
+              {/* Profile Dropdown */}
+              <ProfileDropdown 
+                userName={user.name}
+                userEmail={user.email}
+                onLogout={handleLogout}
+              />
 
               {/* Mobile menu button */}
               <button 

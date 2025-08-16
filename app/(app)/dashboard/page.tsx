@@ -73,21 +73,19 @@ export default function DashboardPage() {
   const firstName = user?.name?.split(' ')[0] || 'User';
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Section */}
-      <div className="bg-white overflow-hidden shadow rounded-lg">
-        <div className="px-4 py-5 sm:p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Welcome back, {firstName}! 👋
-          </h1>
-          <p className="text-gray-600">
-            Manage your events and keep track of your participants.
-          </p>
-        </div>
+    <div className="px-8 sm:px-16 lg:px-32 space-y-8">
+      {/* Welcome Section - No Card Background */}
+      <div className="text-center">
+        <h1 className="text-3xl font-bold text-gray-900 mb-3">
+          Welcome back, {firstName}! 👋
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Manage your events and keep track of your participants.
+        </p>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid-cards">
+      {/* Quick Actions - 3 Cards in One Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Create Event Card */}
         <Card href="/dashboard/create-event">
           <CardIcon backgroundColor="#ec4899">
@@ -113,11 +111,29 @@ export default function DashboardPage() {
             <Icon name="arrow-right" size="sm" className="card-action-icon" />
           </CardAction>
         </Card>
+
+        {/* Events I'm Hosting Card - Smaller */}
+        <Card href="/dashboard/events">
+          <CardIcon backgroundColor="#10b981">
+            <Icon name="users" size="lg" />
+          </CardIcon>
+          <CardTitle>My Events</CardTitle>
+          <CardDescription>
+            {events.length === 0 
+              ? "No active events" 
+              : `${events.length} active event${events.length !== 1 ? 's' : ''}`
+            }
+          </CardDescription>
+          <CardAction>
+            Manage Events
+            <Icon name="arrow-right" size="sm" className="card-action-icon" />
+          </CardAction>
+        </Card>
       </div>
 
-      {/* Current Events */}
+      {/* Current Events - Full Width Card */}
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
+        <div className="px-6 py-5 border-b border-gray-200">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
             Events I'm Hosting
           </h3>
@@ -125,9 +141,9 @@ export default function DashboardPage() {
             Your active events and participant counts.
           </p>
         </div>
-        <div className="border-t border-gray-200">
+        <div className="divide-y divide-gray-200">
           {events.length === 0 ? (
-            <div className="px-4 py-8 text-center">
+            <div className="px-6 py-12 text-center">
               <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -145,40 +161,38 @@ export default function DashboardPage() {
               </div>
             </div>
           ) : (
-            <ul className="divide-y divide-gray-200">
-              {events.map((event) => (
-                <li key={event.id}>
-                  <div className="px-4 py-4 flex items-center justify-between sm:px-6">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
-                          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="text-lg font-medium text-gray-900">{event.title}</h4>
-                        <p className="text-sm text-gray-500">
-                          {event.date} at {event.time} • {event.location}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {event.participant_count} participants
-                        </p>
+            events.map((event) => (
+              <div key={event.id} className="px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-green-500 rounded-md flex items-center justify-center">
+                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
                       </div>
                     </div>
-                    <div className="flex space-x-2">
-                      <Link
-                        href={`/dashboard/event/${event.id}`}
-                        className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-pink-700 bg-pink-100 hover:bg-pink-200"
-                      >
-                        Manage
-                      </Link>
+                    <div className="ml-4">
+                      <h4 className="text-lg font-medium text-gray-900">{event.title}</h4>
+                      <p className="text-sm text-gray-500">
+                        {event.date} at {event.time} • {event.location}
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        {event.participant_count} participants
+                      </p>
                     </div>
                   </div>
-                </li>
-              ))}
-            </ul>
+                  <div className="flex space-x-2">
+                    <Link
+                      href={`/dashboard/event/${event.id}`}
+                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-pink-700 bg-pink-100 hover:bg-pink-200"
+                    >
+                      Manage
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>
