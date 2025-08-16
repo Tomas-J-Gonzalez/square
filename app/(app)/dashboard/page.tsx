@@ -81,20 +81,37 @@ export default function DashboardPage() {
         </h1>
       </div>
 
-      {/* Quick Actions - 2 Cards in One Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Create Event Card */}
-        <Card href="/dashboard/create-event">
-          <CardIcon backgroundColor="#ec4899">
-            <Icon name="plus" size="lg" />
-          </CardIcon>
-          <CardTitle>Create New Event</CardTitle>
-          <CardDescription>Plan your next gathering</CardDescription>
-          <CardAction>
-            Create Event
-            <Icon name="arrow-right" size="sm" className="card-action-icon" />
-          </CardAction>
-        </Card>
+      {/* Quick Actions */}
+      <div className={`grid gap-6 ${events.length > 0 ? 'grid-cols-1 md:grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+        {/* Create Event Card - Only show if no active events */}
+        {events.length === 0 ? (
+          <Card href="/dashboard/create-event">
+            <CardIcon backgroundColor="#ec4899">
+              <Icon name="plus" size="lg" />
+            </CardIcon>
+            <CardTitle>Create New Event</CardTitle>
+            <CardDescription>Plan your next gathering</CardDescription>
+            <CardAction>
+              Create Event
+              <Icon name="arrow-right" size="sm" className="card-action-icon" />
+            </CardAction>
+          </Card>
+        ) : (
+          /* Disabled Create Event Card - Show when user has active event */
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 opacity-60 cursor-not-allowed">
+            <div className="space-y-3">
+              <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#ec4899' }}>
+                <Icon name="plus" size="lg" className="text-white" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900">Create New Event</h3>
+              <p className="text-gray-600">Users can only host 1 event at a time</p>
+              <div className="flex items-center justify-between text-pink-600 font-medium">
+                <span>Disabled</span>
+                <Icon name="arrow-right" size="sm" className="card-action-icon" />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Past Events Card */}
         <Card href="/dashboard/past-events">

@@ -147,10 +147,27 @@ async function getEvent(body) {
       return NextResponse.json({ success: false, error: 'Event not found' }, { status: 404 });
     }
 
-    // Add host name from invited_by field
+    // Get host's first name from users table
+    let hostFirstName = 'Unknown Host';
+    if (data.invited_by) {
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('name')
+        .eq('email', data.invited_by)
+        .single();
+      
+      if (!userError && userData?.name) {
+        // Extract first name from full name
+        hostFirstName = userData.name.split(' ')[0];
+      } else {
+        // Fallback to email if user not found
+        hostFirstName = data.invited_by.split('@')[0];
+      }
+    }
+
     const eventWithHostName = {
       ...data,
-      host_name: data.invited_by || 'Unknown Host'
+      host_name: hostFirstName
     };
 
     return NextResponse.json({ success: true, event: eventWithHostName });
