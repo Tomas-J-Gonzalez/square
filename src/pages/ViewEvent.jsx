@@ -381,6 +381,48 @@ const ViewEvent = () => {
     }));
   };
 
+  // Simple copy function that works reliably
+  const copyToClipboard = (text) => {
+    const input = document.getElementById('invitation-link-input');
+    
+    // Always select the input first
+    if (input) {
+      input.select();
+      input.setSelectionRange(0, 99999);
+    }
+    
+    // Try clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
+      return navigator.clipboard.writeText(text)
+        .then(() => {
+          showModal({
+            title: 'Link Copied!',
+            message: 'The invitation link has been copied to your clipboard.',
+            type: 'success'
+          });
+          return true;
+        })
+        .catch((err) => {
+          console.error('Clipboard API failed:', err);
+          // Fallback to manual copy instructions
+          showModal({
+            title: 'Copy Link',
+            message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+            type: 'info'
+          });
+          return false;
+        });
+    } else {
+      // Fallback for older browsers or non-HTTPS
+      showModal({
+        title: 'Copy Link',
+        message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+        type: 'info'
+      });
+      return Promise.resolve(false);
+    }
+  };
+
   const handleCompleteEvent = async () => {
     showModal({
       title: 'Complete Event',
@@ -737,7 +779,7 @@ const ViewEvent = () => {
                 Share this link with your friends to invite them to your event:
               </p>
               <p className="text-sm text-gray-600 mb-8">
-                💡 Tip: Click on the link below to select it, then copy with Ctrl+C (or Cmd+C on Mac)
+                💡 Tip: Click the "Copy Link" button or click on the link below to select it, then copy with Ctrl+C (or Cmd+C on Mac)
               </p>
               <div className="flex gap-8">
                 <input
@@ -755,47 +797,16 @@ const ViewEvent = () => {
                       type: 'info'
                     });
                   }}
-                  title="Click to select the link"
-                />
-                <button
-                  onClick={() => {
-                    const link = `${window.location.origin}/invite/${eventId}`;
-                    const input = document.getElementById('invitation-link-input');
-                    
-                    // Always try to select the input first
-                    if (input) {
-                      input.select();
-                      input.setSelectionRange(0, 99999);
-                    }
-                    
-                    // Try modern clipboard API
-                    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
-                      navigator.clipboard.writeText(link)
-                        .then(() => {
-                          showModal({
-                            title: 'Link Copied!',
-                            message: 'The invitation link has been copied to your clipboard.',
-                            type: 'success'
-                          });
-                        })
-                        .catch((err) => {
-                          console.error('Clipboard API failed:', err);
-                          // Fallback: show instructions for manual copy
-                          showModal({
-                            title: 'Copy Link',
-                            message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
-                            type: 'info'
-                          });
-                        });
-                    } else {
-                      // Fallback for older browsers or non-HTTPS
-                      showModal({
-                        title: 'Copy Link',
-                        message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
-                        type: 'info'
-                      });
+                  onKeyDown={(e) => {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                      e.preventDefault();
+                      copyToClipboard(e.target.value);
                     }
                   }}
+                  title="Click to select the link, or press Ctrl+C to copy"
+                />
+                <button
+                  onClick={() => copyToClipboard(`${window.location.origin}/invite/${eventId}`)}
                   className="btn btn-primary btn-sm"
                 >
                   Copy Link
