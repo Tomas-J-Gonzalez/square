@@ -138,7 +138,7 @@ const getEvents = async (userEmail) => {
       decisionMode: event.decision_mode,
       punishment: event.punishment,
       participants: [], // Will be fetched separately
-      status: 'active', // Default status since it's not in database
+      status: event.status || 'active', // Use actual status from database
       createdAt: event.created_at,
       updatedAt: event.updated_at,
       flakes: [],

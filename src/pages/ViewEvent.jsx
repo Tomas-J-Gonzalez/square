@@ -120,7 +120,7 @@ const ViewEvent = () => {
                 punishment: eventData.punishment || '',
                 dateTime: eventData.dateTime || `${eventData.date}T${eventData.time}`,
                 participants: [], // Will be populated by fetchParticipants
-                status: 'active',
+                status: eventData.status || 'active',
                 createdAt: eventData.created_at,
                 updatedAt: eventData.updated_at
               };
@@ -467,6 +467,29 @@ const ViewEvent = () => {
     );
   }
 
+  // Show cancelled event message
+  if (event && event.status === 'cancelled') {
+    return (
+      <div className="section">
+        <div className="section-container">
+          <div className="text-center">
+            <Icon name="times-circle" style="solid" size="xl" className="text-red-500 mx-auto mb-16" />
+            <h1 className="section-title text-red-600">Event Cancelled</h1>
+            <p className="text-gray-600 mb-24">
+              This event has been cancelled by the organizer.
+            </p>
+            <button
+              onClick={() => router.push('/')}
+              className="btn btn-primary"
+            >
+              Back to Home
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className="section">
@@ -584,6 +607,14 @@ const ViewEvent = () => {
             <div className="card-content">
               {/* Add Participant Form */}
               <form onSubmit={handleAddParticipant} className="mb-24">
+                {event.status === 'cancelled' && (
+                  <div className="mb-16 p-12 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-sm text-red-700">
+                      <Icon name="exclamation-triangle" style="solid" size="sm" className="mr-4" />
+                      This event has been cancelled. No new participants can be added.
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
                   <div>
                     <label className="form-label" htmlFor="participantName">Name *</label>
@@ -595,6 +626,7 @@ const ViewEvent = () => {
                       onChange={(e) => setNewParticipant(prev => ({ ...prev, name: e.target.value }))}
                       placeholder="Friend's name"
                       required
+                      disabled={event.status === 'cancelled'}
                     />
                   </div>
                   <div>
@@ -606,6 +638,7 @@ const ViewEvent = () => {
                       value={newParticipant.email}
                       onChange={(e) => setNewParticipant(prev => ({ ...prev, email: e.target.value }))}
                       placeholder="friend@email.com"
+                      disabled={event.status === 'cancelled'}
                     />
                   </div>
                   <div>
@@ -617,13 +650,14 @@ const ViewEvent = () => {
                       value={newParticipant.message}
                       onChange={(e) => setNewParticipant(prev => ({ ...prev, message: e.target.value }))}
                       placeholder="Optional message"
+                      disabled={event.status === 'cancelled'}
                     />
                   </div>
                 </div>
                 <button
                   type="submit"
                   className="btn btn-primary btn-sm flex items-center justify-center"
-                  disabled={isAddingParticipant}
+                  disabled={isAddingParticipant || event.status === 'cancelled'}
                 >
                   {isAddingParticipant ? (
                     <>
@@ -641,13 +675,14 @@ const ViewEvent = () => {
                 <button
                   onClick={() => setShowShareModal(true)}
                   className="btn btn-secondary btn-sm flex items-center"
+                  disabled={event.status === 'cancelled'}
                 >
                   <Icon name="share" style="solid" size="sm" className="mr-4" />
                   Share Invitation
                 </button>
                 <button
                   onClick={handleCompleteEvent}
-                  disabled={isProcessing}
+                  disabled={isProcessing || event.status === 'cancelled'}
                   className="btn btn-success btn-sm flex items-center justify-center"
                 >
                   {isProcessing ? (
@@ -661,7 +696,7 @@ const ViewEvent = () => {
                 </button>
                 <button
                   onClick={handleCancelEvent}
-                  disabled={isCancelling}
+                  disabled={isCancelling || event.status === 'cancelled'}
                   className="btn btn-danger btn-sm flex items-center justify-center"
                 >
                   {isCancelling ? (
