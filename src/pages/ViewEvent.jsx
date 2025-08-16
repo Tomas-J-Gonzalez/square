@@ -188,11 +188,10 @@ const ViewEvent = () => {
     
     // Validate required fields
     if (!newParticipant.name.trim()) {
-      showModal({
-        title: 'Missing Information',
-        message: 'Please enter a name for the friend.',
-        type: 'error'
-      });
+      showErrorModal(
+        'Missing Information',
+        'Please enter a name for the friend.'
+      );
       return;
     }
 
@@ -227,39 +226,32 @@ const ViewEvent = () => {
         
         setNewParticipant({ name: '', email: '', message: '' });
         
-        showModal({
-          title: 'Success',
-          message: 'Participant added successfully!',
-          type: 'success'
-        });
+        showSuccessModal(
+          'Success',
+          'Participant added successfully!'
+        );
       } else {
-        showModal({
-          title: 'Error',
-          message: result.error || 'Failed to add participant',
-          type: 'error'
-        });
+        showErrorModal(
+          'Error',
+          result.error || 'Failed to add participant'
+        );
       }
     } catch (error) {
       console.error('Error adding participant:', error);
-      showModal({
-        title: 'Error',
-        message: 'Error adding participant: ' + error.message,
-        type: 'error'
-      });
+      showErrorModal(
+        'Error',
+        'Error adding participant: ' + error.message
+      );
     } finally {
       setIsAddingParticipant(false);
     }
   };
 
   const handleRemoveParticipant = (participantId) => {
-    showModal({
-      title: 'Remove Friend',
-      message: 'Are you sure you want to remove this friend?',
-      type: 'confirm',
-      showCancel: true,
-      confirmText: 'Remove',
-      cancelText: 'Cancel',
-      onConfirm: async () => {
+    showConfirmModal(
+      'Remove Friend',
+      'Are you sure you want to remove this friend?',
+      async () => {
         try {
           // Find the participant to get their name
           const participant = participants.find(p => p.id === participantId);
@@ -292,86 +284,79 @@ const ViewEvent = () => {
             delete newStatus[participantId];
             setAttendanceStatus(newStatus);
             
-            showModal({
-              title: 'Success',
-              message: 'Participant removed successfully!',
-              type: 'success'
-            });
+            showSuccessModal(
+              'Success',
+              'Participant removed successfully!'
+            );
           } else {
             throw new Error(result.error || 'Failed to remove participant');
           }
         } catch (error) {
           console.error('Error removing participant:', error);
-          showModal({
-            title: 'Error',
-            message: 'Failed to remove participant: ' + error.message,
-            type: 'error'
-          });
+          showErrorModal(
+            'Error',
+            'Failed to remove participant: ' + error.message
+          );
         }
-      },
-      onCancel: hideModal
-    });
+      }
+    );
   };
 
   const handleCancelEvent = async () => {
-    showModal({
-      title: 'Cancel Event',
-      message: 'Are you sure you want to cancel this event? It will be marked as cancelled.',
-      type: 'confirm',
-      showCancel: true,
-      confirmText: 'Cancel Event',
-      cancelText: 'Keep Event',
-      onConfirm: async () => {
+    showConfirmModal(
+      'Cancel Event',
+      'Are you sure you want to cancel this event? It will be marked as cancelled.',
+      async () => {
         setIsCancelling(true);
         try {
           await eventService.cancelEvent(eventId, currentUser?.email);
-          showModal({
-            title: 'Event Cancelled',
-            message: 'Event cancelled successfully!',
-            type: 'success',
-            onConfirm: () => router.push('/')
-          });
+          showSuccessModal(
+            'Event Cancelled',
+            'Event cancelled successfully!',
+            () => router.push('/')
+          );
         } catch (error) {
           console.error('Error cancelling event:', error);
-          showModal({
-            title: 'Error',
-            message: 'Error cancelling event. Please try again.',
-            type: 'error'
-          });
+          showErrorModal(
+            'Error',
+            'Error cancelling event. Please try again.'
+          );
         } finally {
           setIsCancelling(false);
         }
-      },
-      onCancel: hideModal
-    });
+      }
+    );
   };
 
   const handleShare = (platform) => {
-    const eventUrl = `${window.location.origin}/invite/${eventId}`;
-    const text = `You're invited to ${event.title}! ${eventUrl}`;
-    
-    let shareUrl;
-    switch (platform) {
-      case 'twitter':
-        shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
-        break;
-      case 'facebook':
-        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
-        break;
-      case 'instagram':
-        // Instagram doesn't have a direct share URL, so we'll copy to clipboard
-        navigator.clipboard.writeText(text);
-        showModal({
-          title: 'Link Copied!',
-          message: 'Event link copied to clipboard. You can paste it in Instagram.',
-          type: 'success'
-        });
-        return;
-      default:
-        return;
+    try {
+      const eventUrl = `${window.location.origin}/invite/${eventId}`;
+      const text = `You're invited to ${event.title}! ${eventUrl}`;
+      
+      let shareUrl;
+      switch (platform) {
+        case 'twitter':
+          shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+          break;
+        case 'facebook':
+          shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(eventUrl)}`;
+          break;
+        case 'instagram':
+          // Instagram doesn't have a direct share URL, so we'll copy to clipboard
+          copyToClipboard(text);
+          return;
+        default:
+          return;
+      }
+      
+      window.open(shareUrl, '_blank', 'width=600,height=400');
+    } catch (error) {
+      console.error('Error sharing event:', error);
+      showErrorModal(
+        'Share Error',
+        'Failed to share event. Please try copying the link manually.'
+      );
     }
-    
-    window.open(shareUrl, '_blank', 'width=600,height=400');
   };
 
   const handleAttendanceChange = (participantId, status) => {
@@ -475,36 +460,29 @@ const ViewEvent = () => {
   };
 
   const handleCompleteEvent = async () => {
-    showModal({
-      title: 'Complete Event',
-      message: 'Are you sure you want to complete this event? This will archive it and show the final results.',
-      type: 'confirm',
-      showCancel: true,
-      confirmText: 'Complete Event',
-      cancelText: 'Keep Active',
-      onConfirm: async () => {
+    showConfirmModal(
+      'Complete Event',
+      'Are you sure you want to complete this event? This will archive it and show the final results.',
+      async () => {
         setIsProcessing(true);
         try {
           await eventService.completeEvent(eventId, currentUser?.email);
-          showModal({
-            title: 'Event Completed',
-            message: 'Event completed successfully! You can view the results in Past Events.',
-            type: 'success',
-            onConfirm: () => router.push('/past')
-          });
+          showSuccessModal(
+            'Event Completed',
+            'Event completed successfully! You can view the results in Past Events.',
+            () => router.push('/past')
+          );
         } catch (error) {
           console.error('Error completing event:', error);
-          showModal({
-            title: 'Error',
-            message: 'Error completing event. Please try again.',
-            type: 'error'
-          });
+          showErrorModal(
+            'Error',
+            'Error completing event. Please try again.'
+          );
         } finally {
           setIsProcessing(false);
         }
-      },
-      onCancel: hideModal
-    });
+      }
+    );
   };
 
   if (loading) {
