@@ -217,7 +217,9 @@ export default function InvitePage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-group">
-              <label htmlFor="name" className="form-label">Your Name</label>
+              <label htmlFor="name" className="form-label">
+                Your Name <span className="text-red-500" aria-label="required">*</span>
+              </label>
               <input
                 type="text"
                 id="name"
@@ -225,12 +227,19 @@ export default function InvitePage() {
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 className="form-input"
-                placeholder="Enter your name"
+                placeholder="Enter your full name"
+                aria-describedby="name-help"
+                disabled={submitting}
               />
+              <p id="name-help" className="mt-1 text-xs text-gray-500">
+                Enter your name as you'd like it to appear on the guest list
+              </p>
             </div>
 
             <div className="form-group">
-              <label htmlFor="email" className="form-label">Your Email</label>
+              <label htmlFor="email" className="form-label">
+                Your Email <span className="text-red-500" aria-label="required">*</span>
+              </label>
               <input
                 type="email"
                 id="email"
@@ -238,13 +247,20 @@ export default function InvitePage() {
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 className="form-input"
-                placeholder="Enter your email"
+                placeholder="Enter your email address"
+                aria-describedby="email-help"
+                disabled={submitting}
               />
+              <p id="email-help" className="mt-1 text-xs text-gray-500">
+                We'll use this to send you event updates
+              </p>
             </div>
 
             <div className="form-group">
-              <label className="form-label">Will you attend?</label>
-              <div className="space-y-3">
+              <label className="form-label">
+                Will you attend? <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <div className="space-y-3" role="radiogroup" aria-describedby="attendance-help">
                 <label className="flex items-center">
                   <input
                     type="radio"
@@ -274,6 +290,9 @@ export default function InvitePage() {
                   </div>
                 </label>
               </div>
+              <p id="attendance-help" className="mt-1 text-xs text-gray-500">
+                Let the host know if you can make it to the event
+              </p>
             </div>
 
             <div className="form-group">
@@ -285,7 +304,12 @@ export default function InvitePage() {
                 className="form-input"
                 rows={3}
                 placeholder="Add a personal message or reason..."
+                aria-describedby="message-help"
+                disabled={submitting}
               />
+              <p id="message-help" className="mt-1 text-xs text-gray-500">
+                Optional: Add a personal note or reason for your response
+              </p>
             </div>
 
             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">

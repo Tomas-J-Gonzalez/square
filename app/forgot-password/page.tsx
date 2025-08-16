@@ -101,7 +101,7 @@ export default function ForgotPasswordPage() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Email address
+                  Email address <span className="text-red-500" aria-label="required">*</span>
                 </label>
                 <div className="mt-1">
                   <input
@@ -112,11 +112,16 @@ export default function ForgotPasswordPage() {
                     required
                     value={email}
                     onChange={handleEmailChange}
-                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                    placeholder="Enter your email"
-                    aria-describedby={error ? "error-message" : undefined}
+                    className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
+                    placeholder="Enter your email address"
+                    aria-describedby={error ? "error-message" : "email-help"}
+                    aria-invalid={error ? "true" : "false"}
+                    disabled={loading}
                   />
                 </div>
+                <p id="email-help" className="mt-1 text-xs text-gray-500">
+                  We'll send a password reset link to this email address
+                </p>
               </div>
 
               <div>

@@ -124,7 +124,7 @@ export default function SignupPage() {
 
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full name
+                Full name <span className="text-red-500" aria-label="required">*</span>
               </label>
               <div className="mt-1">
                 <input
@@ -135,16 +135,21 @@ export default function SignupPage() {
                   required
                   value={formData.name}
                   onChange={handleInputChange('name')}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 transition-colors"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your full name"
-                  aria-describedby={error ? "error-message" : undefined}
+                  aria-describedby={error ? "error-message" : "name-help"}
+                  aria-invalid={error ? "true" : "false"}
+                  disabled={loading}
                 />
               </div>
+              <p id="name-help" className="mt-1 text-xs text-gray-500">
+                Enter your first and last name as you'd like it to appear
+              </p>
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+                Email address <span className="text-red-500" aria-label="required">*</span>
               </label>
               <div className="mt-1">
                 <input
@@ -155,16 +160,21 @@ export default function SignupPage() {
                   required
                   value={formData.email}
                   onChange={handleInputChange('email')}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  placeholder="Enter your email"
-                  aria-describedby={error ? "error-message" : undefined}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
+                  placeholder="Enter your email address"
+                  aria-describedby={error ? "error-message" : "email-help"}
+                  aria-invalid={error ? "true" : "false"}
+                  disabled={loading}
                 />
               </div>
+              <p id="email-help" className="mt-1 text-xs text-gray-500">
+                We'll send a confirmation email to this address
+              </p>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                Password <span className="text-red-500" aria-label="required">*</span>
               </label>
               <div className="mt-1 relative">
                 <input
@@ -175,9 +185,11 @@ export default function SignupPage() {
                   required
                   value={formData.password}
                   onChange={handleInputChange('password')}
-                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 transition-colors"
+                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Create a password (min 6 characters)"
-                  aria-describedby={error ? "error-message" : undefined}
+                  aria-describedby={error ? "error-message" : "password-help"}
+                  aria-invalid={error ? "true" : "false"}
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -197,14 +209,14 @@ export default function SignupPage() {
                   )}
                 </button>
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p id="password-help" className="mt-1 text-xs text-gray-500">
                 Must be at least 6 characters long
               </p>
             </div>
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm password
+                Confirm password <span className="text-red-500" aria-label="required">*</span>
               </label>
               <div className="mt-1 relative">
                 <input
@@ -215,9 +227,11 @@ export default function SignupPage() {
                   required
                   value={formData.confirmPassword}
                   onChange={handleInputChange('confirmPassword')}
-                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 transition-colors"
+                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Confirm your password"
-                  aria-describedby={error ? "error-message" : undefined}
+                  aria-describedby={error ? "error-message" : "confirm-password-help"}
+                  aria-invalid={error ? "true" : "false"}
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -237,6 +251,9 @@ export default function SignupPage() {
                   )}
                 </button>
               </div>
+              <p id="confirm-password-help" className="mt-1 text-xs text-gray-500">
+                Re-enter your password to confirm
+              </p>
             </div>
 
             <div>
@@ -248,6 +265,20 @@ export default function SignupPage() {
               >
                 Create account
               </Button>
+            </div>
+
+            {/* Terms and Privacy Policy */}
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-500">
+                By creating an account, you agree to our{' '}
+                <Link href="/terms" className="text-pink-600 hover:text-pink-500">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy" className="text-pink-600 hover:text-pink-500">
+                  Privacy Policy
+                </Link>
+              </p>
             </div>
           </form>
 
@@ -271,18 +302,7 @@ export default function SignupPage() {
             </div>
           </div>
 
-          <div className="mt-6 text-center">
-            <p className="text-xs text-gray-500">
-              By creating an account, you agree to our{' '}
-              <Link href="/terms" className="text-pink-600 hover:text-pink-500">
-                Terms of Service
-              </Link>{' '}
-              and{' '}
-              <Link href="/privacy" className="text-pink-600 hover:text-pink-500">
-                Privacy Policy
-              </Link>
-            </p>
-          </div>
+
         </div>
       </div>
 

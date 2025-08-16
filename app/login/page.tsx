@@ -92,7 +92,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+                Email address <span className="text-red-500" aria-label="required">*</span>
               </label>
               <div className="mt-1">
                 <input
@@ -103,16 +103,21 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={handleEmailChange}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  placeholder="Enter your email"
-                  aria-describedby={error ? "error-message" : undefined}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
+                  placeholder="Enter your email address"
+                  aria-describedby={error ? "error-message" : "email-help"}
+                  aria-invalid={error ? "true" : "false"}
+                  disabled={loading}
                 />
               </div>
+              <p id="email-help" className="mt-1 text-xs text-gray-500">
+                Enter the email address you used to create your account
+              </p>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                Password <span className="text-red-500" aria-label="required">*</span>
               </label>
               <div className="mt-1 relative">
                 <input
@@ -123,9 +128,11 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={handlePasswordChange}
-                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-pink-500 focus:border-pink-500 transition-colors"
+                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your password"
-                  aria-describedby={error ? "error-message" : undefined}
+                  aria-describedby={error ? "error-message" : "password-help"}
+                  aria-invalid={error ? "true" : "false"}
+                  disabled={loading}
                 />
                 <button
                   type="button"
@@ -145,6 +152,9 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
+              <p id="password-help" className="mt-1 text-xs text-gray-500">
+                Enter the password for your account
+              </p>
             </div>
 
             <div className="flex items-center justify-between">

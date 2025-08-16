@@ -105,10 +105,10 @@ export async function POST(request) {
     }
 
     // Send confirmation email
-    const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/confirm-email?token=${confirmationToken}`;
+    const confirmationUrl = `${process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'https://square-tomas-j-gonzalez.vercel.app'}/confirm-email?token=${confirmationToken}`;
     
     try {
-      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'http://localhost:3000'}/api/send-confirmation-email`, {
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'https://square-tomas-j-gonzalez.vercel.app'}/api/send-confirmation-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
