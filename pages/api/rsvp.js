@@ -29,7 +29,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { eventId, name, email, willAttend = true, message, event } = req.body || {};
+    const { action, eventId, name, email, willAttend = true, message, event } = req.body || {};
+
+    // Handle different actions
+    if (action === 'getParticipants') {
+      return await getParticipants(req, res);
+    }
+
+    // Default RSVP submission logic
+    if (!eventId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Event ID is required' 
+      });
+    }
 
     // Validate required fields
     if (!eventId) {
@@ -224,6 +237,60 @@ export default async function handler(req, res) {
     return res.status(500).json({ 
       success: false, 
       error: 'Internal server error during RSVP submission' 
+    });
+  }
+}
+
+async function getParticipants(req, res) {
+  try {
+    const { eventId } = req.body;
+    
+    if (!eventId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Event ID is required' 
+      });
+    }
+
+    // Initialize Supabase client
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    
+    if (!supabaseUrl || !supabaseKey) {
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Database configuration error' 
+      });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get all participants for the event
+    const { data, error } = await supabase
+      .from('event_rsvps')
+      .select('id, name, email, will_attend, message, created_at')
+      .eq('event_id', eventId)
+      .eq('will_attend', true)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching participants:', error);
+      return res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch participants' 
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      participants: data || []
+    });
+
+  } catch (error) {
+    console.error('Get participants error:', error);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Internal server error while fetching participants' 
     });
   }
 }

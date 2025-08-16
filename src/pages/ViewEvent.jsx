@@ -28,43 +28,42 @@ const ViewEvent = () => {
   // Use the modal hook
   const { modal, showModal, showConfirmModal } = useModal();
 
-  // Fetch participants from Supabase
+  // Fetch participants from API
   const fetchParticipants = async () => {
     try {
-      const { supabase } = await import('../../lib/supabaseClient');
-      if (!supabase) {
-        console.warn('Supabase not configured, cannot fetch participants');
+      const response = await fetch('/api/rsvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'getParticipants',
+          eventId
+        })
+      });
+
+      if (!response.ok) {
+        console.error('Error fetching participants:', response.status);
         return [];
       }
 
-      const { data, error } = await supabase
-        .from('event_rsvps')
-        .select('id, name, email, will_attend, message, created_at')
-        .eq('event_id', eventId)
-        .eq('will_attend', true)
-        .order('created_at', { ascending: true });
+      const result = await response.json();
+      
+      if (result.success && Array.isArray(result.participants)) {
+        // Convert to participant format
+        const participantList = result.participants.map(rsvp => ({
+          id: rsvp.id,
+          name: rsvp.name,
+          email: rsvp.email || `${rsvp.name.replace(/\s+/g, '').toLowerCase()}@guest.local`,
+          message: rsvp.message || 'Confirmed attendance',
+          joinedAt: rsvp.created_at,
+          status: 'pending' // Default status for new participants
+        }));
 
-      if (error) {
-        console.error('Error fetching participants:', error);
+        console.log('Fetched participants from API:', participantList);
+        return participantList;
+      } else {
+        console.error('Invalid response format:', result);
         return [];
       }
-
-      if (!Array.isArray(data)) {
-        return [];
-      }
-
-      // Convert to participant format
-      const participantList = data.map(rsvp => ({
-        id: rsvp.id,
-        name: rsvp.name,
-        email: rsvp.email || `${rsvp.name.replace(/\s+/g, '').toLowerCase()}@guest.local`,
-        message: rsvp.message || 'Confirmed attendance',
-        joinedAt: rsvp.created_at,
-        status: 'pending' // Default status for new participants
-      }));
-
-      console.log('Fetched participants from Supabase:', participantList);
-      return participantList;
     } catch (error) {
       console.error('Error in fetchParticipants:', error);
       return [];
@@ -262,34 +261,50 @@ const ViewEvent = () => {
       cancelText: 'Cancel',
       onConfirm: async () => {
         try {
-          // Remove from Supabase (set will_attend to false)
-          const { supabase } = await import('../../lib/supabaseClient');
-          if (supabase) {
-            await supabase
-              .from('event_rsvps')
-              .update({ will_attend: false })
-              .eq('id', participantId);
+          // Find the participant to get their name
+          const participant = participants.find(p => p.id === participantId);
+          if (!participant) {
+            throw new Error('Participant not found');
           }
-          
-          // Refresh participants list
-          const newParticipants = await fetchParticipants();
-          setParticipants(newParticipants);
-          
-          // Remove from attendance status
-          const newStatus = { ...attendanceStatus };
-          delete newStatus[participantId];
-          setAttendanceStatus(newStatus);
-          
-          showModal({
-            title: 'Success',
-            message: 'Participant removed successfully!',
-            type: 'success'
+
+          // Use the API to update the RSVP (set will_attend to false)
+          const response = await fetch('/api/rsvp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              eventId,
+              name: participant.name,
+              email: participant.email,
+              willAttend: false,
+              message: 'Removed by organizer'
+            })
           });
+
+          const result = await response.json();
+          
+          if (result.success) {
+            // Refresh participants list
+            const newParticipants = await fetchParticipants();
+            setParticipants(newParticipants);
+            
+            // Remove from attendance status
+            const newStatus = { ...attendanceStatus };
+            delete newStatus[participantId];
+            setAttendanceStatus(newStatus);
+            
+            showModal({
+              title: 'Success',
+              message: 'Participant removed successfully!',
+              type: 'success'
+            });
+          } else {
+            throw new Error(result.error || 'Failed to remove participant');
+          }
         } catch (error) {
           console.error('Error removing participant:', error);
           showModal({
             title: 'Error',
-            message: 'Failed to remove participant',
+            message: 'Failed to remove participant: ' + error.message,
             type: 'error'
           });
         }
