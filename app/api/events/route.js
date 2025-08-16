@@ -178,6 +178,7 @@ async function createEvent(body) {
     }
 
     const insertData = {
+      id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       title: eventData.title,
       date: eventData.date,
       time: eventData.time,
@@ -186,12 +187,10 @@ async function createEvent(body) {
       event_details: eventData.eventDetails || null,
       decision_mode: eventData.decisionMode,
       punishment: eventData.punishment,
+      // punishment_severity: eventData.punishmentSeverity || 5, // Temporarily disabled
       invited_by: eventData.invited_by,
       status: 'active'
     };
-
-    // Only add punishment_severity if the column exists (we'll add it later)
-    // For now, omit it to avoid the error
 
     console.log('Inserting event data:', insertData);
 
