@@ -12,12 +12,19 @@ interface EventFormData {
   eventDetails: string;
   punishment: string;
   customPunishment: string;
+  punishmentSeverity: number;
 }
 
 const PUNISHMENT_OPTIONS = [
-  { value: '25_pushups', label: '25 Pushups', description: 'Do 25 pushups at the next event' },
-  { value: 'buys_drinks', label: 'Buys Drinks Next Time', description: 'Pay for everyone\'s drinks at the next gathering' },
-  { value: 'custom', label: 'Custom Punishment', description: 'Write your own punishment below' }
+  { value: '25_pushups', label: '25 Pushups' },
+  { value: 'buys_drinks', label: 'Buys Drinks Next Time' },
+  { value: 'cleans_up', label: 'Cleans Up After Event' },
+  { value: 'cooks_next', label: 'Cooks for Next Event' },
+  { value: 'pays_penalty', label: 'Pays $20 Penalty' },
+  { value: 'wears_costume', label: 'Wears Embarrassing Costume' },
+  { value: 'sings_song', label: 'Sings a Song in Public' },
+  { value: 'dance_routine', label: 'Does a Dance Routine' },
+  { value: 'custom', label: 'Custom Punishment' }
 ];
 
 export default function CreateEventPage() {
@@ -32,7 +39,8 @@ export default function CreateEventPage() {
     eventType: 'in-person',
     eventDetails: '',
     punishment: '',
-    customPunishment: ''
+    customPunishment: '',
+    punishmentSeverity: 5
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -100,6 +108,7 @@ export default function CreateEventPage() {
         eventDetails: formData.eventDetails.trim(),
         decisionMode: 'single_person', // Default for now
         punishment: finalPunishment,
+        punishmentSeverity: formData.punishmentSeverity,
         invited_by: user.email
       };
 
@@ -123,10 +132,18 @@ export default function CreateEventPage() {
     }
   };
 
-  const handleInputChange = (field: keyof EventFormData, value: string) => {
+  const handleInputChange = (field: keyof EventFormData, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (error) setError('');
+  };
+
+  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Only allow valid date format YYYY-MM-DD
+    if (value === '' || /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      handleInputChange('date', value);
+    }
   };
 
   const isFormValid = () => {
@@ -138,6 +155,14 @@ export default function CreateEventPage() {
       formData.punishment &&
       (formData.punishment !== 'custom' || formData.customPunishment.trim())
     );
+  };
+
+  const getSeverityLabel = (severity: number) => {
+    if (severity <= 2) return 'Very Easy';
+    if (severity <= 4) return 'Easy';
+    if (severity <= 6) return 'Medium';
+    if (severity <= 8) return 'Hard';
+    return 'Very Hard';
   };
 
   return (
@@ -187,12 +212,8 @@ export default function CreateEventPage() {
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 placeholder="Enter event title"
-                aria-describedby="title-help"
                 aria-invalid={formData.title.trim() === '' ? 'true' : 'false'}
               />
-              <p id="title-help" className="mt-1 text-sm text-gray-500">
-                Give your event a catchy name that will get people excited
-              </p>
             </div>
 
             {/* Date and Time */}
@@ -207,14 +228,10 @@ export default function CreateEventPage() {
                   name="date"
                   required
                   value={formData.date}
-                  onChange={(e) => handleInputChange('date', e.target.value)}
+                  onChange={handleDateChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  aria-describedby="date-help"
                   min={new Date().toISOString().split('T')[0]}
                 />
-                <p id="date-help" className="mt-1 text-sm text-gray-500">
-                  When is your event happening?
-                </p>
               </div>
 
               <div>
@@ -229,11 +246,7 @@ export default function CreateEventPage() {
                   value={formData.time}
                   onChange={(e) => handleInputChange('time', e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
-                  aria-describedby="time-help"
                 />
-                <p id="time-help" className="mt-1 text-sm text-gray-500">
-                  What time should people arrive?
-                </p>
               </div>
             </div>
 
@@ -251,12 +264,8 @@ export default function CreateEventPage() {
                 onChange={(e) => handleInputChange('location', e.target.value)}
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 placeholder="Enter event location"
-                aria-describedby="location-help"
                 aria-invalid={formData.location.trim() === '' ? 'true' : 'false'}
               />
-              <p id="location-help" className="mt-1 text-sm text-gray-500">
-                Where is your event taking place?
-              </p>
             </div>
 
             {/* Event Type */}
@@ -305,41 +314,28 @@ export default function CreateEventPage() {
                 rows={4}
                 className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                 placeholder="Add any additional details about your event, what to bring, dress code, etc."
-                aria-describedby="eventDetails-help"
               />
-              <p id="eventDetails-help" className="mt-1 text-sm text-gray-500">
-                Provide any additional information that participants should know
-              </p>
             </div>
           </div>
 
           {/* Punishment Section */}
           <div className="space-y-6">
             <h2 className="text-xl font-semibold text-gray-900">Punishment for Flakers</h2>
-            <p className="text-sm text-gray-600">
-              What happens to people who don't show up? Choose from our suggestions or create your own.
-            </p>
             
             <fieldset>
               <legend className="sr-only">Punishment options</legend>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {PUNISHMENT_OPTIONS.map((option) => (
-                  <label key={option.value} className="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                  <label key={option.value} className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
                     <input
                       type="radio"
                       name="punishment"
                       value={option.value}
                       checked={formData.punishment === option.value}
                       onChange={(e) => handleInputChange('punishment', e.target.value)}
-                      className="mt-1 h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300"
-                      aria-describedby={`punishment-${option.value}-description`}
+                      className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300"
                     />
-                    <div className="ml-3">
-                      <div className="font-medium text-gray-900">{option.label}</div>
-                      <div id={`punishment-${option.value}-description`} className="text-sm text-gray-500">
-                        {option.description}
-                      </div>
-                    </div>
+                    <span className="ml-3 text-sm font-medium text-gray-900">{option.label}</span>
                   </label>
                 ))}
               </div>
@@ -360,14 +356,31 @@ export default function CreateEventPage() {
                   rows={3}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors"
                   placeholder="Describe the punishment for people who don't show up..."
-                  aria-describedby="customPunishment-help"
                   aria-invalid={formData.customPunishment.trim() === '' ? 'true' : 'false'}
                 />
-                <p id="customPunishment-help" className="mt-1 text-sm text-gray-500">
-                  Be creative but keep it fun and reasonable!
-                </p>
               </div>
             )}
+
+            {/* Punishment Severity Slider */}
+            <div>
+              <label htmlFor="severity" className="block text-sm font-medium text-gray-700 mb-2">
+                Punishment Severity: <span className="text-pink-600 font-medium">{getSeverityLabel(formData.punishmentSeverity)}</span>
+              </label>
+              <input
+                type="range"
+                id="severity"
+                name="severity"
+                min="1"
+                max="10"
+                value={formData.punishmentSeverity}
+                onChange={(e) => handleInputChange('punishmentSeverity', parseInt(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+              />
+              <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <span>Very Easy</span>
+                <span>Very Hard</span>
+              </div>
+            </div>
           </div>
 
           {/* Submit Buttons */}
