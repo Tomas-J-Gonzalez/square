@@ -54,7 +54,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <img 
                   src="/assets/Logo.svg" 
                   alt="Show up or Else" 
-                  className="h-8 w-auto"
+                  className="h-6 w-auto max-w-[120px]"
                 />
                 <span className="ml-3 text-lg font-bold text-gray-900">Dashboard</span>
               </Link>

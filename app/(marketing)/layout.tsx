@@ -16,7 +16,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               <img 
                 src="/assets/Logo.svg" 
                 alt="Show up or Else" 
-                className="h-8 sm:h-10 w-auto"
+                className="h-6 sm:h-8 w-auto max-w-[120px] sm:max-w-[160px]"
               />
             </Link>
           </div>

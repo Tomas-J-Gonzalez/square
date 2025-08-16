@@ -7,7 +7,7 @@ export default function MarketingPage() {
       <section className="bg-gray-900 text-white py-20 px-0 sm:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-12">
-            <h1 className="text-5xl sm:text-7xl lg:text-8xl font-bold text-white mb-6 marketing-heading">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 marketing-heading">
               Make plans that stick
             </h1>
             <p className="text-lg sm:text-xl text-gray-300">
