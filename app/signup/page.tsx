@@ -83,7 +83,7 @@ export default function SignupPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex justify-center">
           <img 
-            src="/logo-stacked.svg" 
+            src="/logo-icon.svg" 
             alt="Show up or Else" 
             className="h-12 w-auto"
           />

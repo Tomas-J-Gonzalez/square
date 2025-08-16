@@ -14,9 +14,9 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           <div className="flex items-center">
             <Link href="/" className="flex items-center">
               <img 
-                src="/logo-stacked.svg" 
+                src="/logo-icon.svg" 
                 alt="Show up or Else" 
-                className="h-8 sm:h-12 w-auto"
+                className="h-8 sm:h-10 w-auto"
               />
             </Link>
           </div>
