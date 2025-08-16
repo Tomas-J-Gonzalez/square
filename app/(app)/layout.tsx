@@ -52,7 +52,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <div className="flex items-center">
               <Link href="/dashboard" className="flex items-center">
                 <img 
-                  src="/logo-res.svg" 
+                  src="/assets/Logo.svg" 
                   alt="Show up or Else" 
                   className="h-8 w-auto"
                 />
