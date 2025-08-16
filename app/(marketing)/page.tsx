@@ -21,7 +21,7 @@ export default function MarketingPage() {
           
           <Link 
             href="/signup" 
-            className="inline-flex items-center gap-3 bg-pink-500 text-white px-12 sm:px-16 py-4 sm:py-5 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl"
+            className="inline-flex items-center gap-3 bg-pink-500 text-white px-16 sm:px-20 py-4 sm:py-5 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl"
           >
             Create your event
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
