@@ -69,7 +69,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const navigationItems = [
     { name: 'Dashboard', href: '/dashboard', icon: 'home' },
     { name: 'Create Event', href: '/dashboard/create-event', icon: 'plus' },
-    { name: 'My Events', href: '/dashboard/events', icon: 'calendar' },
     { name: 'Past Events', href: '/dashboard/past-events', icon: 'clock' },
   ];
 
