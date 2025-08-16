@@ -742,15 +742,49 @@ const ViewEvent = () => {
                   value={`${window.location.origin}/invite/${eventId}`}
                   readOnly
                   className="form-input flex-1"
+                  id="invitation-link-input"
                 />
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/invite/${eventId}`);
-                    showModal({
-                      title: 'Link Copied!',
-                      message: 'The invitation link has been copied to your clipboard.',
-                      type: 'success'
-                    });
+                    const link = `${window.location.origin}/invite/${eventId}`;
+                    
+                    // Try modern clipboard API first
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                      navigator.clipboard.writeText(link)
+                        .then(() => {
+                          showModal({
+                            title: 'Link Copied!',
+                            message: 'The invitation link has been copied to your clipboard.',
+                            type: 'success'
+                          });
+                        })
+                        .catch((err) => {
+                          console.error('Clipboard API failed:', err);
+                          // Fallback: select the input and show instructions
+                          const input = document.getElementById('invitation-link-input');
+                          if (input) {
+                            input.select();
+                            input.setSelectionRange(0, 99999);
+                            showModal({
+                              title: 'Copy Link',
+                              message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+                              type: 'info'
+                            });
+                          }
+                        });
+                    } else {
+                      // Fallback for older browsers
+                      const input = document.getElementById('invitation-link-input');
+                      if (input) {
+                        input.select();
+                        input.setSelectionRange(0, 99999);
+                        showModal({
+                          title: 'Copy Link',
+                          message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+                          type: 'info'
+                        });
+                      }
+                    }
                   }}
                   className="btn btn-primary btn-sm"
                 >
