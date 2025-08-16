@@ -105,7 +105,7 @@ export default function MarketingPage() {
       <section className="bg-white py-20 px-4 sm:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-8 marketing-heading">
-            Make event planning "funner"
+            No more maybes. Just memories.
           </h2>
           <p className="text-lg sm:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
             Tired of flaky friends ruining your plans? We make event planning fun, collaborative, and flake-proof. 
