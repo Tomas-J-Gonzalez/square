@@ -21,7 +21,7 @@ export default function MarketingPage() {
           
           <Link 
             href="/signup" 
-            className="inline-flex items-center gap-3 bg-pink-500 text-white px-16 sm:px-20 py-4 sm:py-5 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl"
+            className="inline-flex items-center gap-3 bg-pink-500 text-white px-12 sm:px-16 py-4 sm:py-5 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl"
           >
             Create your event
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,9 +104,9 @@ export default function MarketingPage() {
       {/* Main Content */}
       <section className="bg-white py-20 px-4 sm:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 sm:mb-8 marketing-heading">
+          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-4 sm:mb-8 marketing-heading">
             No more maybes. Just memories.
-          </h2>
+          </h1>
           <p className="text-lg sm:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
             Tired of flaky friends ruining your plans? We make event planning fun, collaborative, and flake-proof. 
             Create events, collect RSVPs, and keep everyone accountable with playful punishments and rewards. 
