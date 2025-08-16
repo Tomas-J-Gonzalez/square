@@ -108,7 +108,7 @@ export default function CreateEventPage() {
         eventDetails: formData.eventDetails.trim(),
         decisionMode: 'single_person', // Default for now
         punishment: finalPunishment,
-        punishmentSeverity: formData.punishmentSeverity,
+        // punishmentSeverity: formData.punishmentSeverity, // Temporarily disabled until DB column is added
         invited_by: user.email
       };
 

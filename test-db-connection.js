@@ -1,92 +1,91 @@
-/**
- * Database Connection Test Script
- * 
- * This script tests the Supabase connection and verifies that required tables exist.
- * Run this to diagnose database connection issues.
- */
+// Test database connection and schema
+// Run with: node test-db-connection.js
 
 import { createClient } from '@supabase/supabase-js';
+import dotenv from 'dotenv';
 
-async function testDatabaseConnection() {
-  console.log('🔍 Testing Supabase Database Connection...\n');
+// Load environment variables
+dotenv.config();
 
-  // Check environment variables
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  console.log('📋 Environment Variables:');
-  console.log(`  NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? '✅ SET' : '❌ MISSING'}`);
-  console.log(`  SUPABASE_SERVICE_ROLE_KEY: ${supabaseKey ? '✅ SET' : '❌ MISSING'}`);
-  console.log(`  NEXT_PUBLIC_SUPABASE_ANON_KEY: ${anonKey ? '✅ SET' : '❌ MISSING'}\n`);
+if (!supabaseUrl || !supabaseKey) {
+  console.error('Missing environment variables:');
+  console.error('  NEXT_PUBLIC_SUPABASE_URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+  console.error('  SUPABASE_URL:', !!process.env.SUPABASE_URL);
+  console.error('  SUPABASE_SERVICE_ROLE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
+  process.exit(1);
+}
 
-  if (!supabaseUrl || !supabaseKey) {
-    console.log('❌ ERROR: Missing required Supabase environment variables!');
-    console.log('\n📝 To fix this, add the following to your .env file:');
-    console.log('NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co');
-    console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key_here');
-    console.log('SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here');
-    console.log('\n🔗 Get these values from your Supabase project dashboard:');
-    console.log('   https://supabase.com/dashboard/project/[your-project-id]/settings/api');
-    return;
-  }
+const supabase = createClient(supabaseUrl, supabaseKey);
 
+async function testConnection() {
   try {
-    // Test connection with service role key
-    console.log('🔌 Testing connection with service role key...');
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    console.log('Testing database connection...');
     
     // Test basic connection
-    const { data: testData, error: testError } = await supabase
-      .from('users')
-      .select('count')
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
       .limit(1);
-
-    if (testError) {
-      console.log('❌ Connection failed:', testError.message);
-      
-      if (testError.message.includes('relation "users" does not exist')) {
-        console.log('\n📋 The "users" table does not exist in your database.');
-        console.log('📝 You need to run the database schema setup.');
-        console.log('\n🔧 To fix this:');
-        console.log('1. Go to your Supabase dashboard');
-        console.log('2. Navigate to SQL Editor');
-        console.log('3. Run the SQL from supabase-rsvp-schema.sql');
-        console.log('4. Or run the schema from README.md');
-      }
+    
+    if (error) {
+      console.error('Connection error:', error);
       return;
     }
-
-    console.log('✅ Connection successful!\n');
-
-    // Test required tables
-    console.log('📊 Testing required tables...');
     
-    const tables = ['users', 'email_confirmations', 'events', 'event_rsvps'];
+    console.log('✅ Database connection successful');
+    console.log('Sample events data:', data);
     
-    for (const table of tables) {
-      try {
-        const { data, error } = await supabase
-          .from(table)
-          .select('*')
-          .limit(1);
+    // Check table schema
+    console.log('\nChecking events table schema...');
+    const { data: schemaData, error: schemaError } = await supabase
+      .rpc('get_table_columns', { table_name: 'events' });
+    
+    if (schemaError) {
+      console.log('Could not get schema info, trying alternative method...');
+      // Try to insert a test record to see what columns exist
+      const testData = {
+        title: 'Test Event',
+        date: '2024-01-01',
+        time: '12:00',
+        location: 'Test Location',
+        event_type: 'in-person',
+        event_details: 'Test details',
+        decision_mode: 'single_person',
+        punishment: 'Test punishment',
+        punishment_severity: 5,
+        invited_by: 'test@example.com',
+        status: 'active'
+      };
+      
+      const { data: insertData, error: insertError } = await supabase
+        .from('events')
+        .insert(testData)
+        .select();
+      
+      if (insertError) {
+        console.error('❌ Insert test failed:', insertError);
+        console.error('Error details:', insertError.message, insertError.details, insertError.hint);
+      } else {
+        console.log('✅ Insert test successful');
+        console.log('Inserted data:', insertData);
         
-        if (error) {
-          console.log(`  ❌ ${table}: ${error.message}`);
-        } else {
-          console.log(`  ✅ ${table}: Table exists`);
-        }
-      } catch (err) {
-        console.log(`  ❌ ${table}: ${err.message}`);
+        // Clean up test data
+        await supabase
+          .from('events')
+          .delete()
+          .eq('title', 'Test Event');
+        console.log('✅ Test data cleaned up');
       }
+    } else {
+      console.log('Table schema:', schemaData);
     }
-
-    console.log('\n🎉 Database connection test completed!');
-
+    
   } catch (error) {
-    console.log('❌ Unexpected error:', error.message);
+    console.error('Test failed:', error);
   }
 }
 
-// Run the test
-testDatabaseConnection().catch(console.error);
+testConnection();

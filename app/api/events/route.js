@@ -186,10 +186,14 @@ async function createEvent(body) {
       event_details: eventData.eventDetails || null,
       decision_mode: eventData.decisionMode,
       punishment: eventData.punishment,
-      punishment_severity: eventData.punishmentSeverity || 5,
       invited_by: eventData.invited_by,
       status: 'active'
     };
+
+    // Only add punishment_severity if the column exists (we'll add it later)
+    // For now, omit it to avoid the error
+
+    console.log('Inserting event data:', insertData);
 
     const { data, error } = await supabase
       .from('events')
@@ -199,7 +203,12 @@ async function createEvent(body) {
 
     if (error) {
       console.error('Error creating event:', error);
-      return NextResponse.json({ success: false, error: 'Failed to create event' }, { status: 500 });
+      console.error('Error details:', error.message, error.details, error.hint);
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Failed to create event',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, event: data });
