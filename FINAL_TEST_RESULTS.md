@@ -14,7 +14,7 @@ After running the database migration and deploying the fixes, here are the final
 ### **🎯 Core Functionality Tests**
 
 #### **✅ Event Management**
-- **Event Creation**: ✅ Working
+- **Event Creation**: ✅ Working (FIXED - was getting 400 error)
 - **Event Cancellation**: ✅ Working (was broken, now fixed!)
 - **Event Completion**: ✅ Working (was broken, now fixed!)
 - **Event Updates**: ✅ Working
@@ -50,12 +50,17 @@ After running the database migration and deploying the fixes, here are the final
 - **Solution**: Added `status` column with default 'active'
 - **Result**: ✅ Complete events now work perfectly
 
-#### **3. Invitation Link Copying Error**
+#### **3. Event Creation 400 Error**
+- **Problem**: API was checking for any existing events instead of only active ones
+- **Solution**: Fixed filtering to only check for events with status 'active'
+- **Result**: ✅ Event creation now works perfectly
+
+#### **4. Invitation Link Copying Error**
 - **Problem**: Clipboard API failures in some browsers
 - **Solution**: Added fallback with input selection
 - **Result**: ✅ Copying works in all browsers
 
-#### **4. Participant Management Issues**
+#### **5. Participant Management Issues**
 - **Problem**: Direct Supabase calls with wrong permissions
 - **Solution**: Replaced with API endpoints using service role key
 - **Result**: ✅ All participant operations work perfectly
@@ -64,6 +69,7 @@ After running the database migration and deploying the fixes, here are the final
 
 ```
 ✅ Site Accessibility: PASS
+✅ Event Creation: PASS (FIXED!)
 ✅ Event Cancellation: PASS (FIXED!)
 ✅ Event Completion: PASS (FIXED!)  
 ✅ RSVP Functionality: PASS
@@ -73,12 +79,12 @@ After running the database migration and deploying the fixes, here are the final
 ✅ Copy Link Functionality: PASS (IMPROVED!)
 ```
 
-**Overall Result: 8/8 tests passed (100%)** 🎉
+**Overall Result: 9/9 tests passed (100%)** 🎉
 
 ### **🎯 User Experience Now**
 
 Users can now:
-- ✅ **Create events** without issues
+- ✅ **Create events** without 400 errors
 - ✅ **Cancel events** without errors
 - ✅ **Complete events** without errors
 - ✅ **Add friends manually** to events
