@@ -736,20 +736,40 @@ const ViewEvent = () => {
               <p className="modal-message mb-16">
                 Share this link with your friends to invite them to your event:
               </p>
+              <p className="text-sm text-gray-600 mb-8">
+                💡 Tip: Click on the link below to select it, then copy with Ctrl+C (or Cmd+C on Mac)
+              </p>
               <div className="flex gap-8">
                 <input
                   type="text"
                   value={`${window.location.origin}/invite/${eventId}`}
                   readOnly
-                  className="form-input flex-1"
+                  className="form-input flex-1 cursor-pointer"
                   id="invitation-link-input"
+                  onClick={(e) => {
+                    e.target.select();
+                    e.target.setSelectionRange(0, 99999);
+                    showModal({
+                      title: 'Link Selected',
+                      message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+                      type: 'info'
+                    });
+                  }}
+                  title="Click to select the link"
                 />
                 <button
                   onClick={() => {
                     const link = `${window.location.origin}/invite/${eventId}`;
+                    const input = document.getElementById('invitation-link-input');
                     
-                    // Try modern clipboard API first
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                    // Always try to select the input first
+                    if (input) {
+                      input.select();
+                      input.setSelectionRange(0, 99999);
+                    }
+                    
+                    // Try modern clipboard API
+                    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext) {
                       navigator.clipboard.writeText(link)
                         .then(() => {
                           showModal({
@@ -760,30 +780,20 @@ const ViewEvent = () => {
                         })
                         .catch((err) => {
                           console.error('Clipboard API failed:', err);
-                          // Fallback: select the input and show instructions
-                          const input = document.getElementById('invitation-link-input');
-                          if (input) {
-                            input.select();
-                            input.setSelectionRange(0, 99999);
-                            showModal({
-                              title: 'Copy Link',
-                              message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
-                              type: 'info'
-                            });
-                          }
+                          // Fallback: show instructions for manual copy
+                          showModal({
+                            title: 'Copy Link',
+                            message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+                            type: 'info'
+                          });
                         });
                     } else {
-                      // Fallback for older browsers
-                      const input = document.getElementById('invitation-link-input');
-                      if (input) {
-                        input.select();
-                        input.setSelectionRange(0, 99999);
-                        showModal({
-                          title: 'Copy Link',
-                          message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
-                          type: 'info'
-                        });
-                      }
+                      // Fallback for older browsers or non-HTTPS
+                      showModal({
+                        title: 'Copy Link',
+                        message: 'The link has been selected. Press Ctrl+C (or Cmd+C on Mac) to copy it.',
+                        type: 'info'
+                      });
                     }
                   }}
                   className="btn btn-primary btn-sm"
