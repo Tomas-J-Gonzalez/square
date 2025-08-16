@@ -11,7 +11,7 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white px-8 py-4 sticky top-0 z-50 shadow-sm">
+      <header className="bg-white px-32 py-4 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
             <img 
@@ -59,7 +59,7 @@ const Landing = () => {
           
           <Link 
             href={currentUser ? "/dashboard" : "/register"} 
-            className="inline-flex items-center gap-2 bg-pink-500 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors"
+            className="inline-flex items-center gap-2 bg-pink-500 text-white px-32 py-3 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors"
           >
             {currentUser ? "Go to Dashboard" : "Create your event"}
             <Icon name="arrow-right" style="solid" size="sm" />
@@ -132,7 +132,7 @@ const Landing = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-pink-600 text-white py-20 px-8">
+      <footer className="bg-pink-600 text-white py-20 px-32">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-8">
             <div>

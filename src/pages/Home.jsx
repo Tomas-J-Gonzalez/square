@@ -209,7 +209,7 @@ const Home = () => {
               className="card-link w-full text-left"
             >
               <div className="card-content">
-                <div className="card-icon" style={{ backgroundColor: '#10b981' }}>
+                <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
                   <Icon name="gamepad" style="solid" size="xl" />
                 </div>
                 <h3 className="card-title">Fun</h3>
