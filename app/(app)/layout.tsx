@@ -121,7 +121,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 <img 
                   src="/assets/circle-pink.svg" 
                   alt="Show up or Else" 
-                  className="h-10 w-10 transition-transform group-hover:scale-105"
+                  className="h-8 w-8 transition-transform group-hover:scale-105"
                 />
               </Link>
             </div>

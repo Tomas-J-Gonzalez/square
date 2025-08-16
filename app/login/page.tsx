@@ -58,7 +58,7 @@ export default function LoginPage() {
           <img 
             src="/assets/circle-pink.svg" 
             alt="Show up or Else" 
-            className="h-16 w-16"
+            className="h-20 w-20"
           />
         </Link>
         <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900 marketing-heading">
