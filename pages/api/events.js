@@ -5,10 +5,14 @@ let supabase = null;
 
 function getSupabaseClient() {
   if (!supabase) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !supabaseKey) {
+      console.error('Missing environment variables:');
+      console.error('  NEXT_PUBLIC_SUPABASE_URL:', !!process.env.NEXT_PUBLIC_SUPABASE_URL);
+      console.error('  SUPABASE_URL:', !!process.env.SUPABASE_URL);
+      console.error('  SUPABASE_SERVICE_ROLE_KEY:', !!process.env.SUPABASE_SERVICE_ROLE_KEY);
       throw new Error('Supabase environment variables not configured');
     }
 
@@ -68,7 +72,13 @@ export default async function handler(req, res) {
     }
   } catch (error) {
     console.error('Events API - Unhandled error:', error);
-    return res.status(500).json({ success: false, error: 'Internal server error' });
+    console.error('Events API - Error message:', error.message);
+    console.error('Events API - Error stack:', error.stack);
+    return res.status(500).json({ 
+      success: false, 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 }
 
