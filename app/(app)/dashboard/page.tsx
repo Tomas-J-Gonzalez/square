@@ -84,7 +84,7 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
               <img 
-                src="/logo.svg" 
+                src="/assets/Logo.svg" 
                 alt="Show up or Else" 
                 className="h-8 w-auto"
               />
@@ -94,7 +94,7 @@ export default function DashboardPage() {
               <span className="text-gray-700">Welcome, {user?.name}</span>
               <button
                 onClick={handleLogout}
-                className="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700"
+                className="btn btn-secondary bg-gray-600 hover:bg-gray-700"
               >
                 Logout
               </button>

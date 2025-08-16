@@ -22,10 +22,10 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/login" className="text-pink-500 font-bold hover:text-pink-600 transition-colors px-6 py-2 rounded-full border-2 border-pink-500 hover:bg-pink-500 hover:text-white transition-all duration-200">
+            <Link href="/login" className="btn btn-secondary border-2 border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white px-6 py-2">
               Login
             </Link>
-            <Link href="/signup" className="bg-pink-500 text-white px-10 py-3 rounded-full font-bold hover:bg-pink-600 transition-colors shadow-md hover:shadow-lg">
+            <Link href="/signup" className="btn btn-primary px-8 py-3 font-semibold shadow-md hover:shadow-lg">
               Sign Up
             </Link>
           </nav>

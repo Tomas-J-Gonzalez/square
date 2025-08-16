@@ -17,10 +17,10 @@ export default function MarketingPage() {
           
           <Link 
             href="/signup" 
-            className="inline-flex items-center gap-3 bg-pink-500 text-white px-12 sm:px-16 py-4 sm:py-5 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors shadow-lg hover:shadow-xl"
+            className="btn btn-primary inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold shadow-lg hover:shadow-xl"
           >
             Create your event
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
@@ -100,7 +100,7 @@ export default function MarketingPage() {
       {/* Main Content */}
       <section className="bg-white py-20 px-4 sm:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-4 sm:mb-8 marketing-heading">
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 sm:mb-8 marketing-heading">
             No more maybes. Just memories.
           </h1>
           <p className="text-lg sm:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">

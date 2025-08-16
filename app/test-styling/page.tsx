@@ -14,9 +14,9 @@ export default function TestStylingPage() {
             <div className="bg-red-500 text-white p-4 rounded">Red Box</div>
           </div>
           
-          <button className="bg-pink-600 text-white px-6 py-2 rounded hover:bg-pink-700 transition-colors">
-            Test Button
-          </button>
+                  <button className="btn btn-primary">
+          Test Button
+        </button>
         </div>
         
         <div className="bg-white rounded-lg shadow-lg p-6">
