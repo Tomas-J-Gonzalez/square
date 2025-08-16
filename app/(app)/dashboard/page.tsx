@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import Card, { CardIcon, CardTitle, CardDescription, CardAction } from '../../components/Card';
 import Icon from '../../components/Icon';
 
@@ -81,10 +80,10 @@ export default function DashboardPage() {
         </h1>
       </div>
 
-      {/* Quick Actions */}
-      <div className={`grid gap-6 ${events.length > 0 ? 'grid-cols-1 md:grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}>
+      {/* Quick Actions - 3 Cards in One Row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Create Event Card - Only show if no active events */}
-        {events.length === 0 ? (
+        {events.length === 0 && (
           <Card href="/dashboard/create-event">
             <CardIcon backgroundColor="#ec4899">
               <Icon name="plus" size="lg" />
@@ -96,21 +95,6 @@ export default function DashboardPage() {
               <Icon name="arrow-right" size="sm" className="card-action-icon" />
             </CardAction>
           </Card>
-        ) : (
-          /* Disabled Create Event Card - Show when user has active event */
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 opacity-60 cursor-not-allowed">
-            <div className="space-y-3">
-              <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#ec4899' }}>
-                <Icon name="plus" size="lg" className="text-white" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">Create New Event</h3>
-              <p className="text-gray-600">Users can only host 1 event at a time</p>
-              <div className="flex items-center justify-between text-pink-600 font-medium">
-                <span>Disabled</span>
-                <Icon name="arrow-right" size="sm" className="card-action-icon" />
-              </div>
-            </div>
-          </div>
         )}
 
         {/* Past Events Card */}
@@ -125,71 +109,26 @@ export default function DashboardPage() {
             <Icon name="arrow-right" size="sm" className="card-action-icon" />
           </CardAction>
         </Card>
+
+        {/* Events I'm Hosting Card - Only show if user has active events */}
+        {events.length > 0 && (
+          <Card href="/dashboard/events">
+            <CardIcon backgroundColor="#ec4899">
+              <Icon name="users" size="lg" />
+            </CardIcon>
+            <CardTitle>My Events</CardTitle>
+            <CardDescription>
+              {events.length} active event{events.length !== 1 ? 's' : ''}
+            </CardDescription>
+            <CardAction>
+              Manage Events
+              <Icon name="arrow-right" size="sm" className="card-action-icon" />
+            </CardAction>
+          </Card>
+        )}
       </div>
 
-      {/* Current Events - Full Width Card */}
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-        <div className="px-6 py-5 border-b border-gray-200">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">
-            Events I'm Hosting
-          </h3>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
-            Your active events and participant counts.
-          </p>
-        </div>
-        <div className="divide-y divide-gray-200">
-          {events.length === 0 ? (
-            <div className="px-6 py-12 text-center">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No events</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Get started by creating your first event.
-              </p>
-              <div className="mt-6">
-                <Link
-                  href="/dashboard/create-event"
-                  className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-pink-600 hover:bg-pink-700"
-                >
-                  Create Event
-                </Link>
-              </div>
-            </div>
-          ) : (
-            events.map((event) => (
-              <div key={event.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="flex-shrink-0">
-                      <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center">
-                        <Icon name="calendar" size="md" className="text-pink-600" />
-                      </div>
-                    </div>
-                    <div className="ml-4">
-                      <h4 className="text-lg font-medium text-gray-900">{event.title}</h4>
-                      <p className="text-sm text-gray-500">
-                        {event.date} at {event.time} • {event.location}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {event.participant_count} participants
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Link
-                      href={`/dashboard/event/${event.id}`}
-                      className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-pink-700 bg-pink-100 hover:bg-pink-200"
-                    >
-                      Manage
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
+
     </div>
   );
 }

@@ -68,7 +68,6 @@ export default function AppLayout({ children }: AppLayoutProps) {
   // Navigation items with active state
   const navigationItems = [
     { name: 'Dashboard', href: '/dashboard', icon: 'home' },
-    { name: 'Create Event', href: '/dashboard/create-event', icon: 'plus' },
     { name: 'Past Events', href: '/dashboard/past-events', icon: 'clock' },
   ];
 
