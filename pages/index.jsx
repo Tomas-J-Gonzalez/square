@@ -1,9 +1,4 @@
-import withAuth from '../src/components/withAuth';
-import Home from '../src/pages/Home';
+import Landing from '../src/pages/Landing';
 
-function IndexPage() {
-  return <Home />;
-}
-
-export default withAuth(IndexPage);
+export default Landing;
 

@@ -2,9 +2,11 @@ import React from 'react';
 import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import Icon from '../components/Icon';
+import { useRouter } from 'next/router';
 
 const Landing = () => {
   const { currentUser } = useAuth();
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-white">
@@ -30,9 +32,14 @@ const Landing = () => {
                 </Link>
               </>
             ) : (
-              <Link href="/" className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-pink-600 transition-colors">
-                Dashboard
-              </Link>
+              <>
+                <Link href="/dashboard" className="text-pink-500 font-bold text-sm hover:text-pink-600">
+                  Dashboard
+                </Link>
+                <Link href="/create" className="bg-pink-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-pink-600 transition-colors">
+                  Create Event
+                </Link>
+              </>
             )}
           </div>
         </div>
@@ -51,10 +58,10 @@ const Landing = () => {
           </div>
           
           <Link 
-            href={currentUser ? "/create" : "/register"} 
+            href={currentUser ? "/dashboard" : "/register"} 
             className="inline-flex items-center gap-2 bg-pink-500 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-pink-600 transition-colors"
           >
-            Create your event
+            {currentUser ? "Go to Dashboard" : "Create your event"}
             <Icon name="arrow-right" style="solid" size="sm" />
           </Link>
         </div>

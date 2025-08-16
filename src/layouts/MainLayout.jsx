@@ -79,7 +79,7 @@ const MainLayout = ({ children }) => {
         <div className="header-container">
           <div className="header-content">
             {/* Logo */}
-            <Link href="/" className="logo" aria-label="Go to home page">
+            <Link href="/dashboard" className="logo" aria-label="Go to dashboard">
                               <img src={logoPath} alt="Show up or Else" width="32" height="32" className="mr-8" onError={(e)=>{ e.currentTarget.src='/favicon.png?v=1'; }} />
             </Link>
 
@@ -88,20 +88,11 @@ const MainLayout = ({ children }) => {
               <ul className="flex items-center justify-center gap-32 list-none m-0 p-0">
                 <li>
                   <Link
-                    href="/landing"
-                    className={`nav-link ${isActive('/landing') ? 'active' : ''}`}
-                    aria-current={isActive('/landing') ? 'page' : undefined}
+                    href="/dashboard"
+                    className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+                    aria-current={isActive('/dashboard') ? 'page' : undefined}
                   >
-                    Landing
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    href="/"
-                    className={`nav-link ${isActive('/') ? 'active' : ''}`}
-                    aria-current={isActive('/') ? 'page' : undefined}
-                  >
-                    Home
+                    Dashboard
                   </Link>
                 </li>
                 <li>
@@ -215,22 +206,12 @@ const MainLayout = ({ children }) => {
             <ul className="nav-mobile-content list-none m-0 p-0">
               <li>
                 <Link
-                  href="/landing"
-                  className={`nav-link ${isActive('/landing') ? 'active' : ''}`}
-                  aria-current={isActive('/landing') ? 'page' : undefined}
+                  href="/dashboard"
+                  className={`nav-link ${isActive('/dashboard') ? 'active' : ''}`}
+                  aria-current={isActive('/dashboard') ? 'page' : undefined}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Landing
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/"
-                  className={`nav-link ${isActive('/') ? 'active' : ''}`}
-                  aria-current={isActive('/') ? 'page' : undefined}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  Home
+                  Dashboard
                 </Link>
               </li>
               <li>
