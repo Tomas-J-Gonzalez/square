@@ -75,6 +75,11 @@ export async function POST(request) {
     }
 
     // Verify password
+    if (!user.password) {
+      console.error('No password hash found for user:', email);
+      return NextResponse.json({ success: false, error: 'Invalid email or password' }, { status: 401 });
+    }
+    
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       console.error('Invalid password for user:', email);

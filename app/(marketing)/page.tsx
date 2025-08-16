@@ -4,7 +4,7 @@ export default function MarketingPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className="bg-gray-900 text-white py-20 px-4 sm:px-8">
+      <section className="bg-gray-900 text-white py-20 px-0 sm:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-12">
             <div className="mb-6">
