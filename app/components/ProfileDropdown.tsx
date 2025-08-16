@@ -51,7 +51,7 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
         const rect = button.getBoundingClientRect();
         const dropdownWidth = 224; // w-56 = 14rem = 224px
         const viewportWidth = window.innerWidth;
-        const margin = 16; // 16px margin from viewport edge
+        const margin = 32; // 32px margin from viewport edge
         
         // Check if dropdown would overflow right edge
         if (rect.right + dropdownWidth + margin > viewportWidth) {
@@ -98,7 +98,9 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
           style={{ 
             width: '14rem',
             maxWidth: 'calc(100vw - 2rem)',
-            minWidth: '12rem'
+            minWidth: '12rem',
+            right: dropdownPosition === 'right' ? '0' : 'auto',
+            left: dropdownPosition === 'left' ? '0' : 'auto'
           }}
         >
           {/* Menu Items */}

@@ -97,22 +97,9 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        {/* Past Events Card */}
-        <Card href="/dashboard/past-events">
-          <CardIcon backgroundColor="#ec4899">
-            <Icon name="calendar" size="lg" />
-          </CardIcon>
-          <CardTitle>Past Events</CardTitle>
-          <CardDescription>View completed events</CardDescription>
-          <CardAction>
-            View Past Events
-            <Icon name="arrow-right" size="sm" className="card-action-icon" />
-          </CardAction>
-        </Card>
-
         {/* Events I'm Hosting Card - Only show if user has active events */}
         {events.length > 0 && (
-          <Card href="/dashboard/events">
+          <Card href={`/dashboard/event/${events[0].id}`}>
             <CardIcon backgroundColor="#ec4899">
               <Icon name="users" size="lg" />
             </CardIcon>
@@ -126,6 +113,19 @@ export default function DashboardPage() {
             </CardAction>
           </Card>
         )}
+
+        {/* Past Events Card */}
+        <Card href="/dashboard/past-events">
+          <CardIcon backgroundColor="#ec4899">
+            <Icon name="calendar" size="lg" />
+          </CardIcon>
+          <CardTitle>Past Events</CardTitle>
+          <CardDescription>View completed events</CardDescription>
+          <CardAction>
+            View Past Events
+            <Icon name="arrow-right" size="sm" className="card-action-icon" />
+          </CardAction>
+        </Card>
       </div>
 
 
