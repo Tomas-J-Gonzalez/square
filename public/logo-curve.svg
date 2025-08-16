@@ -1,0 +1,21 @@
+<svg width="400" height="120" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Define curved paths for text -->
+    <path id="topCurve" d="M 50 80 Q 200 40 350 80" fill="none"/>
+    <path id="bottomCurve" d="M 50 100 Q 200 140 350 100" fill="none"/>
+  </defs>
+  
+  <!-- Top curved text: "show up!" -->
+  <text font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="white">
+    <textPath href="#topCurve" startOffset="10%">
+      show up!
+    </textPath>
+  </text>
+  
+  <!-- Bottom curved text: "or else..." -->
+  <text font-family="Arial, sans-serif" font-size="24" font-weight="bold" fill="white">
+    <textPath href="#bottomCurve" startOffset="15%">
+      or else...
+    </textPath>
+  </text>
+</svg>

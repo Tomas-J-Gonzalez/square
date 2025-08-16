@@ -7,9 +7,13 @@ export default function MarketingPage() {
       <section className="bg-gray-900 text-white py-20 px-8">
         <div className="max-w-7xl mx-auto text-center">
           <div className="mb-12">
-            <h1 className="text-6xl font-bold mb-4">
-              Show up or Else
-            </h1>
+            <div className="mb-6">
+              <img 
+                src="/logo-curve.svg" 
+                alt="Show up or Else" 
+                className="h-24 mx-auto"
+              />
+            </div>
             <p className="text-xl text-gray-300">
               Make event planning fun, collaborative, and flake-proof
             </p>
@@ -100,7 +104,7 @@ export default function MarketingPage() {
       {/* Main Content */}
       <section className="bg-white py-20 px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-gray-900 mb-8">
+          <h2 className="text-4xl font-bold text-gray-900 mb-8 marketing-heading">
             Make event planning "funner"
           </h2>
           <p className="text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">

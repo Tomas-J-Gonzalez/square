@@ -16,6 +16,9 @@
   animation: scroll 30s linear infinite;
 }
 
+/* Import Space Grotesk font */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
 /* Base styles */
 * {
   box-sizing: border-box;
@@ -34,6 +37,12 @@ body {
   line-height: 1.6;
   color: #374151;
   background-color: #f9fafb;
+}
+
+/* Marketing page headings */
+.marketing-heading {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
 }
 
 /* Card styles */
@@ -75,7 +84,7 @@ body {
 
 /* Button styles */
 .btn {
-  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md transition-colors duration-200 !important;
+  @apply inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-full transition-colors duration-200 !important;
 }
 
 .btn-primary {
