@@ -80,7 +80,7 @@ const MainLayout = ({ children }) => {
           <div className="header-content">
             {/* Logo */}
             <Link href="/" className="logo" aria-label="Go to home page">
-              <img src={logoPath} alt="Show Up or Else" width="32" height="32" className="mr-8" onError={(e)=>{ e.currentTarget.src='/favicon.png?v=1'; }} />
+                              <img src={logoPath} alt="Show up or Else" width="32" height="32" className="mr-8" onError={(e)=>{ e.currentTarget.src='/favicon.png?v=1'; }} />
             </Link>
 
             {/* Desktop Navigation (centered) */}
@@ -268,7 +268,7 @@ const MainLayout = ({ children }) => {
         <div className="text-center text-xs text-gray-400 space-x-12">
           <Link href="/terms" className="hover:text-gray-600">Terms & Conditions</Link>
           <Link href="/privacy" className="hover:text-gray-600">Privacy Policy</Link>
-          <span>© {new Date().getFullYear()} Show Up or Else</span>
+                          <span>© {new Date().getFullYear()} Show up or Else</span>
         </div>
       </footer>
 

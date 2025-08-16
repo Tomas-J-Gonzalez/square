@@ -90,7 +90,7 @@ const Home = () => {
     <div className="section">
       <div className="section-container">
         <div className="section-header">
-          <h1 className="section-title">Show up or else</h1>
+          <h1 className="section-title">Show up or Else</h1>
           <p className="section-subtitle">
             Never get flaked on again! Create events and let fate decide the punishment for flakes.
           </p>
