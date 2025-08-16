@@ -85,12 +85,26 @@ export default function NotificationModal({
 
   const config = variantConfig[variant];
 
+  // Map notification variants to modal variants
+  const getModalVariant = (notificationVariant: string) => {
+    switch (notificationVariant) {
+      case 'error':
+        return 'danger';
+      case 'success':
+        return 'success';
+      case 'warning':
+        return 'warning';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
       title={title}
-      variant={variant}
+      variant={getModalVariant(variant)}
       size="sm"
       showCloseButton={showCloseButton}
       className={`${config.bgColor} ${config.borderColor}`}

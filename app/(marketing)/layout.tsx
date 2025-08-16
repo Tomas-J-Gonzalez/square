@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { ReactNode, useState } from 'react';
 
@@ -72,12 +74,24 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
       </main>
 
       {/* Marketing Footer */}
-      <footer className="bg-gray-100 text-gray-600 py-8 px-4 sm:px-32">
+      <footer className="bg-gray-100 text-gray-600 py-8 px-4 sm:px-32" role="contentinfo">
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-6 text-xs">
             <span>Show Up or Else © 2025</span>
-            <Link href="/privacy" className="hover:text-gray-800 transition-colors">Privacy Policy</Link>
-            <Link href="/terms" className="hover:text-gray-800 transition-colors">Terms & Conditions</Link>
+            <Link 
+              href="/privacy" 
+              className="hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 rounded px-1 py-0.5"
+              aria-label="Read our Privacy Policy"
+            >
+              Privacy Policy
+            </Link>
+            <Link 
+              href="/terms" 
+              className="hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 rounded px-1 py-0.5"
+              aria-label="Read our Terms of Service"
+            >
+              Terms & Conditions
+            </Link>
           </div>
         </div>
       </footer>

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'https://square-tomas-j-gonzalez.vercel.app'),
   title: 'Show up or Else - Make event planning fun and flake-proof',
   description: 'Create events, collect RSVPs, and keep everyone accountable with playful punishments and rewards.',
   icons: {
