@@ -1,21 +1,6 @@
 <svg width="600" height="200" viewBox="0 0 600 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <!-- Define curved paths for text -->
-    <path id="topCurve" d="M 50 120 Q 300 80 550 120" fill="none"/>
-    <path id="bottomCurve" d="M 50 160 Q 300 200 550 160" fill="none"/>
-  </defs>
-  
-  <!-- Top curved text: "show up!" -->
-  <text font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white">
-    <textPath href="#topCurve" startOffset="10%">
-      show up!
-    </textPath>
-  </text>
-  
-  <!-- Bottom curved text: "or else..." -->
-  <text font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="white">
-    <textPath href="#bottomCurve" startOffset="15%">
-      or else...
-    </textPath>
+  <!-- Main text: "Make plans that stick" -->
+  <text x="300" y="100" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="white" text-anchor="middle">
+    Make plans that stick
   </text>
 </svg>
