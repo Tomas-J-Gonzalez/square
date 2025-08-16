@@ -143,7 +143,7 @@ const Home = () => {
                 <Icon name="calendar-times" style="solid" size="xl" className="text-gray-400 mx-auto mb-16" />
                 <p className="text-gray-600 mb-16">You're not organizing any events yet.</p>
                 <Link href="/create" className="btn btn-primary btn-sm">
-                  Create Your First Event
+                  Create New Event
                 </Link>
               </div>
             )}
@@ -199,26 +199,7 @@ const Home = () => {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-32">
-          {/* Create Event Card */}
-          <div className="card">
-            <Link href="/create" className="card-link">
-              <div className="card-content">
-                <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
-                  <Icon name="plus" style="solid" size="xl" />
-                </div>
-                <h3 className="card-title">Create Event</h3>
-                <p className="card-description">
-                  Set up a new event and choose how to decide who gets punished for flaking.
-                </p>
-                <div className="card-action">
-                  Get Started
-                  <Icon name="arrow-right" style="solid" size="sm" className="card-action-icon" />
-                </div>
-              </div>
-            </Link>
-          </div>
-
+        <div className="grid grid-cols-1 md:grid-cols-1 gap-32">
           {/* Past Events Card */}
           <div className="card">
             <Link href="/past" className="card-link">
@@ -232,25 +213,6 @@ const Home = () => {
                 </p>
                 <div className="card-action">
                   View History
-                  <Icon name="arrow-right" style="solid" size="sm" className="card-action-icon" />
-                </div>
-              </div>
-            </Link>
-          </div>
-
-          {/* Profile Card */}
-          <div className="card">
-            <Link href="/profile" className="card-link">
-              <div className="card-content">
-                <div className="card-icon" style={{ backgroundColor: '#ec4899' }}>
-                  <Icon name="user" style="solid" size="xl" />
-                </div>
-                <h3 className="card-title">Profile</h3>
-                <p className="card-description">
-                  Manage your account settings and preferences.
-                </p>
-                <div className="card-action">
-                  View Profile
                   <Icon name="arrow-right" style="solid" size="sm" className="card-action-icon" />
                 </div>
               </div>

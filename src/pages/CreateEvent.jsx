@@ -12,6 +12,8 @@ const CreateEvent = () => {
     date: '',
     time: '',
     location: '',
+    eventType: 'in-person', // 'in-person' or 'virtual'
+    eventDetails: '',
     decisionMode: 'none',
     punishment: ''
   });
@@ -256,6 +258,47 @@ const CreateEvent = () => {
                     required
                   />
                 </div>
+              </div>
+              
+              {/* Event Type */}
+              <div className="mt-6">
+                <label className="form-label">Event Type *</label>
+                <div className="flex gap-6 mt-2">
+                  <label className="flex items-center gap-8 text-sm text-gray-700">
+                    <input 
+                      type="radio" 
+                      name="eventType" 
+                      value="in-person" 
+                      checked={formData.eventType === 'in-person'} 
+                      onChange={handleInputChange} 
+                    />
+                    In Person
+                  </label>
+                  <label className="flex items-center gap-8 text-sm text-gray-700">
+                    <input 
+                      type="radio" 
+                      name="eventType" 
+                      value="virtual" 
+                      checked={formData.eventType === 'virtual'} 
+                      onChange={handleInputChange} 
+                    />
+                    Virtual
+                  </label>
+                </div>
+              </div>
+
+              {/* Event Details */}
+              <div className="mt-6">
+                <label htmlFor="eventDetails" className="form-label">Event Details (optional)</label>
+                <textarea
+                  id="eventDetails"
+                  name="eventDetails"
+                  value={formData.eventDetails}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="Add any additional information about the event, what to bring, dress code, etc."
+                  rows="4"
+                />
               </div>
             </div>
 

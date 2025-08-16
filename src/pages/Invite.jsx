@@ -13,7 +13,7 @@ const Invite = () => {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [form, setForm] = useState({ name: '', email: '', willAttend: 'yes' });
+  const [form, setForm] = useState({ name: '', email: '', willAttend: 'yes', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -144,6 +144,7 @@ const Invite = () => {
           name: form.name.trim(),
           email: form.email.trim() || null,
           willAttend: form.willAttend === 'yes',
+          message: form.message.trim() || null,
           event
         })
       });
@@ -212,7 +213,6 @@ const Invite = () => {
                 {event.location && (
                   <div><span className="font-medium">Where:</span> {event.location}</div>
                 )}
-                <div><span className="font-medium">Decision mode:</span> {event.decisionMode}</div>
                 <div><span className="font-medium">Punishment for flaking:</span> {event.punishment}</div>
               </div>
 
@@ -240,6 +240,19 @@ const Invite = () => {
                     value={form.email} 
                     onChange={handleChange}
                     placeholder="your@email.com"
+                  />
+                </div>
+
+                <div>
+                  <label className="form-label" htmlFor="message">Message (optional)</label>
+                  <textarea 
+                    id="message" 
+                    name="message" 
+                    className="form-input" 
+                    value={form.message} 
+                    onChange={handleChange}
+                    placeholder="Any additional comments or questions..."
+                    rows="3"
                   />
                 </div>
 

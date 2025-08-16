@@ -58,6 +58,8 @@ export default async function handler(req, res) {
         return await getEvents(req, res);
       case 'getEvent':
         return await getEvent(req, res);
+      case 'getPastEvents':
+        return await getPastEvents(req, res);
       case 'createEvent':
         return await createEvent(req, res);
       case 'updateEvent':
@@ -161,6 +163,59 @@ async function getEvent(req, res) {
   }
 }
 
+async function getPastEvents(req, res) {
+  try {
+    const { userEmail } = req.body;
+    
+    if (!userEmail) {
+      return res.status(400).json({ success: false, error: 'User email required' });
+    }
+
+    const supabase = getSupabaseClient();
+    
+    // Get past events (completed or cancelled)
+    const { data: events, error: eventsError } = await supabase
+      .from('events')
+      .select('*')
+      .eq('invited_by', userEmail)
+      .in('status', ['completed', 'cancelled'])
+      .order('created_at', { ascending: false });
+
+    if (eventsError) {
+      console.error('Error fetching past events:', eventsError);
+      return res.status(500).json({ success: false, error: 'Failed to fetch past events' });
+    }
+
+    // Get flake data for each event
+    const eventsWithFlakes = await Promise.all(
+      (events || []).map(async (event) => {
+        try {
+          const { data: flakes, error: flakesError } = await supabase
+            .from('event_rsvps')
+            .select('id, name, email, message')
+            .eq('event_id', event.id)
+            .eq('will_attend', false);
+
+          if (flakesError) {
+            console.error('Error fetching flakes for event', event.id, ':', flakesError);
+            return { ...event, flakes: [] };
+          }
+
+          return { ...event, flakes: flakes || [] };
+        } catch (flakesError) {
+          console.error('Error fetching flakes for event', event.id, ':', flakesError);
+          return { ...event, flakes: [] };
+        }
+      })
+    );
+
+    return res.status(200).json({ success: true, events: eventsWithFlakes });
+  } catch (error) {
+    console.error('Error in getPastEvents:', error);
+    return res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+}
+
 async function createEvent(req, res) {
   try {
     console.log('Events API - createEvent - Request body:', req.body);
@@ -207,6 +262,8 @@ async function createEvent(req, res) {
       date: eventData.date,
       time: eventData.time,
       location: eventData.location,
+      event_type: eventData.eventType || 'in-person',
+      event_details: eventData.eventDetails || null,
       decision_mode: eventData.decisionMode,
       punishment: eventData.punishment,
       invited_by: userEmail,

@@ -135,6 +135,8 @@ const getEvents = async (userEmail) => {
       date: event.date,
       time: event.time,
       location: event.location,
+      eventType: event.event_type || 'in-person',
+      eventDetails: event.event_details || '',
       decisionMode: event.decision_mode,
       punishment: event.punishment,
       participants: [], // Will be fetched separately
@@ -185,6 +187,8 @@ const createNewEvent = async (eventData, userEmail) => {
       date: result.event.date,
       time: result.event.time,
       location: result.event.location,
+      eventType: result.event.event_type || 'in-person',
+      eventDetails: result.event.event_details || '',
       decisionMode: result.event.decision_mode,
       punishment: result.event.punishment,
       participants: [],
@@ -377,8 +381,27 @@ const removeParticipant = async (eventId, participantId) => {
  */
 const getPastEvents = async (userEmail) => {
   try {
-    const events = await getEvents(userEmail);
-    return events.filter(event => event.status === 'completed' || event.status === 'cancelled');
+    const result = await callEventsAPI('getPastEvents', {}, userEmail);
+    
+    // Convert API format to event format
+    return (result.events || []).map(event => ({
+      id: event.id,
+      title: event.title,
+      date: event.date,
+      time: event.time,
+      location: event.location,
+      eventType: event.event_type || 'in-person',
+      eventDetails: event.event_details || '',
+      decisionMode: event.decision_mode,
+      punishment: event.punishment,
+      participants: [], // Will be fetched separately
+      status: event.status || 'active',
+      createdAt: event.created_at,
+      updatedAt: event.updated_at,
+      flakes: event.flakes || [], // Include flakes from API
+      winner: null,
+      loser: null
+    }));
   } catch (error) {
     console.error('Error in getPastEvents:', error);
     return [];
