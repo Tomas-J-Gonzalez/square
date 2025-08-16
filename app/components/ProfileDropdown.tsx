@@ -11,6 +11,7 @@ interface ProfileDropdownProps {
 
 export default function ProfileDropdown({ userName, userEmail, onLogout }: ProfileDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState<'right' | 'left'>('right');
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown when clicking outside
@@ -42,11 +43,30 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
     onLogout();
   };
 
+  const handleToggle = () => {
+    if (!isOpen) {
+      // Check if dropdown would overflow to the right
+      const button = dropdownRef.current?.querySelector('button');
+      if (button) {
+        const rect = button.getBoundingClientRect();
+        const dropdownWidth = 224; // w-56 = 14rem = 224px
+        const viewportWidth = window.innerWidth;
+        
+        if (rect.right + dropdownWidth > viewportWidth) {
+          setDropdownPosition('left');
+        } else {
+          setDropdownPosition('right');
+        }
+      }
+    }
+    setIsOpen(!isOpen);
+  };
+
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Profile Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="flex items-center space-x-3 p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors"
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -71,7 +91,7 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 transform opacity-100 scale-100 transition-all duration-200 ease-out">
+        <div className={`absolute mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 transform opacity-100 scale-100 transition-all duration-200 ease-out ${dropdownPosition === 'right' ? 'right-0' : 'left-0'}`}>
           {/* Menu Items */}
           <div className="py-1">
             <Link

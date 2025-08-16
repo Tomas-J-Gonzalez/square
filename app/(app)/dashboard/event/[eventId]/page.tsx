@@ -294,10 +294,7 @@ export default function EventManagementPage() {
                     <p className="text-gray-900">{event.event_details}</p>
                   </div>
                 )}
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Decision Mode</label>
-                  <p className="text-gray-900 capitalize">{event.decision_mode.replace('_', ' ')}</p>
-                </div>
+
                 <div>
                   <label className="text-sm font-medium text-gray-500">Punishment for Flakers</label>
                   <p className="text-gray-900">{event.punishment}</p>
