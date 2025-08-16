@@ -79,13 +79,10 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold text-gray-900 mb-3">
           Welcome back, {firstName}! 👋
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl">
-          Manage your events and keep track of your participants.
-        </p>
       </div>
 
-      {/* Quick Actions - 3 Cards in One Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Quick Actions - 2 Cards in One Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Create Event Card */}
         <Card href="/dashboard/create-event">
           <CardIcon backgroundColor="#ec4899">
@@ -108,24 +105,6 @@ export default function DashboardPage() {
           <CardDescription>View completed events</CardDescription>
           <CardAction>
             View Past Events
-            <Icon name="arrow-right" size="sm" className="card-action-icon" />
-          </CardAction>
-        </Card>
-
-        {/* Events I'm Hosting Card - Smaller */}
-        <Card href="/dashboard/events">
-          <CardIcon backgroundColor="#ec4899">
-            <Icon name="users" size="lg" />
-          </CardIcon>
-          <CardTitle>My Events</CardTitle>
-          <CardDescription>
-            {events.length === 0 
-              ? "No active events" 
-              : `${events.length} active event${events.length !== 1 ? 's' : ''}`
-            }
-          </CardDescription>
-          <CardAction>
-            Manage Events
             <Icon name="arrow-right" size="sm" className="card-action-icon" />
           </CardAction>
         </Card>
