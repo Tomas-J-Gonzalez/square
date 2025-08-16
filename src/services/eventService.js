@@ -138,6 +138,7 @@ const getEvents = async (userEmail) => {
       decisionMode: event.decision_mode,
       punishment: event.punishment,
       participants: [], // Will be fetched separately
+      participantCount: event.participant_count || 0, // Use participant count from API
       status: event.status || 'active', // Use actual status from database
       createdAt: event.created_at,
       updatedAt: event.updated_at,

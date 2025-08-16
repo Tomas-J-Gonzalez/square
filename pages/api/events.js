@@ -104,7 +104,30 @@ async function getEvents(req, res) {
       return res.status(500).json({ success: false, error: 'Failed to fetch events' });
     }
 
-    return res.status(200).json({ success: true, events: data || [] });
+    // Get participant count for each event
+    const eventsWithParticipantCount = await Promise.all(
+      (data || []).map(async (event) => {
+        try {
+          const { count, error: countError } = await supabase
+            .from('event_rsvps')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', event.id)
+            .eq('will_attend', true);
+
+          if (countError) {
+            console.error('Error fetching participant count for event', event.id, ':', countError);
+            return { ...event, participant_count: 0 };
+          }
+
+          return { ...event, participant_count: count || 0 };
+        } catch (countError) {
+          console.error('Error fetching participant count for event', event.id, ':', countError);
+          return { ...event, participant_count: 0 };
+        }
+      })
+    );
+
+    return res.status(200).json({ success: true, events: eventsWithParticipantCount });
   } catch (error) {
     console.error('Error in getEvents:', error);
     return res.status(500).json({ success: false, error: 'Internal server error' });

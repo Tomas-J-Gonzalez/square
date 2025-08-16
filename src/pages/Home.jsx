@@ -117,7 +117,7 @@ const Home = () => {
                     </span>
                     <span className="flex items-center text-sm text-gray-600">
                       <Icon name="users" style="solid" size="sm" className="mr-4" />
-                      {activeEvent.participants.length} friends
+                      {activeEvent.participantCount || 0} participants
                     </span>
                   </div>
                   <div className="flex gap-12">

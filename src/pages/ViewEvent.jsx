@@ -191,7 +191,7 @@ const ViewEvent = () => {
     if (!newParticipant.name.trim()) {
       showErrorModal(
         'Missing Information',
-        'Please enter a name for the friend.'
+        'Please enter a name for the participant.'
       );
       return;
     }
@@ -250,8 +250,8 @@ const ViewEvent = () => {
 
   const handleRemoveParticipant = (participantId) => {
     showConfirmModal(
-      'Remove Friend',
-      'Are you sure you want to remove this friend?',
+      'Remove Participant',
+      'Are you sure you want to remove this participant?',
       async () => {
         try {
           // Find the participant to get their name
@@ -590,38 +590,7 @@ const ViewEvent = () => {
             )}
           </div>
           
-          {/* Share Options - Individual Buttons - Only show for organizers */}
-          {isOrganizer && (
-            <div className="flex flex-wrap items-center justify-center gap-8 mb-24">
-              <button
-                onClick={() => handleShare('twitter')}
-                className="btn btn-secondary btn-sm flex items-center"
-                aria-label="Share event on Twitter"
-                type="button"
-              >
-                <Icon name="twitter" style="brands" size="sm" className="mr-4" aria-hidden="true" />
-                Twitter
-              </button>
-              <button
-                onClick={() => handleShare('facebook')}
-                className="btn btn-secondary btn-sm flex items-center"
-                aria-label="Share event on Facebook"
-                type="button"
-              >
-                <Icon name="facebook" style="brands" size="sm" className="mr-4" aria-hidden="true" />
-                Facebook
-              </button>
-              <button
-                onClick={() => handleShare('instagram')}
-                className="btn btn-secondary btn-sm flex items-center"
-                aria-label="Share event on Instagram"
-                type="button"
-              >
-                <Icon name="instagram" style="brands" size="sm" className="mr-4" aria-hidden="true" />
-                Instagram
-              </button>
-            </div>
-          )}
+
         </div>
 
         {/* Organizer Controls */}
@@ -654,7 +623,7 @@ const ViewEvent = () => {
                       className="form-input"
                       value={newParticipant.name}
                       onChange={(e) => setNewParticipant(prev => ({ ...prev, name: e.target.value }))}
-                      placeholder="Friend's name"
+                      placeholder="Participant's name"
                       required
                       disabled={event.status === 'cancelled'}
                     />
@@ -695,7 +664,7 @@ const ViewEvent = () => {
                       Adding...
                     </>
                   ) : (
-                    'Add Friend'
+                    'Add Participant'
                   )}
                 </button>
               </form>
@@ -764,7 +733,7 @@ const ViewEvent = () => {
                 <p className="text-gray-600">No participants yet.</p>
                 {isOrganizer && (
                   <p className="text-sm text-gray-500 mt-8">
-                    Add friends above or share the event link to get RSVPs.
+                    Add participants above or share the event link to get RSVPs.
                   </p>
                 )}
               </div>
@@ -841,7 +810,7 @@ const ViewEvent = () => {
             </div>
             <div className="modal-body">
               <p className="modal-message mb-16">
-                Share this link with your friends to invite them to your event:
+                Share this link with your participants to invite them to your event:
               </p>
               <p className="text-sm text-gray-600 mb-8">
                 💡 Tip: Click the "Copy Link" button or click on the link below to select it, then copy with Ctrl+C (or Cmd+C on Mac)
