@@ -9,7 +9,7 @@ const withAuth = (WrappedComponent) => {
 
     useEffect(() => {
       if (!loading && !isAuthenticated) {
-        const redirect = router.asPath || '/';
+        const redirect = router.asPath || '/dashboard';
         router.replace(`/login?redirect=${encodeURIComponent(redirect)}`);
       }
     }, [loading, isAuthenticated, router]);

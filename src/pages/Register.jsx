@@ -98,7 +98,7 @@ const Register = () => {
         showSuccessModal(
           'Account Created!', 
           'Your account has been created successfully! Please check your email for a confirmation link before you can log in.',
-          () => router.push('/login')
+          () => router.push('/login?redirect=/dashboard')
         );
       } else {
         setErrors({ general: result.error });
@@ -135,9 +135,9 @@ const Register = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="mx-auto mb-4" style={{ width: 64, height: 64 }}>
+          <Link href="/" className="inline-block mx-auto mb-4" style={{ width: 64, height: 64 }}>
             <img src="/logo.svg?v=1" alt="Logo" width="64" height="64" />
-          </div>
+          </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
           <p className="text-gray-600">Join the anti-flake movement</p>
         </div>

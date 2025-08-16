@@ -35,8 +35,8 @@ const Login = () => {
     }
   }, []);
 
-  // Get the page user was trying to access
-  const from = location.state?.from?.pathname || new URLSearchParams(location.search).get('redirect') || '/';
+  // Get the page user was trying to access, default to dashboard
+  const from = location.state?.from?.pathname || new URLSearchParams(location.search).get('redirect') || '/dashboard';
 
   const validateForm = () => {
     const newErrors = {};
@@ -138,9 +138,9 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="mx-auto mb-4" style={{ width: 64, height: 64 }}>
+          <Link href="/" className="inline-block mx-auto mb-4" style={{ width: 64, height: 64 }}>
             <img src="/logo.svg?v=1" alt="Logo" width="64" height="64" />
-          </div>
+          </Link>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome back</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
