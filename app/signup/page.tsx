@@ -137,14 +137,11 @@ export default function SignupPage() {
                   onChange={handleInputChange('name')}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your full name"
-                  aria-describedby={error ? "error-message" : "name-help"}
+                  aria-describedby={error ? "error-message" : undefined}
                   aria-invalid={error ? "true" : "false"}
                   disabled={loading}
                 />
               </div>
-              <p id="name-help" className="mt-1 text-xs text-gray-500">
-                Enter your first and last name as you'd like it to appear
-              </p>
             </div>
 
             <div>

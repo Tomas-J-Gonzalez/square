@@ -71,7 +71,7 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 transform opacity-100 scale-100 transition-all duration-200 ease-out">
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50">
           {/* Menu Items */}
           <div className="py-1">
             <Link

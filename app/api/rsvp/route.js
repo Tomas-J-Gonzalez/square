@@ -171,21 +171,30 @@ async function getParticipants(body) {
 
 async function rsvp(body) {
   try {
-    const { eventId, participantData } = body;
+    const { eventId, rsvpData } = body;
     
-    if (!eventId || !participantData) {
-      return NextResponse.json({ success: false, error: 'Event ID and participant data required' }, { status: 400 });
+    if (!eventId || !rsvpData) {
+      return NextResponse.json({ success: false, error: 'Event ID and RSVP data required' }, { status: 400 });
     }
 
     const supabase = getSupabaseClient();
     
-    // Check if participant already exists for this event
-    const { data: existingParticipant, error: checkError } = await supabase
-      .from('event_rsvps')
-      .select('*')
-      .eq('event_id', eventId)
-      .eq('email', participantData.email)
-      .single();
+    // If email is provided, check if participant already exists for this event
+    let existingParticipant = null;
+    if (rsvpData.email) {
+      const { data, error: checkError } = await supabase
+        .from('event_rsvps')
+        .select('*')
+        .eq('event_id', eventId)
+        .eq('email', rsvpData.email)
+        .single();
+      
+      if (checkError && checkError.code !== 'PGRST116') {
+        console.error('Error checking existing participant:', checkError);
+        return NextResponse.json({ success: false, error: 'Failed to check existing participant' }, { status: 500 });
+      }
+      existingParticipant = data;
+    }
 
     let result;
     if (existingParticipant) {
@@ -193,8 +202,8 @@ async function rsvp(body) {
       const { data, error } = await supabase
         .from('event_rsvps')
         .update({
-          will_attend: participantData.will_attend,
-          message: participantData.message || null,
+          will_attend: rsvpData.willAttend,
+          message: rsvpData.message || null,
           updated_at: new Date().toISOString()
         })
         .eq('id', existingParticipant.id)
@@ -210,10 +219,10 @@ async function rsvp(body) {
       // Create new RSVP
       const insertData = {
         event_id: eventId,
-        name: participantData.name,
-        email: participantData.email,
-        will_attend: participantData.will_attend,
-        message: participantData.message || null
+        name: rsvpData.name,
+        email: rsvpData.email || null,
+        will_attend: rsvpData.willAttend,
+        message: rsvpData.message || null
       };
 
       const { data, error } = await supabase

@@ -238,21 +238,20 @@ export default function InvitePage() {
 
             <div className="form-group">
               <label htmlFor="email" className="form-label">
-                Your Email <span className="text-red-500" aria-label="required">*</span>
+                Your Email <span className="text-gray-500 text-xs">(Optional)</span>
               </label>
               <input
                 type="email"
                 id="email"
-                required
                 value={formData.email}
                 onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                 className="form-input"
-                placeholder="Enter your email address"
+                placeholder="Enter your email address (optional)"
                 aria-describedby="email-help"
                 disabled={submitting}
               />
               <p id="email-help" className="mt-1 text-xs text-gray-500">
-                We'll use this to send you event updates
+                Optional: We'll use this to send you event updates
               </p>
             </div>
 
@@ -323,7 +322,7 @@ export default function InvitePage() {
               <Button
                 type="submit"
                 loading={submitting}
-                disabled={!formData.name || !formData.email}
+                disabled={!formData.name}
               >
                 Submit RSVP
               </Button>

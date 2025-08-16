@@ -100,19 +100,15 @@ export default function LoginPage() {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  required
                   value={email}
                   onChange={handleEmailChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your email address"
-                  aria-describedby={error ? "error-message" : "email-help"}
+                  aria-describedby={error ? "error-message" : undefined}
                   aria-invalid={error ? "true" : "false"}
                   disabled={loading}
                 />
               </div>
-              <p id="email-help" className="mt-1 text-xs text-gray-500">
-                Enter the email address you used to create your account
-              </p>
             </div>
 
             <div>
@@ -130,7 +126,7 @@ export default function LoginPage() {
                   onChange={handlePasswordChange}
                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your password"
-                  aria-describedby={error ? "error-message" : "password-help"}
+                  aria-describedby={error ? "error-message" : undefined}
                   aria-invalid={error ? "true" : "false"}
                   disabled={loading}
                 />
@@ -152,9 +148,6 @@ export default function LoginPage() {
                   )}
                 </button>
               </div>
-              <p id="password-help" className="mt-1 text-xs text-gray-500">
-                Enter the password for your account
-              </p>
             </div>
 
             <div className="flex items-center justify-between">
@@ -170,7 +163,7 @@ export default function LoginPage() {
                 type="submit"
                 loading={loading}
                 className="w-full justify-center"
-                disabled={!email.trim() || !password}
+                disabled={!password}
               >
                 Sign in
               </Button>

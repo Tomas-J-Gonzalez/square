@@ -129,9 +129,14 @@ async function getEvent(body) {
     }
 
     const supabase = getSupabaseClient();
+    
+    // Get event with host name from users table
     const { data, error } = await supabase
       .from('events')
-      .select('*')
+      .select(`
+        *,
+        host:users!events_invited_by_fkey(name)
+      `)
       .eq('id', eventId)
       .single();
 
@@ -140,7 +145,13 @@ async function getEvent(body) {
       return NextResponse.json({ success: false, error: 'Event not found' }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, event: data });
+    // Extract host name from the joined data
+    const eventWithHostName = {
+      ...data,
+      host_name: data.host?.name || data.invited_by || 'Unknown Host'
+    };
+
+    return NextResponse.json({ success: true, event: eventWithHostName });
   } catch (error) {
     console.error('Error in getEvent:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
