@@ -10,7 +10,7 @@ export default function MarketingPage() {
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 marketing-heading">
               Make plans that stick
             </h1>
-            <p className="text-lg sm:text-xl text-gray-300">
+            <p className="text-lg sm:text-xl text-gray-300 max-w-2xl sm:max-w-[38rem] mx-auto">
               Make event planning fun, collaborative, and flake-proof
             </p>
           </div>
@@ -100,10 +100,12 @@ export default function MarketingPage() {
       {/* Main Content */}
       <section className="bg-white py-20 px-4 sm:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-8 marketing-heading">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 sm:mb-15
+           marketing-heading">
             No more maybes. Just memories.
           </h2>
-          <p className="text-lg sm:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
+
+          <p className="text-lg sm:text-xl text-gray-700 leading-relaxed max-w-2xl sm:max-w-[38rem] mx-auto">
             Tired of flaky friends ruining your plans? We make event planning fun, collaborative, and flake-proof. 
             Create events, collect RSVPs, and keep everyone accountable with playful punishments and rewards. 
             Finally — planning hangouts that people actually show up to.
