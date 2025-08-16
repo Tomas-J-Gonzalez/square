@@ -25,6 +25,7 @@ const Invite = () => {
         // Try API first to get event data
         let data = null;
         try {
+          console.log('🔍 Invite page - Fetching event with ID:', eventId);
           const response = await fetch('/api/events', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -34,18 +35,27 @@ const Invite = () => {
             })
           });
           
+          console.log('🔍 Invite page - API response status:', response.status);
+          
           if (response.ok) {
             const result = await response.json();
+            console.log('🔍 Invite page - API response:', result);
             if (result.success && result.event) {
               data = result.event;
+              console.log('🔍 Invite page - Event data found:', data);
+            } else {
+              console.log('🔍 Invite page - No event data in response');
             }
+          } else {
+            const errorText = await response.text();
+            console.log('🔍 Invite page - API error:', errorText);
           }
         } catch (error) {
-          console.error('Error fetching event from API:', error);
+          console.error('🔍 Invite page - Error fetching event from API:', error);
         }
 
         if (data) {
-          setEvent({
+          const eventData = {
             id: data.id,
             title: data.title,
             date: data.date,
@@ -55,7 +65,9 @@ const Invite = () => {
             punishment: data.punishment,
             dateTime: `${data.date}T${data.time}`,
             invitedBy: data.invited_by || 'A friend'
-          });
+          };
+          console.log('🔍 Invite page - Setting event data:', eventData);
+          setEvent(eventData);
         } else {
           // Fallback to URL params then local (so public RSVP works without server)
           const params = new URLSearchParams(window.location.search);
@@ -79,6 +91,7 @@ const Invite = () => {
               invitedBy: invited_by || 'A friend'
             });
           } else {
+            console.log('🔍 Invite page - No event data found, setting error');
             setError('Event not found');
           }
         }
