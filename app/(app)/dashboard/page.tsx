@@ -75,7 +75,7 @@ export default function DashboardPage() {
   return (
     <div className="px-8 sm:px-16 lg:px-32 space-y-8">
       {/* Welcome Section - No Card Background */}
-      <div className="text-left">
+      <div className="text-left mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-3">
           Welcome back, {firstName}! 👋
         </h1>
