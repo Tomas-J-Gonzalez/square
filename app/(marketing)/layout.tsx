@@ -24,12 +24,6 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           </div>
           
           <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/about" className="text-gray-600 hover:text-gray-900 transition-colors">
-              About
-            </Link>
-            <Link href="/pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Pricing
-            </Link>
             <Link href="/login" className="text-pink-500 font-bold hover:text-pink-600 transition-colors">
               Login
             </Link>
