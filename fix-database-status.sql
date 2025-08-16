@@ -38,5 +38,6 @@ CREATE TRIGGER update_events_updated_at
     EXECUTE FUNCTION update_updated_at_column();
 
 -- Add RLS policy for event updates
-CREATE POLICY IF NOT EXISTS "Allow event updates" ON public.events
+DROP POLICY IF EXISTS "Allow event updates" ON public.events;
+CREATE POLICY "Allow event updates" ON public.events
   FOR UPDATE USING (true);
