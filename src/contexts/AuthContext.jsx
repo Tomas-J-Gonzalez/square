@@ -41,6 +41,8 @@ export const AuthProvider = ({ children }) => {
       const result = await response.json();
       
       if (result.success) {
+        // Save user to localStorage for persistence
+        authService.setCurrentUser(result.user);
         setCurrentUser(result.user);
         return { success: true, user: result.user };
       } else {
