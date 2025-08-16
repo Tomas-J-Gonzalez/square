@@ -51,8 +51,10 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
         const rect = button.getBoundingClientRect();
         const dropdownWidth = 224; // w-56 = 14rem = 224px
         const viewportWidth = window.innerWidth;
+        const margin = 16; // 16px margin from viewport edge
         
-        if (rect.right + dropdownWidth > viewportWidth) {
+        // Check if dropdown would overflow right edge
+        if (rect.right + dropdownWidth + margin > viewportWidth) {
           setDropdownPosition('left');
         } else {
           setDropdownPosition('right');
@@ -67,7 +69,7 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
       {/* Profile Button */}
       <button
         onClick={handleToggle}
-        className="flex items-center space-x-3 p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors"
+        className="flex items-center space-x-2 p-2 rounded-lg text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 transition-colors max-w-xs"
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-label="Open user menu"
@@ -91,7 +93,14 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className={`absolute mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 transform opacity-100 scale-100 transition-all duration-200 ease-out ${dropdownPosition === 'right' ? 'right-0' : 'left-0'}`}>
+        <div 
+          className={`absolute mt-2 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 transform opacity-100 scale-100 transition-all duration-200 ease-out ${dropdownPosition === 'right' ? 'right-0' : 'left-0'}`}
+          style={{ 
+            width: '14rem',
+            maxWidth: 'calc(100vw - 2rem)',
+            minWidth: '12rem'
+          }}
+        >
           {/* Menu Items */}
           <div className="py-1">
             <Link
