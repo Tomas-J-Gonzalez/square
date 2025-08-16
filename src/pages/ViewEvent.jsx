@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/router';
 import { eventService } from '../services/eventService';
 import Icon from '../components/Icon';
+import Modal from '../components/Modal';
 import { useModal } from '../hooks/useModal';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -26,7 +27,7 @@ const ViewEvent = () => {
   const [isOrganizer, setIsOrganizer] = useState(false);
   
   // Use the modal hook
-  const { modal, showModal, showConfirmModal } = useModal();
+  const { modal, showModal, showConfirmModal, showSuccessModal, showErrorModal, hideModal } = useModal();
 
   // Fetch participants from API
   const fetchParticipants = async () => {
