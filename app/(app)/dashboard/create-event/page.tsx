@@ -108,7 +108,7 @@ export default function CreateEventPage() {
         eventDetails: formData.eventDetails.trim(),
         decisionMode: 'single_person', // Default for now
         punishment: finalPunishment,
-        // punishmentSeverity: formData.punishmentSeverity, // Temporarily disabled
+        punishmentSeverity: formData.punishmentSeverity,
         invited_by: user.email
       };
 

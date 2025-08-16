@@ -187,7 +187,7 @@ async function createEvent(body) {
       event_details: eventData.eventDetails || null,
       decision_mode: eventData.decisionMode,
       punishment: eventData.punishment,
-      // punishment_severity: eventData.punishmentSeverity || 5, // Temporarily disabled
+      punishment_severity: eventData.punishmentSeverity || 5,
       invited_by: eventData.invited_by,
       status: 'active'
     };
