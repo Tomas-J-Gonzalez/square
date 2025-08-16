@@ -116,6 +116,10 @@ const Home = () => {
                       {new Date(activeEvent.date).toLocaleDateString()}
                     </span>
                     <span className="flex items-center text-sm text-gray-600">
+                      <Icon name="clock" style="solid" size="sm" className="mr-4" />
+                      {activeEvent.time ? new Date(`2000-01-01T${activeEvent.time}`).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }) : 'No time set'}
+                    </span>
+                    <span className="flex items-center text-sm text-gray-600">
                       <Icon name="users" style="solid" size="sm" className="mr-4" />
                       {activeEvent.participantCount || 0} participants
                     </span>

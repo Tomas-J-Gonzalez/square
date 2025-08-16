@@ -590,6 +590,34 @@ const ViewEvent = () => {
             )}
           </div>
           
+          {/* Event Details */}
+          <div className="card mb-32">
+            <div className="card-header">
+              <h2 className="card-title flex items-center">
+                <Icon name="info-circle" style="solid" size="sm" className="mr-8 text-pink-500" />
+                Event Details
+              </h2>
+            </div>
+            <div className="card-content">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-8">Decision Method</h3>
+                  <p className="text-gray-600">
+                    {event.decisionMode === 'vote' && 'Group Vote - Participants will vote on the decision'}
+                    {event.decisionMode === 'chance' && 'Random Chance - Decision will be made randomly'}
+                    {event.decisionMode === 'game' && 'Mini Game - Decision will be made through a fun game'}
+                    {event.decisionMode === 'none' && 'Single Choice - You will make the decision'}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-900 mb-8">Punishment for Flaking</h3>
+                  <p className="text-gray-600">
+                    {event.punishment || 'No punishment specified'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
 
         </div>
 
@@ -682,7 +710,7 @@ const ViewEvent = () => {
                 <button
                   onClick={handleCompleteEvent}
                   disabled={isProcessing || event.status === 'cancelled'}
-                  className="btn btn-success btn-sm flex items-center justify-center"
+                  className="btn btn-success btn-sm flex items-center justify-center border-2 border-green-600"
                 >
                   {isProcessing ? (
                     <>

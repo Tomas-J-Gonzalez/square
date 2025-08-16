@@ -194,7 +194,7 @@ async function createEvent(req, res) {
       const activeEvent = existingEvents[0];
       return res.status(400).json({ 
         success: false, 
-        error: `There is already an active event. Please cancel or complete the current event first. [View Current Event](/event/${activeEvent.id})` 
+        error: `You can only host a maximum of 1 event at a time. Please cancel or complete your current event "${activeEvent.title}" before creating a new one.` 
       });
     }
 

@@ -18,29 +18,34 @@ const CreateEvent = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  const decisionModes = [
+  const [activeTab, setActiveTab] = useState('single'); // 'single' or 'group'
+
+  const singleChoiceOptions = [
     {
       id: 'none',
-      title: 'No Group Decision',
-      description: 'You decide yourself',
+      title: 'Single Person Choice',
+      description: 'You decide yourself where to go or what to do',
       icon: 'user'
-    },
+    }
+  ];
+
+  const groupDecisionOptions = [
     {
       id: 'vote',
-      title: 'Vote',
-      description: 'Everyone gets to vote on the event',
+      title: 'Group Vote',
+      description: 'Everyone gets to vote on where to go or what to do',
       icon: 'vote-yea'
     },
     {
       id: 'chance',
-      title: 'Chance',
-      description: 'Random selection decides',
+      title: 'Random Chance',
+      description: 'Random selection decides where to go or what to do',
       icon: 'dice'
     },
     {
       id: 'game',
-      title: 'Game',
-      description: 'Play a game to decide',
+      title: 'Mini Game',
+      description: 'Play a fun game to decide where to go or what to do',
       icon: 'gamepad'
     }
   ];
@@ -57,6 +62,16 @@ const CreateEvent = () => {
   ];
 
   const isCustomPunishment = formData.punishment === '__custom__';
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    // Reset decision mode when switching tabs
+    if (tab === 'single') {
+      setFormData(prev => ({ ...prev, decisionMode: 'none' }));
+    } else {
+      setFormData(prev => ({ ...prev, decisionMode: 'vote' }));
+    }
+  };
 
   // Helper to get today's date in local timezone as YYYY-MM-DD (no UTC shift)
   const getLocalDateString = (date = new Date()) => {
@@ -244,19 +259,44 @@ const CreateEvent = () => {
               </div>
             </div>
 
-            {/* Decision Mode */}
+            {/* Decision Method */}
             <div className="form-section bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">How to Decide on Event</h2>
-              <p className="text-sm text-gray-600 mb-6">Choose how you will decide on the event</p>
+              <p className="text-sm text-gray-600 mb-6">Choose how you will decide where to go or what to do</p>
+              
+              {/* Tab Navigation */}
+              <div className="flex border-b border-gray-200 mb-6">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('single')}
+                  className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'single'
+                      ? 'border-pink-500 text-pink-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Single Person Choice
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('group')}
+                  className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === 'group'
+                      ? 'border-pink-500 text-pink-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Group Decision
+                </button>
+              </div>
+
+              {/* Tab Content */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {decisionModes.map((mode) => {
-                  const isDisabled = mode.id !== 'none';
-                  return (
+                {activeTab === 'single' ? (
+                  singleChoiceOptions.map((mode) => (
                     <label 
                       key={mode.id} 
-                      className={`decision-option ${formData.decisionMode === mode.id ? 'selected' : ''} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                      title={isDisabled ? 'Currently unavailable' : undefined}
-                      aria-disabled={isDisabled}
+                      className={`decision-option ${formData.decisionMode === mode.id ? 'selected' : ''}`}
                     >
                       <input
                         type="radio"
@@ -264,8 +304,6 @@ const CreateEvent = () => {
                         value={mode.id}
                         checked={formData.decisionMode === mode.id}
                         onChange={handleInputChange}
-                        disabled={isDisabled}
-                        tabIndex={isDisabled ? -1 : 0}
                       />
                       <div className="decision-content">
                         <div className="decision-icon">
@@ -275,8 +313,30 @@ const CreateEvent = () => {
                         <div className="decision-description">{mode.description}</div>
                       </div>
                     </label>
-                  );
-                })}
+                  ))
+                ) : (
+                  groupDecisionOptions.map((mode) => (
+                    <label 
+                      key={mode.id} 
+                      className={`decision-option ${formData.decisionMode === mode.id ? 'selected' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name="decisionMode"
+                        value={mode.id}
+                        checked={formData.decisionMode === mode.id}
+                        onChange={handleInputChange}
+                      />
+                      <div className="decision-content">
+                        <div className="decision-icon">
+                          <Icon name={mode.icon} style="solid" size="lg" />
+                        </div>
+                        <div className="decision-title">{mode.title}</div>
+                        <div className="decision-description">{mode.description}</div>
+                      </div>
+                    </label>
+                  ))
+                )}
               </div>
             </div>
 
