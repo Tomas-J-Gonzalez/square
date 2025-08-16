@@ -44,7 +44,7 @@ export default function DashboardPage() {
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'getEvents', userEmail }),
+        body: JSON.stringify({ action: 'getEvents', userEmail, status: 'active' }),
       });
 
       const data = await response.json();

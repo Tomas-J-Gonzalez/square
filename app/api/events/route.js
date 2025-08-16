@@ -73,19 +73,24 @@ export async function POST(request) {
 
 async function getEvents(body) {
   try {
-    const { userEmail } = body;
+    const { userEmail, status } = body;
     
     if (!userEmail) {
       return NextResponse.json({ success: false, error: 'User email required' }, { status: 400 });
     }
 
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase
+    let query = supabase
       .from('events')
       .select('*')
-      .eq('invited_by', userEmail)
-      .eq('status', 'active')
-      .order('created_at', { ascending: false });
+      .eq('invited_by', userEmail);
+    
+    // If status is specified, filter by it, otherwise get all events
+    if (status) {
+      query = query.eq('status', status);
+    }
+    
+    const { data, error } = await query.order('created_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching events:', error);
@@ -130,13 +135,10 @@ async function getEvent(body) {
 
     const supabase = getSupabaseClient();
     
-    // Get event with host name from users table
+    // Get event (without foreign key join for now to avoid constraint issues)
     const { data, error } = await supabase
       .from('events')
-      .select(`
-        *,
-        host:users!events_invited_by_fkey(name)
-      `)
+      .select('*')
       .eq('id', eventId)
       .single();
 
@@ -145,10 +147,10 @@ async function getEvent(body) {
       return NextResponse.json({ success: false, error: 'Event not found' }, { status: 404 });
     }
 
-    // Extract host name from the joined data
+    // Add host name from invited_by field
     const eventWithHostName = {
       ...data,
-      host_name: data.host?.name || data.invited_by || 'Unknown Host'
+      host_name: data.invited_by || 'Unknown Host'
     };
 
     return NextResponse.json({ success: true, event: eventWithHostName });
