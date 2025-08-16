@@ -1,8 +1,11 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Button from '../../components/Button';
+import NotificationModal from '../../components/NotificationModal';
+import { useModal } from '../../hooks/useModal';
 import Icon from '../../components/Icon';
 
 interface Event {
@@ -29,6 +32,7 @@ export default function InvitePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const successModal = useModal();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -81,8 +85,10 @@ export default function InvitePage() {
       const data = await response.json();
       if (data.success) {
         // Show success message and redirect
-        alert('RSVP submitted successfully!');
-        router.push('/');
+        successModal.open();
+        setTimeout(() => {
+          router.push('/');
+        }, 2000);
       } else {
         setError(data.error || 'Failed to submit RSVP');
       }
@@ -301,6 +307,18 @@ export default function InvitePage() {
           </form>
         </div>
       </div>
+
+      {/* Success Notification Modal */}
+      <NotificationModal
+        isOpen={successModal.isOpen}
+        onClose={successModal.close}
+        title="RSVP Submitted Successfully!"
+        message="Thank you for responding to the invitation. We'll see you there!"
+        variant="success"
+        autoClose={true}
+        autoCloseDelay={2000}
+        showCloseButton={false}
+      />
     </div>
   );
 }

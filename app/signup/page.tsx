@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '../components/Button';
+import NotificationModal from '../components/NotificationModal';
+import { useModal } from '../hooks/useModal';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -17,6 +19,7 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
+  const successModal = useModal();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,8 +54,10 @@ export default function SignupPage() {
 
       if (data.success) {
         // Show success message and redirect to login
-        alert('Account created successfully! Please check your email to confirm your account before logging in.');
-        router.push('/login');
+        successModal.open();
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
       } else {
         setError(data.error || 'Registration failed');
       }
@@ -280,6 +285,18 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Notification Modal */}
+      <NotificationModal
+        isOpen={successModal.isOpen}
+        onClose={successModal.close}
+        title="Account Created Successfully!"
+        message="Please check your email to confirm your account before logging in."
+        variant="success"
+        autoClose={true}
+        autoCloseDelay={2000}
+        showCloseButton={false}
+      />
     </div>
   );
 }
