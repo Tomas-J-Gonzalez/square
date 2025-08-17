@@ -24,7 +24,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
     console.log('AppLayout: Auth state changed - user:', user, 'loading:', loading);
     if (!loading && !user) {
       console.log('AppLayout: No user found, redirecting to login');
-      router.push('/login');
+      // Add a small delay to prevent race conditions
+      setTimeout(() => {
+        router.push('/login');
+      }, 100);
     }
   }, [user, loading, router]);
 

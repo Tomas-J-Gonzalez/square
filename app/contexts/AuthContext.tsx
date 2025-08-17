@@ -24,21 +24,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Start with loading true
 
   // Check for existing user in localStorage on mount
   useEffect(() => {
+    console.log('AuthContext: Initializing, checking localStorage');
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       try {
         const userData = JSON.parse(storedUser);
+        console.log('AuthContext: Found stored user:', userData);
         setUser(userData);
       } catch (error) {
         console.error('Error parsing stored user:', error);
         localStorage.removeItem('currentUser');
       }
+    } else {
+      console.log('AuthContext: No stored user found');
     }
+    setLoading(false); // Set loading to false after checking localStorage
   }, []);
+
+  // Monitor user state changes
+  useEffect(() => {
+    console.log('AuthContext: User state changed:', user);
+  }, [user]);
 
   const signUp = async (email: string, password: string, name: string) => {
     setLoading(true);
@@ -83,6 +93,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(data.user);
         localStorage.setItem('currentUser', JSON.stringify(data.user));
         console.log('AuthContext: User stored in localStorage');
+        // Add a small delay to ensure state is properly set
+        await new Promise(resolve => setTimeout(resolve, 50));
+        console.log('AuthContext: Login process completed');
         return { error: null };
       } else {
         console.log('AuthContext: Login failed:', data.error);

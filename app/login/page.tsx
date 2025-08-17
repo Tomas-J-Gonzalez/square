@@ -13,15 +13,20 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login form submitted:', { email: email.trim(), password: password ? '[HIDDEN]' : '[EMPTY]' });
+    console.log('LoginPage: Form submitted:', { email: email.trim(), password: password ? '[HIDDEN]' : '[EMPTY]' });
     setError('');
 
     const result = await signIn(email.trim(), password);
+    console.log('LoginPage: SignIn result:', result);
     
     if (result.error) {
+      console.log('LoginPage: Login failed with error:', result.error);
       setError(result.error);
     } else {
-      console.log('Login successful, redirecting to dashboard');
+      console.log('LoginPage: Login successful, waiting for user state to update...');
+      // Wait for the user state to be properly set
+      await new Promise(resolve => setTimeout(resolve, 200));
+      console.log('LoginPage: Redirecting to dashboard');
       window.location.href = '/dashboard';
     }
   };
