@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import { supabase } from '../../../lib/supabase';
 
 interface Props {
   children: React.ReactNode;
@@ -23,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         siteName: 'Show up or Else',
         images: [
           {
-            url: '/assets/Logo.svg',
+            url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://square-tomas-j-gonzalez.vercel.app'}/assets/social-share.svg`,
             width: 1200,
             height: 630,
             alt: 'Event Invitation - Show up or Else',
@@ -39,7 +38,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: 'You have been invited to an event.',
         images: [
           {
-            url: '/assets/Logo.svg',
+            url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://square-tomas-j-gonzalez.vercel.app'}/assets/social-share.svg`,
             alt: 'Event Invitation - Show up or Else',
           },
         ],
@@ -52,46 +51,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   try {
-    if (!supabase) {
-      throw new Error('Supabase not configured');
-    }
-    
-    // Fetch event data
-    const { data: event, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('id', params.eventId)
-      .single();
-
-    if (error || !event) {
-      return {
-        title: 'Event Not Found - Show up or Else',
-        description: 'This event invitation is invalid or has been deleted.',
-      };
-    }
-
-    // Get host name
-    const { data: host } = await supabase
-      .from('users')
-      .select('name')
-      .eq('email', event.invited_by)
-      .single();
-
-    const hostName = host?.name?.split(' ')[0] || 'Someone';
-    const eventDate = new Date(event.date).toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-      year: 'numeric',
-    });
-
-    const title = `Event invitation by ${hostName} - ${event.title}`;
-    const description = `You're invited to ${event.title} on ${eventDate} at ${event.location}. Join us for this ${event.event_type} event!`;
+    // For now, return default metadata since we can't access Supabase on the server
+    // The actual event data will be fetched on the client side
+    const title = `Event invitation - Show up or Else`;
+    const description = `You have been invited to an event. Click to view details and RSVP.`;
+    const imageUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://square-tomas-j-gonzalez.vercel.app'}/assets/social-share.svg`;
 
     return {
       title,
       description,
-      keywords: ['event invitation', 'RSVP', event.event_type, event.location],
+      keywords: ['event invitation', 'RSVP'],
       openGraph: {
         title,
         description,
@@ -99,10 +68,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         siteName: 'Show up or Else',
         images: [
           {
-            url: '/assets/Logo.svg',
+            url: imageUrl,
             width: 1200,
             height: 630,
-            alt: `${event.title} - Event Invitation`,
+            alt: 'Event Invitation - Show up or Else',
             type: 'image/svg+xml',
           },
         ],
@@ -115,8 +84,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description,
         images: [
           {
-            url: '/assets/Logo.svg',
-            alt: `${event.title} - Event Invitation`,
+            url: imageUrl,
+            alt: 'Event Invitation - Show up or Else',
           },
         ],
       },

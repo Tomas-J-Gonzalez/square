@@ -46,6 +46,48 @@ export default function InvitePage() {
     }
   }, [eventId]);
 
+  // Update page metadata when event data is loaded
+  useEffect(() => {
+    if (event) {
+      // Update the page title and meta tags
+      document.title = `Event invitation by ${event.host_name?.split(' ')[0] || 'Someone'} - ${event.title}`;
+      
+      // Update Open Graph meta tags
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) {
+        ogTitle.setAttribute('content', `Event invitation by ${event.host_name?.split(' ')[0] || 'Someone'} - ${event.title}`);
+      }
+      
+      const ogDescription = document.querySelector('meta[property="og:description"]');
+      if (ogDescription) {
+        const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        });
+        ogDescription.setAttribute('content', `You're invited to ${event.title} on ${eventDate} at ${event.location}. Join us for this ${event.event_type} event!`);
+      }
+      
+      // Update Twitter meta tags
+      const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twitterTitle) {
+        twitterTitle.setAttribute('content', `Event invitation by ${event.host_name?.split(' ')[0] || 'Someone'} - ${event.title}`);
+      }
+      
+      const twitterDescription = document.querySelector('meta[name="twitter:description"]');
+      if (twitterDescription) {
+        const eventDate = new Date(event.date).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'long',
+          day: 'numeric',
+          year: 'numeric',
+        });
+        twitterDescription.setAttribute('content', `You're invited to ${event.title} on ${eventDate} at ${event.location}. Join us for this ${event.event_type} event!`);
+      }
+    }
+  }, [event]);
+
   const fetchEvent = async () => {
     try {
       const response = await fetch('/api/events', {

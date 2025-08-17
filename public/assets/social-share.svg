@@ -1,0 +1,39 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#FDF2F8"/>
+  
+  <!-- Pink circle background -->
+  <circle cx="600" cy="315" r="200" fill="#EC4899" opacity="0.1"/>
+  
+  <!-- Main logo circle -->
+  <circle cx="600" cy="315" r="80" fill="#EC4899"/>
+  
+  <!-- Calendar icon in the circle -->
+  <g transform="translate(560, 275)">
+    <rect x="8" y="12" width="24" height="20" rx="2" fill="white"/>
+    <rect x="10" y="14" width="4" height="2" fill="#EC4899"/>
+    <rect x="16" y="14" width="4" height="2" fill="#EC4899"/>
+    <rect x="22" y="14" width="4" height="2" fill="#EC4899"/>
+    <rect x="10" y="18" width="4" height="2" fill="#EC4899"/>
+    <rect x="16" y="18" width="4" height="2" fill="#EC4899"/>
+    <rect x="22" y="18" width="4" height="2" fill="#EC4899"/>
+    <rect x="10" y="22" width="4" height="2" fill="#EC4899"/>
+    <rect x="16" y="22" width="4" height="2" fill="#EC4899"/>
+    <rect x="22" y="22" width="4" height="2" fill="#EC4899"/>
+  </g>
+  
+  <!-- Main title -->
+  <text x="600" y="480" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="48" font-weight="bold" fill="#1F2937">
+    Show up or Else
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="520" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#6B7280">
+    Make event planning fun and flake-proof
+  </text>
+  
+  <!-- Event invitation text -->
+  <text x="600" y="560" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#EC4899" font-weight="600">
+    Event Invitation
+  </text>
+</svg>
