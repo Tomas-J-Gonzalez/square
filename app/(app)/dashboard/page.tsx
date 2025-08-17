@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Card, { CardIcon, CardTitle, CardDescription, CardAction } from '../../components/Card';
 import Icon from '../../components/Icon';
 import { useAuth } from '../../contexts/AuthContext';
+import IdeaGeneratorModal from '../../components/IdeaGeneratorModal';
 
 // Force dynamic rendering for authenticated pages
 export const dynamic = 'force-dynamic';
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isIdeaModalOpen, setIsIdeaModalOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -71,8 +73,8 @@ export default function DashboardPage() {
         </h1>
       </div>
 
-      {/* Quick Actions - 3 Cards in One Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Quick Actions - 4 Cards in One Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Create Event Card - Only show if no active events */}
         {events.length === 0 && (
           <Card href="/dashboard/create-event">
@@ -105,6 +107,19 @@ export default function DashboardPage() {
           </Card>
         )}
 
+        {/* What are we doing? Card */}
+        <Card onClick={() => setIsIdeaModalOpen(true)}>
+          <CardIcon backgroundColor="#8B5CF6">
+            <Icon name="lightbulb" size="lg" />
+          </CardIcon>
+          <CardTitle>What are we doing?</CardTitle>
+          <CardDescription>Get AI-powered activity ideas</CardDescription>
+          <CardAction>
+            Generate Ideas
+            <Icon name="arrow-right" size="sm" className="card-action-icon" />
+          </CardAction>
+        </Card>
+
         {/* Past Events Card */}
         <Card href="/dashboard/past-events">
           <CardIcon backgroundColor="#ec4899">
@@ -119,6 +134,11 @@ export default function DashboardPage() {
         </Card>
       </div>
 
+      {/* Idea Generator Modal */}
+      <IdeaGeneratorModal 
+        isOpen={isIdeaModalOpen} 
+        onClose={() => setIsIdeaModalOpen(false)} 
+      />
 
     </div>
   );

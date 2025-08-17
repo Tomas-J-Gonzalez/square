@@ -1,0 +1,40 @@
+@Tomas-J-Gonzalez
+
+#Ideas
+
+On landing the 'create your first event" button takes you to an engaging multistep event creation page?? instead of straight to sign-up (friction)
+
+ical option on event invitations
+available to view live event page (see event page) - only invitees can see
+
+Make it so when i view detials of a past event i can only see the details and not the past events controls.
+
+make invitation look less like a scam
+
+Dont show active events on past events.
+
+How will private events work? if a send an invite to someone what stops them from sharing?
+
+Allow host to edit existing events?
+
+Differentiate between on-the-fly events, not knowing where we goign yet, and already planned events.
+
+
+"When are we all free"
+
+"What are we doing?" (new card)
+Idea gen for events and colab to come up with ideas
+Suggest ideas based on proximity of event location? and based on filters set.
+
+"Games"
+Decide who pays
+Decide who
+
+For current events, allow host and users to upload photos or messages.
+
+Commited people who dont show up are flakes, not those who cant actually attend.
+
+Does not being able to go == flaking, or is flaking just when someone says they'll go but dont show up?
+
+fix ugly urls (e.g events page, best practice for nesting and urls naming conventions)
+should dashboard always show as first sub url??? no
