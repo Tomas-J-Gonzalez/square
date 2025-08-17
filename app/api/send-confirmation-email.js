@@ -48,46 +48,99 @@ export default async function handler(req, res) {
       },
       html: `
         <!DOCTYPE html>
-        <html lang="en">
+        <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <meta http-equiv="X-UA-Compatible" content="IE=edge">
           <title>Confirm your Show Up or Else account</title>
           <meta name="description" content="Confirm your email address for Show Up or Else">
           <meta name="color-scheme" content="light">
           <meta name="supported-color-schemes" content="light">
           <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
           <meta name="x-apple-disable-message-reformatting">
+          
           <!--[if mso]>
           <noscript>
             <xml>
               <o:OfficeDocumentSettings>
                 <o:PixelsPerInch>96</o:PixelsPerInch>
+                <o:AllowPNG/>
+                <o:AllowPNG/>
               </o:OfficeDocumentSettings>
             </xml>
           </noscript>
           <![endif]-->
+          
+          <!--[if mso]>
+          <style type="text/css">
+          body, table, td {font-family: Arial, Helvetica, sans-serif !important;}
+          </style>
+          <![endif]-->
+          
+          <style type="text/css">
+            /* Reset styles for email clients */
+            body, table, td, p, a, li, blockquote { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+            table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+            img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+            
+            /* Responsive design */
+            @media only screen and (max-width: 600px) {
+              .email-container { width: 100% !important; }
+              .mobile-padding { padding: 20px !important; }
+              .mobile-text { font-size: 16px !important; line-height: 24px !important; }
+              .mobile-heading { font-size: 24px !important; line-height: 32px !important; }
+              .mobile-button { display: block !important; width: 100% !important; }
+            }
+            
+            /* Button styles for email clients */
+            .email-button {
+              background: #ec4899 !important;
+              color: #ffffff !important;
+              text-decoration: none !important;
+              border: none !important;
+              outline: none !important;
+            }
+            
+            /* Outlook-specific fixes */
+            .outlook-button {
+              background: #ec4899 !important;
+              color: #ffffff !important;
+              text-decoration: none !important;
+              border: none !important;
+              outline: none !important;
+              display: inline-block !important;
+              padding: 16px 32px !important;
+              font-weight: 600 !important;
+              font-size: 16px !important;
+              line-height: 1.2 !important;
+            }
+          </style>
         </head>
-        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f9fafb; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+        <body style="margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; background-color: #f9fafb; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
           <!--[if mso]>
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
           <tr>
           <td align="center" style="background-color: #f9fafb;">
           <![endif]-->
           
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
             <!-- Header -->
             <tr>
-              <td style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); padding: 40px 20px; text-align: center;">
+              <td style="background-color: #ec4899; padding: 40px 20px; text-align: center;">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td align="center" style="padding-bottom: 20px;">
-                      <!-- Text-based logo instead of SVG for better compatibility -->
-                      <div style="display: inline-block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 2px solid rgba(255, 255, 255, 0.2); box-sizing: border-box;">
-                        <div style="color: #ffffff; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.2; padding-top: 20px;">
-                          Show Up<br>or Else
-                        </div>
-                      </div>
+                      <!-- Text-based logo for Outlook compatibility -->
+                      <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                        <tr>
+                          <td style="background-color: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.2); padding: 8px; text-align: center; width: 80px; height: 80px;">
+                            <div style="color: #ffffff; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.2; padding-top: 20px;">
+                              Show Up<br>or Else
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                   <tr>
@@ -125,16 +178,27 @@ export default async function handler(req, res) {
                   <!-- CTA Button -->
                   <tr>
                     <td align="center" style="padding: 30px 0;">
+                      <!--[if mso]>
+                      <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="${confirmationUrl}" style="height:56px;v-text-anchor:middle;width:200px;" arcsize="8%" stroke="f" fillcolor="#ec4899">
+                      <w:anchorlock/>
+                      <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:600;">
+                      Confirm Email Address
+                      </center>
+                      </v:roundrect>
+                      <![endif]-->
+                      <!--[if !mso]><!-->
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                         <tr>
-                          <td align="center" style="border-radius: 8px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);">
+                          <td align="center" style="background-color: #ec4899; border-radius: 8px;">
                             <a href="${confirmationUrl}"
-                               style="background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px; line-height: 1.2; border: 2px solid #ec4899; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);">
+                               class="outlook-button"
+                               style="background-color: #ec4899; color: #ffffff; padding: 16px 32px; text-decoration: none; border-radius: 8px; display: inline-block; font-weight: 600; font-size: 16px; line-height: 1.2;">
                               Confirm Email Address
                             </a>
                           </td>
                         </tr>
                       </table>
+                      <!--<![endif]-->
                     </td>
                   </tr>
                   
@@ -150,7 +214,7 @@ export default async function handler(req, res) {
                   <!-- Fallback Link -->
                   <tr>
                     <td align="center" style="padding-bottom: 30px;">
-                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f3f4f6; border-radius: 6px;">
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f3f4f6;">
                         <tr>
                           <td style="padding: 16px; text-align: center;">
                             <a href="${confirmationUrl}" 
@@ -166,7 +230,7 @@ export default async function handler(req, res) {
                   <!-- Security Notice -->
                   <tr>
                     <td align="center">
-                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px;">
+                      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fef3c7; border: 1px solid #f59e0b;">
                         <tr>
                           <td style="padding: 16px; text-align: left;">
                             <p style="color: #92400e; margin: 0; font-size: 14px; font-weight: 500; line-height: 1.4;">
