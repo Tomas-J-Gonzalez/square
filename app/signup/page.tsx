@@ -42,7 +42,7 @@ export default function SignupPage() {
     console.log('Error cleared');
 
     console.log('Calling signUp function...');
-    const result = await signUp(name.trim(), email.trim(), password);
+    const result = await signUp(email.trim(), password, name.trim());
     console.log('SignUp result received:', result);
     
     if (result.error) {
