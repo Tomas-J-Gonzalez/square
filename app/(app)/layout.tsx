@@ -7,6 +7,9 @@ import { useRouter, usePathname } from 'next/navigation';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { useAuth } from '../contexts/AuthContext';
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 interface AppLayoutProps {
   children: ReactNode;
 }

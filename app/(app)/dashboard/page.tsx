@@ -4,6 +4,9 @@ import { useState, useEffect } from 'react';
 import Card, { CardIcon, CardTitle, CardDescription, CardAction } from '../../components/Card';
 import Icon from '../../components/Icon';
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 interface Event {
   id: string;
   title: string;

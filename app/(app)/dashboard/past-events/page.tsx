@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 interface Event {
   id: string;
   title: string;

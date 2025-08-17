@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
+// Force dynamic rendering for authenticated pages
+export const dynamic = 'force-dynamic';
+
 type ProfileTab = 'settings' | 'account';
 
 export default function ProfilePage() {
