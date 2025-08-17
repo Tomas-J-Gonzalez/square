@@ -53,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, name: string) => {
     setLoading(true);
     try {
+      console.log('AuthContext: Starting registration for', email);
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -60,15 +61,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       const data = await response.json();
+      console.log('AuthContext: Registration response:', data);
 
       if (data.success) {
+        console.log('AuthContext: Registration successful');
         // Don't set user immediately - they need to confirm email
         return { error: null };
       } else {
+        console.log('AuthContext: Registration failed:', data.error);
         return { error: data.error || 'Registration failed' };
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('AuthContext: Registration error:', error);
       return { error: 'Network error. Please check your connection and try again.' };
     } finally {
       setLoading(false);

@@ -22,13 +22,17 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Signup form submitted:', { name: name.trim(), email: email.trim(), password: password ? '[HIDDEN]' : '[EMPTY]' });
+    console.log('Form validation:', { nameValid: !!name.trim(), emailValid: !!email.trim(), passwordValid: !!password, passwordsMatch: password === confirmPassword });
     setError('');
 
     const result = await signUp(name.trim(), email.trim(), password);
+    console.log('SignUp result:', result);
     
     if (result.error) {
+      console.log('Setting error:', result.error);
       setError(result.error);
     } else {
+      console.log('Registration successful');
       setShowSuccess(true);
       // Clear form
       setName('');
@@ -112,6 +116,14 @@ export default function SignupPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+            {/* Debug info */}
+            <div className="text-xs text-gray-500">
+              Form valid: {isFormValid() ? 'Yes' : 'No'} | 
+              Name: {name ? '✓' : '✗'} | 
+              Email: {email ? '✓' : '✗'} | 
+              Password: {password ? '✓' : '✗'} | 
+              Match: {password === confirmPassword ? '✓' : '✗'}
+            </div>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg" role="alert">
                 <div className="flex">

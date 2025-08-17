@@ -73,6 +73,15 @@ export async function POST(request) {
               .mobile-button { display: block !important; width: 100% !important; }
             }
             
+            /* Button styles for email clients */
+            .email-button {
+              background: linear-gradient(135deg, #ec4899 0%, #db2777 100%) !important;
+              color: #ffffff !important;
+              text-decoration: none !important;
+              border: none !important;
+              outline: none !important;
+            }
+            
             /* Dark mode support */
             @media (prefers-color-scheme: dark) {
               .dark-mode-text { color: #ffffff !important; }
@@ -94,7 +103,7 @@ export async function POST(request) {
                         <tr>
                           <td>
                             <!-- Logo -->
-                            <div style="margin-bottom: 24px;">
+                            <div style="margin-bottom: 12px;">
                               <img src="${logoUrl}" alt="Show Up or Else" width="64" height="64" style="display: inline-block; width: 64px; height: 64px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.15); padding: 8px; box-sizing: border-box;" />
                             </div>
                             <!-- Heading -->
@@ -125,8 +134,8 @@ export async function POST(request) {
                               <tr>
                                 <td style="border-radius: 8px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);">
                                   <a href="${confirmationUrl}" 
-                                     style="display: inline-block; padding: 16px 32px; color: #ffffff; text-decoration: none; font-size: 16px; font-weight: 600; line-height: 24px; border-radius: 8px; background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3); min-width: 200px; text-align: center;" 
-                                     class="mobile-button">
+                                     style="display: inline-block; padding: 16px 32px; font-size: 16px; font-weight: 600; line-height: 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3); min-width: 200px; text-align: center;" 
+                                     class="mobile-button email-button">
                                     Confirm Email Address
                                   </a>
                                 </td>
