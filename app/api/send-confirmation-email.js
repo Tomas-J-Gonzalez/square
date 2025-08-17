@@ -20,7 +20,9 @@ export default async function handler(req, res) {
       return u.replace(/\/$/, '');
     })();
     const confirmationUrl = `${normalizedBase}/confirm-email?token=${encodeURIComponent(token)}`;
-    const logoUrl = `${normalizedBase}/assets/logo-nav.svg`;
+    
+    // Use a text-based logo instead of SVG for better email client compatibility
+    const logoText = "Show Up or Else";
 
     // Note: Tokens are now stored in Supabase during user registration
     // This endpoint is called by the registration API to send the email
@@ -30,6 +32,20 @@ export default async function handler(req, res) {
       from: 'Show Up or Else <noreply@showuporelse.com>',
       to: email,
       subject: 'Confirm your Show Up or Else account',
+      replyTo: 'support@showuporelse.com',
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@showuporelse.com?subject=unsubscribe>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Auto-Response-Suppress': 'OOF, AutoReply',
+        'Precedence': 'bulk',
+        'X-Mailer': 'Show Up or Else Email System',
+        'X-Priority': '3',
+        'X-MSMail-Priority': 'Normal',
+        'Importance': 'Normal',
+        'X-Report-Abuse': 'Please report abuse here: abuse@showuporelse.com',
+        'X-Campaign': 'email-confirmation',
+        'X-Entity-Ref-ID': 'confirmation-email',
+      },
       html: `
         <!DOCTYPE html>
         <html lang="en">
@@ -40,6 +56,8 @@ export default async function handler(req, res) {
           <meta name="description" content="Confirm your email address for Show Up or Else">
           <meta name="color-scheme" content="light">
           <meta name="supported-color-schemes" content="light">
+          <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+          <meta name="x-apple-disable-message-reformatting">
           <!--[if mso]>
           <noscript>
             <xml>
@@ -64,7 +82,12 @@ export default async function handler(req, res) {
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td align="center" style="padding-bottom: 20px;">
-                      <img src="${logoUrl}" alt="Show Up or Else Logo" width="80" height="80" style="display: block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 0;" />
+                      <!-- Text-based logo instead of SVG for better compatibility -->
+                      <div style="display: inline-block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 2px solid rgba(255, 255, 255, 0.2); box-sizing: border-box;">
+                        <div style="color: #ffffff; font-size: 12px; font-weight: bold; text-align: center; line-height: 1.2; padding-top: 20px;">
+                          Show Up<br>or Else
+                        </div>
+                      </div>
                     </td>
                   </tr>
                   <tr>
@@ -183,6 +206,14 @@ export default async function handler(req, res) {
                       </p>
                     </td>
                   </tr>
+                  <tr>
+                    <td align="center" style="padding-top: 15px;">
+                      <p style="color: #9ca3af; margin: 0; font-size: 11px; line-height: 1.4;">
+                        <a href="mailto:unsubscribe@showuporelse.com?subject=unsubscribe" style="color: #9ca3af; text-decoration: underline;">Unsubscribe</a> | 
+                        <a href="mailto:support@showuporelse.com" style="color: #9ca3af; text-decoration: underline;">Support</a>
+                      </p>
+                    </td>
+                  </tr>
                 </table>
               </td>
             </tr>
@@ -211,6 +242,8 @@ Security Note: This link will expire in 24 hours for your security. If you didn'
 
 Show Up or Else - Making sure your friends show up
 © 2024 Show Up or Else. All rights reserved.
+
+To unsubscribe, reply to this email with "unsubscribe" in the subject line.
       `
     });
 

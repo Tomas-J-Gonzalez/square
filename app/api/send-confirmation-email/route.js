@@ -33,12 +33,27 @@ export async function POST(request) {
       return u.replace(/\/$/, '');
     })();
     
-    const logoUrl = `${normalizedBase}/assets/logo-nav.svg`;
+    // Use a text-based logo instead of SVG for better email client compatibility
+    const logoText = "Show Up or Else";
 
     const { data, error } = await resend.emails.send({
       from: 'Show Up or Else <noreply@showuporelse.com>',
       to: email,
       subject: 'Confirm your Show Up or Else account',
+      replyTo: 'support@showuporelse.com',
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@showuporelse.com?subject=unsubscribe>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Auto-Response-Suppress': 'OOF, AutoReply',
+        'Precedence': 'bulk',
+        'X-Mailer': 'Show Up or Else Email System',
+        'X-Priority': '3',
+        'X-MSMail-Priority': 'Normal',
+        'Importance': 'Normal',
+        'X-Report-Abuse': 'Please report abuse here: abuse@showuporelse.com',
+        'X-Campaign': 'email-confirmation',
+        'X-Entity-Ref-ID': 'confirmation-email',
+      },
       html: `
         <!DOCTYPE html>
         <html lang="en">
@@ -102,9 +117,13 @@ export async function POST(request) {
                       <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                         <tr>
                           <td>
-                            <!-- Logo -->
+                            <!-- Text-based logo instead of SVG for better compatibility -->
                             <div style="margin-bottom: 12px;">
-                              <img src="${logoUrl}" alt="Show Up or Else" width="64" height="64" style="display: inline-block; width: 64px; height: 64px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.15); padding: 8px; box-sizing: border-box;" />
+                              <div style="display: inline-block; width: 64px; height: 64px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.15); padding: 8px; border: 2px solid rgba(255, 255, 255, 0.2); box-sizing: border-box;">
+                                <div style="color: #ffffff; font-size: 10px; font-weight: bold; text-align: center; line-height: 1.2; padding-top: 15px;">
+                                  Show Up<br>or Else
+                                </div>
+                              </div>
                             </div>
                             <!-- Heading -->
                             <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 700; line-height: 36px; letter-spacing: -0.025em;">Welcome to Show Up or Else!</h1>

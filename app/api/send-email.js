@@ -23,7 +23,8 @@ export default async function handler(req, res) {
     }
 
     const site = process.env.NEXT_PUBLIC_SITE_URL || `https://${process.env.VERCEL_URL}` || 'http://localhost:3000';
-    const logoUrl = `${site}/assets/logo-nav.svg`;
+    // Use a text-based logo instead of SVG for better email client compatibility
+    const logoText = "Show Up or Else";
 
     let subject, htmlContent;
     
@@ -495,6 +496,20 @@ export default async function handler(req, res) {
       from: 'Show Up or Else <noreply@showuporelse.com>',
       to: to_email,
       subject: subject,
+      replyTo: 'support@showuporelse.com',
+      headers: {
+        'List-Unsubscribe': '<mailto:unsubscribe@showuporelse.com?subject=unsubscribe>',
+        'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        'X-Auto-Response-Suppress': 'OOF, AutoReply',
+        'Precedence': 'bulk',
+        'X-Mailer': 'Show Up or Else Email System',
+        'X-Priority': '3',
+        'X-MSMail-Priority': 'Normal',
+        'Importance': 'Normal',
+        'X-Report-Abuse': 'Please report abuse here: abuse@showuporelse.com',
+        'X-Campaign': 'plan-notification',
+        'X-Entity-Ref-ID': `${action_type}-email`,
+      },
       html: htmlContent
     });
 
