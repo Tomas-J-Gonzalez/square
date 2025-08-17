@@ -11,6 +11,7 @@ interface UserProfile {
 
 interface AuthContextType {
   user: UserProfile | null;
+  userProfile: UserProfile | null; // Add this for compatibility
   loading: boolean;
   signUp: (email: string, password: string, name: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
@@ -67,6 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signIn = async (email: string, password: string) => {
     setLoading(true);
     try {
+      console.log('AuthContext: Starting login for', email);
       const response = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -74,16 +76,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       const data = await response.json();
+      console.log('AuthContext: Login response:', data);
 
       if (data.success) {
+        console.log('AuthContext: Login successful, setting user:', data.user);
         setUser(data.user);
         localStorage.setItem('currentUser', JSON.stringify(data.user));
+        console.log('AuthContext: User stored in localStorage');
         return { error: null };
       } else {
+        console.log('AuthContext: Login failed:', data.error);
         return { error: data.error || 'Login failed' };
       }
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('AuthContext: Login error:', error);
       return { error: 'Network error. Please check your connection and try again.' };
     } finally {
       setLoading(false);
@@ -96,9 +102,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear local state
       setUser(null);
       localStorage.removeItem('currentUser');
-      
-      // Call logout API if needed
-      await fetch('/api/logout', { method: 'POST' });
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
@@ -146,6 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const value = {
     user,
+    userProfile: user, // Use the same user data for both
     loading,
     signUp,
     signIn,

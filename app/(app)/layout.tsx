@@ -17,11 +17,13 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, userProfile, loading, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
+    console.log('AppLayout: Auth state changed - user:', user, 'loading:', loading);
     if (!loading && !user) {
+      console.log('AppLayout: No user found, redirecting to login');
       router.push('/login');
     }
   }, [user, loading, router]);
@@ -47,7 +49,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
   };
 
   // Get first name only
-  const firstName = userProfile?.name?.split(' ')[0] || 'User';
+  const firstName = user?.name?.split(' ')[0] || 'User';
 
   // Navigation items with active state
   const navigationItems = [
@@ -137,8 +139,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
               {/* Desktop Profile Dropdown */}
               <div className="hidden md:block">
                               <ProfileDropdown 
-                userName={userProfile?.name || 'User'}
-                userEmail={userProfile?.email || user?.email || ''}
+                userName={user?.name || 'User'}
+                userEmail={user?.email || ''}
                 onLogout={handleLogout}
               />
               </div>
@@ -188,8 +190,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-base font-medium text-gray-900 truncate">{userProfile?.name || 'User'}</div>
-                                      <div className="text-sm text-gray-500 truncate">{userProfile?.email || user?.email || ''}</div>
+                  <div className="text-base font-medium text-gray-900 truncate">{user?.name || 'User'}</div>
+                                      <div className="text-sm text-gray-500 truncate">{user?.email || ''}</div>
                 </div>
               </div>
 

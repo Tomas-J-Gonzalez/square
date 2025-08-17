@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Card, { CardIcon, CardTitle, CardDescription, CardAction } from '../../components/Card';
 import Icon from '../../components/Icon';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Force dynamic rendering for authenticated pages
 export const dynamic = 'force-dynamic';
@@ -17,29 +18,16 @@ interface Event {
   status: string;
 }
 
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
 export default function DashboardPage() {
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get user from localStorage
-    const userData = localStorage.getItem('currentUser');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      fetchEvents(parsedUser.email);
-    } else {
-      // Redirect to login if no user
-      window.location.href = '/login';
+    if (user) {
+      fetchEvents(user.email);
     }
-  }, []);
+  }, [user]);
 
   const fetchEvents = async (userEmail: string) => {
     try {
