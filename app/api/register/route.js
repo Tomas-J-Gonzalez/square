@@ -37,30 +37,11 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Email, password, and name are required' }, { status: 400 });
     }
 
-    // Validate email format - more permissive for custom domains
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Very permissive email validation - users will confirm their emails anyway
     const trimmedEmail = email.trim().toLowerCase();
     
-    // Basic format check
-    if (!emailRegex.test(trimmedEmail)) {
-      return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
-    }
-    
-    // Additional checks for common issues
-    const [localPart, domain] = trimmedEmail.split('@');
-    
-    // Check local part (before @)
-    if (localPart.length === 0 || localPart.length > 64) {
-      return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
-    }
-    
-    // Check domain (after @)
-    if (domain.length === 0 || domain.length > 253) {
-      return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
-    }
-    
-    // Check if domain has at least one dot and valid characters
-    if (!domain.includes('.') || domain.startsWith('.') || domain.endsWith('.') || domain.includes('..')) {
+    // Only reject obviously invalid formats
+    if (!trimmedEmail.includes('@') || !trimmedEmail.includes('.') || trimmedEmail.length < 5) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
     }
 
