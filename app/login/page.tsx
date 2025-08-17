@@ -178,6 +178,11 @@ export default function LoginPage() {
               >
                 Sign in
               </Button>
+              {!password && (
+                <p className="mt-2 text-sm text-gray-500 text-center">
+                  Please enter your password to continue
+                </p>
+              )}
             </div>
           </form>
 

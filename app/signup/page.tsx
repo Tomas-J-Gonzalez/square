@@ -280,6 +280,11 @@ export default function SignupPage() {
               >
                 Create account
               </Button>
+              {!isFormValid() && (
+                <p className="mt-2 text-sm text-gray-500 text-center">
+                  Please fill in all required fields and ensure passwords match
+                </p>
+              )}
             </div>
 
             {/* Terms and Privacy Policy */}
