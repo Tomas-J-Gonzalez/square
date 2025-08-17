@@ -37,9 +37,30 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Email, password, and name are required' }, { status: 400 });
     }
 
-    // Validate email format
+    // Validate email format - more permissive for custom domains
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    // Basic format check
+    if (!emailRegex.test(trimmedEmail)) {
+      return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
+    }
+    
+    // Additional checks for common issues
+    const [localPart, domain] = trimmedEmail.split('@');
+    
+    // Check local part (before @)
+    if (localPart.length === 0 || localPart.length > 64) {
+      return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
+    }
+    
+    // Check domain (after @)
+    if (domain.length === 0 || domain.length > 253) {
+      return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
+    }
+    
+    // Check if domain has at least one dot and valid characters
+    if (!domain.includes('.') || domain.startsWith('.') || domain.endsWith('.') || domain.includes('..')) {
       return NextResponse.json({ success: false, error: 'Please enter a valid email address' }, { status: 400 });
     }
 
@@ -54,7 +75,7 @@ export async function POST(request) {
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
       .select('id')
-      .eq('email', email)
+      .eq('email', trimmedEmail)
       .single();
 
     if (checkError && checkError.code !== 'PGRST116') {
@@ -73,7 +94,7 @@ export async function POST(request) {
     const { data: user, error: userError } = await supabase
       .from('users')
       .insert({
-        email,
+        email: trimmedEmail,
         password_hash: hashedPassword,
         name,
         email_confirmed: false
