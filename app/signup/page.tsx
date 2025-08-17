@@ -21,25 +21,35 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Signup form submitted:', { name: name.trim(), email: email.trim(), password: password ? '[HIDDEN]' : '[EMPTY]' });
-    console.log('Form validation:', { nameValid: !!name.trim(), emailValid: !!email.trim(), passwordValid: !!password, passwordsMatch: password === confirmPassword });
+    console.log('=== SIGNUP FORM SUBMISSION START ===');
+    console.log('Form data:', { 
+      name: name.trim(), 
+      email: email.trim(), 
+      password: password ? '[HIDDEN]' : '[EMPTY]',
+      confirmPassword: confirmPassword ? '[HIDDEN]' : '[EMPTY]'
+    });
+    console.log('Form validation state:', { 
+      nameValid: !!name.trim(), 
+      emailValid: !!email.trim(), 
+      passwordValid: !!password, 
+      passwordsMatch: password === confirmPassword,
+      isFormValid: isFormValid()
+    });
+    console.log('Current error state:', error);
     
     // Clear any existing errors immediately
     setError('');
-    
-    // Force a re-render to clear any visual error states
-    setTimeout(() => {
-      setError('');
-    }, 0);
+    console.log('Error cleared');
 
+    console.log('Calling signUp function...');
     const result = await signUp(name.trim(), email.trim(), password);
-    console.log('SignUp result:', result);
+    console.log('SignUp result received:', result);
     
     if (result.error) {
       console.log('Setting error:', result.error);
       setError(result.error);
     } else {
-      console.log('Registration successful');
+      console.log('Registration successful, showing success page');
       setShowSuccess(true);
       // Clear form
       setName('');
@@ -47,6 +57,7 @@ export default function SignupPage() {
       setPassword('');
       setConfirmPassword('');
     }
+    console.log('=== SIGNUP FORM SUBMISSION END ===');
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,6 +163,7 @@ export default function SignupPage() {
                   onChange={handleNameChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your full name"
+                  required
                 />
               </div>
             </div>
@@ -170,6 +182,7 @@ export default function SignupPage() {
                   onChange={handleEmailChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your email address"
+                  required
                 />
               </div>
             </div>
@@ -188,6 +201,7 @@ export default function SignupPage() {
                   onChange={handlePasswordChange}
                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Create a password"
+                  required
                 />
                 <button
                   type="button"
@@ -223,6 +237,7 @@ export default function SignupPage() {
                   onChange={handleConfirmPasswordChange}
                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Confirm your password"
+                  required
                 />
                 <button
                   type="button"

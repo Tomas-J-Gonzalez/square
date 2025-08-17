@@ -53,26 +53,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signUp = async (email: string, password: string, name: string) => {
     setLoading(true);
     try {
+      console.log('=== AUTHCONTEXT SIGNUP START ===');
       console.log('AuthContext: Starting registration for', email);
+      console.log('AuthContext: Request payload:', { name, email, password: '[HIDDEN]' });
+      
       const response = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
 
+      console.log('AuthContext: Response status:', response.status);
+      console.log('AuthContext: Response headers:', Object.fromEntries(response.headers.entries()));
+
       const data = await response.json();
-      console.log('AuthContext: Registration response:', data);
+      console.log('AuthContext: Registration response data:', data);
 
       if (data.success) {
         console.log('AuthContext: Registration successful');
         // Don't set user immediately - they need to confirm email
+        console.log('=== AUTHCONTEXT SIGNUP SUCCESS ===');
         return { error: null };
       } else {
         console.log('AuthContext: Registration failed:', data.error);
+        console.log('=== AUTHCONTEXT SIGNUP FAILED ===');
         return { error: data.error || 'Registration failed' };
       }
     } catch (error) {
       console.error('AuthContext: Registration error:', error);
+      console.log('=== AUTHCONTEXT SIGNUP ERROR ===');
       return { error: 'Network error. Please check your connection and try again.' };
     } finally {
       setLoading(false);
