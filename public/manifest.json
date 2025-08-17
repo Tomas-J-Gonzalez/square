@@ -1,0 +1,27 @@
+{
+  "name": "Show up or Else",
+  "short_name": "Show up or Else",
+  "description": "Make event planning fun and flake-proof",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#EC4899",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/assets/circle-pink.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/circle-pink.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "productivity", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
+}
