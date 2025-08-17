@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Button from '../components/Button';
 import NotificationModal from '../components/NotificationModal';
 import { useModal } from '../hooks/useModal';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ export default function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const router = useRouter();
   const successModal = useModal();
+  const { signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,26 +42,42 @@ export default function SignupPage() {
     }
 
     try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          name: formData.name.trim(), 
-          email: formData.email.trim(), 
-          password: formData.password 
-        }),
-      });
+      // Try Supabase Auth first
+      const { error: supabaseError } = await signUp(
+        formData.email.trim(), 
+        formData.password, 
+        formData.name.trim()
+      );
+      
+      if (supabaseError) {
+        // If Supabase Auth fails, try the legacy API
+        const response = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            name: formData.name.trim(), 
+            email: formData.email.trim(), 
+            password: formData.password 
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.success) {
-        // Show success message and redirect to login
+        if (data.success) {
+          // Show success message and redirect to login
+          successModal.open();
+          setTimeout(() => {
+            router.push('/login');
+          }, 2000);
+        } else {
+          setError(data.error || 'Registration failed');
+        }
+      } else {
+        // Supabase Auth successful
         successModal.open();
         setTimeout(() => {
           router.push('/login');
         }, 2000);
-      } else {
-        setError(data.error || 'Registration failed');
       }
     } catch (err) {
       console.error('Registration error:', err);

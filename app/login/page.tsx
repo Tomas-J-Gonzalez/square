@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '../components/Button';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,19 +21,28 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
+      // Try Supabase Auth first
+      const { error: supabaseError } = await signIn(email.trim(), password);
+      
+      if (supabaseError) {
+        // If Supabase Auth fails, try the legacy API
+        const response = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email.trim(), password }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (data.success) {
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
-        router.push('/dashboard');
+        if (data.success) {
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+          router.push('/dashboard');
+        } else {
+          setError(data.error || 'Login failed');
+        }
       } else {
-        setError(data.error || 'Login failed');
+        // Supabase Auth successful
+        router.push('/dashboard');
       }
     } catch (err) {
       console.error('Login error:', err);
