@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ReactNode, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import ProfileDropdown from '../components/ProfileDropdown';
+import { useAuth } from '../contexts/AuthContext';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -13,36 +14,16 @@ interface AppLayoutProps {
 export default function AppLayout({ children }: AppLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const { user, userProfile, loading, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated
-    const checkAuth = () => {
-      const user = localStorage.getItem('currentUser');
-      if (!user) {
-        router.push('/login');
-        return;
-      }
-      try {
-        const parsedUser = JSON.parse(user);
-        setUser(parsedUser);
-        setIsAuthenticated(true);
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        localStorage.removeItem('currentUser');
-        router.push('/login');
-        return;
-      }
-      setIsLoading(false);
-    };
+    if (!loading && !user) {
+      router.push('/login');
+    }
+  }, [user, loading, router]);
 
-    checkAuth();
-  }, [router]);
-
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -53,17 +34,17 @@ export default function AppLayout({ children }: AppLayoutProps) {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return null; // Will redirect to login
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem('currentUser');
+  const handleLogout = async () => {
+    await signOut();
     router.push('/login');
   };
 
   // Get first name only
-  const firstName = user?.name?.split(' ')[0] || 'User';
+  const firstName = userProfile?.name?.split(' ')[0] || 'User';
 
   // Navigation items with active state
   const navigationItems = [
@@ -152,11 +133,11 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <div className="flex items-center space-x-4">
               {/* Desktop Profile Dropdown */}
               <div className="hidden md:block">
-                <ProfileDropdown 
-                  userName={user.name}
-                  userEmail={user.email}
-                  onLogout={handleLogout}
-                />
+                              <ProfileDropdown 
+                userName={userProfile?.name || 'User'}
+                userEmail={userProfile?.email || user?.email || ''}
+                onLogout={handleLogout}
+              />
               </div>
 
               {/* Mobile Profile Button */}
@@ -204,8 +185,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-base font-medium text-gray-900 truncate">{user.name}</div>
-                  <div className="text-sm text-gray-500 truncate">{user.email}</div>
+                  <div className="text-base font-medium text-gray-900 truncate">{userProfile?.name || 'User'}</div>
+                                      <div className="text-sm text-gray-500 truncate">{userProfile?.email || user?.email || ''}</div>
                 </div>
               </div>
 

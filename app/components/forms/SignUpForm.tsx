@@ -6,7 +6,7 @@ import { signUpSchema, type SignUpInput } from '../../lib/validations';
 import { useAuth } from '../../contexts/AuthContext';
 import { useState } from 'react';
 import Button from '../Button';
-import NotificationModal from '../Modal';
+import NotificationModal from '../NotificationModal';
 import { useModal } from '../../hooks/useModal';
 
 export default function SignUpForm() {

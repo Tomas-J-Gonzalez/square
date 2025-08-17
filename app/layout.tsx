@@ -27,18 +27,18 @@ export const metadata: Metadata = {
     ],
   },
   manifest: '/manifest.json',
-      openGraph: {
+  openGraph: {
       title: 'Show up or Else - Make event planning fun and flake-proof',
       description: 'Create events, collect RSVPs, and keep everyone accountable with playful punishments and rewards.',
       url: 'https://square-tomas-j-gonzalez.vercel.app',
       siteName: 'Show up or Else',
       images: [
         {
-          url: '/assets/social-share.png',
+          url: '/assets/Logo.svg',
           width: 1200,
           height: 630,
           alt: 'Show up or Else - Event Planning Made Fun',
-          type: 'image/png',
+          type: 'image/svg+xml',
         },
       ],
       locale: 'en_US',
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
     creator: '@showuporelse',
     images: [
       {
-        url: '/assets/social-share.png',
+        url: '/assets/Logo.svg',
         alt: 'Show up or Else - Event Planning Made Fun',
       },
     ],
