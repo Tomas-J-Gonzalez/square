@@ -3,17 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Button from '../components/Button';
-import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
-  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,28 +17,19 @@ export default function LoginPage() {
     setError('');
 
     try {
-      // Try Supabase Auth first
-      const { error: supabaseError } = await signIn(email.trim(), password);
-      
-      if (supabaseError) {
-        // If Supabase Auth fails, try the legacy API
-        const response = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email.trim(), password }),
-        });
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), password }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.success) {
-          localStorage.setItem('currentUser', JSON.stringify(data.user));
-          router.push('/dashboard');
-        } else {
-          setError(data.error || 'Login failed');
-        }
-      } else {
-        // Supabase Auth successful
+      if (data.success) {
+        localStorage.setItem('currentUser', JSON.stringify(data.user));
         router.push('/dashboard');
+      } else {
+        setError(data.error || 'Login failed');
       }
     } catch (err) {
       console.error('Login error:', err);
@@ -115,9 +102,7 @@ export default function LoginPage() {
                   onChange={handleEmailChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your email address"
-                  aria-describedby={error ? "error-message" : undefined}
-                  aria-invalid={error ? "true" : "false"}
-                  disabled={loading}
+                  aria-invalid={error ? 'true' : 'false'}
                 />
               </div>
             </div>
@@ -130,33 +115,24 @@ export default function LoginPage() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   autoComplete="current-password"
                   required
                   value={password}
                   onChange={handlePasswordChange}
                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your password"
-                  aria-describedby={error ? "error-message" : undefined}
-                  aria-invalid={error ? "true" : "false"}
-                  disabled={loading}
+                  aria-invalid={error ? 'true' : 'false'}
                 />
                 <button
                   type="button"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-label="Show password"
                 >
-                  {showPassword ? (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
+                  <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -170,14 +146,13 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <Button
+              <button
                 type="submit"
-                loading={loading}
-                className="w-full justify-center"
-                disabled={!password}
+                disabled={loading || !password}
+                className="btn inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-pink-600 text-white hover:bg-pink-700 focus:ring-pink-500 px-4 py-2 text-sm w-full justify-center"
               >
-                Sign in
-              </Button>
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
               {!password && (
                 <p className="mt-2 text-sm text-gray-500 text-center">
                   Please enter your password to continue
@@ -195,7 +170,6 @@ export default function LoginPage() {
                 <span className="px-2 bg-white text-gray-500">New to Show up or Else?</span>
               </div>
             </div>
-
             <div className="mt-6">
               <Link
                 href="/signup"

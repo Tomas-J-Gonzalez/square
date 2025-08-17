@@ -3,81 +3,48 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import Button from '../components/Button';
-import NotificationModal from '../components/NotificationModal';
-import { useModal } from '../hooks/useModal';
-import { useAuth } from '../contexts/AuthContext';
 
 export default function SignupPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  });
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const router = useRouter();
-  const successModal = useModal();
-  const { signUp } = useAuth();
+
+  const isFormValid = () => {
+    return name.trim() && email.trim() && password && password === confirmPassword;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // Client-side validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters long');
-      setLoading(false);
-      return;
-    }
-
     try {
-      // Try Supabase Auth first
-      const { error: supabaseError } = await signUp(
-        formData.email.trim(), 
-        formData.password, 
-        formData.name.trim()
-      );
-      
-      if (supabaseError) {
-        // If Supabase Auth fails, try the legacy API
-        const response = await fetch('/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            name: formData.name.trim(), 
-            email: formData.email.trim(), 
-            password: formData.password 
-          }),
-        });
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: name.trim(),
+          email: email.trim(),
+          password,
+        }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
 
-        if (data.success) {
-          // Show success message and redirect to login
-          successModal.open();
-          setTimeout(() => {
-            router.push('/login');
-          }, 2000);
-        } else {
-          setError(data.error || 'Registration failed');
-        }
+      if (data.success) {
+        setShowSuccess(true);
+        // Clear form
+        setName('');
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
       } else {
-        // Supabase Auth successful
-        successModal.open();
-        setTimeout(() => {
-          router.push('/login');
-        }, 2000);
+        setError(data.error || 'Registration failed');
       }
     } catch (err) {
       console.error('Registration error:', err);
@@ -87,19 +54,55 @@ export default function SignupPage() {
     }
   };
 
-  const handleInputChange = (field: keyof typeof formData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [field]: e.target.value }));
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setName(e.target.value);
     if (error) setError('');
   };
 
-  const isFormValid = () => {
-    return formData.name.trim() && 
-           formData.email.trim() && 
-           formData.password && 
-           formData.confirmPassword && 
-           formData.password === formData.confirmPassword &&
-           formData.password.length >= 6;
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) setError('');
   };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError('');
+  };
+
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(e.target.value);
+    if (error) setError('');
+  };
+
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <Link href="/" className="flex justify-center">
+            <img 
+              src="/assets/circle-pink.svg" 
+              alt="Show up or Else" 
+              className="h-20 w-20"
+            />
+          </Link>
+          <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+            Account Created Successfully!
+          </h1>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Please check your email to confirm your account before logging in.
+          </p>
+          <div className="mt-6 text-center">
+            <Link
+              href="/login"
+              className="font-medium text-pink-600 hover:text-pink-500 transition-colors"
+            >
+              Go to login
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -150,14 +153,11 @@ export default function SignupPage() {
                   name="name"
                   type="text"
                   autoComplete="name"
-                  required
-                  value={formData.name}
-                  onChange={handleInputChange('name')}
+                  value={name}
+                  onChange={handleNameChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your full name"
-                  aria-describedby={error ? "error-message" : undefined}
-                  aria-invalid={error ? "true" : "false"}
-                  disabled={loading}
+                  aria-invalid={error ? 'true' : 'false'}
                 />
               </div>
             </div>
@@ -172,135 +172,81 @@ export default function SignupPage() {
                   name="email"
                   type="email"
                   autoComplete="email"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange('email')}
+                  value={email}
+                  onChange={handleEmailChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your email address"
-                  aria-describedby={error ? "error-message" : "email-help"}
-                  aria-invalid={error ? "true" : "false"}
-                  disabled={loading}
+                  aria-invalid={error ? 'true' : 'false'}
                 />
               </div>
-              <p id="email-help" className="mt-1 text-xs text-gray-500">
-                We'll send a confirmation email to this address
-              </p>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password <span className="text-red-500" aria-label="required">*</span>
               </label>
-              <div className="mt-1 relative">
+              <div className="mt-1">
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type="password"
                   autoComplete="new-password"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange('password')}
-                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
-                  placeholder="Create a password (min 6 characters)"
-                  aria-describedby={error ? "error-message" : "password-help"}
-                  aria-invalid={error ? "true" : "false"}
-                  disabled={loading}
+                  value={password}
+                  onChange={handlePasswordChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
+                  placeholder="Create a password"
+                  aria-invalid={error ? 'true' : 'false'}
                 />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
               </div>
-              <p id="password-help" className="mt-1 text-xs text-gray-500">
-                Must be at least 6 characters long
-              </p>
             </div>
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
                 Confirm password <span className="text-red-500" aria-label="required">*</span>
               </label>
-              <div className="mt-1 relative">
+              <div className="mt-1">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
-                  type={showConfirmPassword ? "text" : "password"}
+                  type="password"
                   autoComplete="new-password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange('confirmPassword')}
-                  className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
+                  value={confirmPassword}
+                  onChange={handleConfirmPasswordChange}
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Confirm your password"
-                  aria-describedby={error ? "error-message" : "confirm-password-help"}
-                  aria-invalid={error ? "true" : "false"}
-                  disabled={loading}
+                  aria-invalid={error ? 'true' : 'false'}
                 />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                >
-                  {showConfirmPassword ? (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
               </div>
-              <p id="confirm-password-help" className="mt-1 text-xs text-gray-500">
-                Re-enter your password to confirm
-              </p>
             </div>
 
             <div>
-              <Button
+              <button
                 type="submit"
-                loading={loading}
-                className="w-full justify-center"
-                disabled={!isFormValid()}
+                disabled={loading || !isFormValid()}
+                className="btn inline-flex items-center justify-center font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-pink-600 text-white hover:bg-pink-700 focus:ring-pink-500 px-4 py-2 text-sm w-full justify-center"
               >
-                Create account
-              </Button>
+                {loading ? 'Creating account...' : 'Create account'}
+              </button>
               {!isFormValid() && (
                 <p className="mt-2 text-sm text-gray-500 text-center">
                   Please fill in all required fields and ensure passwords match
                 </p>
               )}
             </div>
-
-            {/* Terms and Privacy Policy */}
-            <div className="mt-4 text-center">
-              <p className="text-xs text-gray-500">
-                By creating an account, you agree to our{' '}
-                <Link href="/terms" className="text-pink-600 hover:text-pink-500">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link href="/privacy" className="text-pink-600 hover:text-pink-500">
-                  Privacy Policy
-                </Link>
-              </p>
-            </div>
           </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              By creating an account, you agree to our{' '}
+              <Link href="/terms" className="font-medium text-pink-600 hover:text-pink-500 transition-colors">
+                Terms of Service
+              </Link>{' '}
+              and{' '}
+              <Link href="/privacy" className="font-medium text-pink-600 hover:text-pink-500 transition-colors">
+                Privacy Policy
+              </Link>
+            </p>
+          </div>
 
           <div className="mt-6">
             <div className="relative">
@@ -311,7 +257,6 @@ export default function SignupPage() {
                 <span className="px-2 bg-white text-gray-500">Already have an account?</span>
               </div>
             </div>
-
             <div className="mt-6">
               <Link
                 href="/login"
@@ -321,22 +266,8 @@ export default function SignupPage() {
               </Link>
             </div>
           </div>
-
-
         </div>
       </div>
-
-      {/* Success Notification Modal */}
-      <NotificationModal
-        isOpen={successModal.isOpen}
-        onClose={successModal.close}
-        title="Account Created Successfully!"
-        message="Please check your email to confirm your account before logging in."
-        variant="success"
-        autoClose={true}
-        autoCloseDelay={2000}
-        showCloseButton={false}
-      />
     </div>
   );
 }

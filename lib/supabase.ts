@@ -3,10 +3,27 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-// Only create client if environment variables are available
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null;
+// Create a function to get the Supabase client
+let supabaseClient: any = null;
+
+export const supabase = (() => {
+  // Only create client if environment variables are available
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return null;
+  }
+  
+  // If we're on the server side, return null to prevent hydration issues
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  
+  // Create client only once
+  if (!supabaseClient) {
+    supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  
+  return supabaseClient;
+})();
 
 // Database types
 export interface Database {

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Providers from './providers';
 import { AuthProvider } from './contexts/AuthContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_URL || 'https://square-tomas-j-gonzalez.vercel.app'),
@@ -87,9 +88,9 @@ export default function RootLayout({
       </head>
       <body className="antialiased">
         <Providers>
-          <AuthProvider>
+          <ErrorBoundary>
             {children}
-          </AuthProvider>
+          </ErrorBoundary>
         </Providers>
       </body>
     </html>
