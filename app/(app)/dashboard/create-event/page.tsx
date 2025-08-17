@@ -124,7 +124,8 @@ export default function CreateEventPage() {
       const data = await response.json();
 
       if (data.success) {
-        router.push('/dashboard');
+        // Redirect to the event's "I'm hosting" page instead of dashboard
+        router.push(`/dashboard/event/${data.event.id}`);
       } else {
         setError(data.error || 'Failed to create event');
       }
