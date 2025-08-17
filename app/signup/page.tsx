@@ -154,7 +154,7 @@ export default function SignupPage() {
                 <input
                   id="email"
                   name="email"
-                  type="email"
+                  type="text"
                   autoComplete="email"
                   value={email}
                   onChange={handleEmailChange}
