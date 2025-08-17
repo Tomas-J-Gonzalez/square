@@ -19,10 +19,16 @@ Allow host to edit existing events?
 
 Differentiate between on-the-fly events, not knowing where we goign yet, and already planned events.
 
+Make it so if theres a collaborative group event creation they go 
+through the below steps in a certain order. Split normal single
+event creation with collaborative group creation.!!
 
 "When are we all free"
 
-"What are we doing?" (new card)
+"What are we doing?" (new card) 1st
+
+"Where are we going"
+
 Idea gen for events and colab to come up with ideas
 Suggest ideas based on proximity of event location? and based on filters set.
 
@@ -38,3 +44,16 @@ Does not being able to go == flaking, or is flaking just when someone says they'
 
 fix ugly urls (e.g events page, best practice for nesting and urls naming conventions)
 should dashboard always show as first sub url??? no
+
+
+Escrow-style deposits (people pay a small refundable fee to secure attendance).
+Streaks (friend streaks) - Streaks or progress trackers for attending events (gamify reliability).
+Accountability groups where people set goals together (fitness, study, networking).
+
+Conflict-Free Scheduling
+
+Auto-detect calendar conflicts and suggest alternative dates.
+
+Sync across Google Calendar, Outlook, iCal, etc.
+
+"Smart RSVP" where people vote availability and the app proposes the optimal time.

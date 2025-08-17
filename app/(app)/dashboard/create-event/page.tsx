@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 // Force dynamic rendering for authenticated pages
@@ -45,6 +45,26 @@ export default function CreateEventPage() {
     customPunishment: '',
     punishmentSeverity: 5
   });
+
+  // Load pre-filled data from idea generation if available
+  useEffect(() => {
+    const ideaData = sessionStorage.getItem('ideaData');
+    if (ideaData) {
+      try {
+        const parsedData = JSON.parse(ideaData);
+        setFormData(prev => ({
+          ...prev,
+          title: parsedData.title || '',
+          location: parsedData.location || '',
+          eventDetails: parsedData.description || ''
+        }));
+        // Clear the session storage after using it
+        sessionStorage.removeItem('ideaData');
+      } catch (err) {
+        console.error('Error parsing idea data:', err);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
