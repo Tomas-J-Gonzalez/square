@@ -50,6 +50,8 @@ export default function SignupPage() {
       setError(result.error);
     } else {
       console.log('Registration successful, showing success page');
+      // Force clear error state again
+      setError('');
       setShowSuccess(true);
       // Clear form
       setName('');
