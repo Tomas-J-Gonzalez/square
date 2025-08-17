@@ -23,7 +23,14 @@ export default function SignupPage() {
     e.preventDefault();
     console.log('Signup form submitted:', { name: name.trim(), email: email.trim(), password: password ? '[HIDDEN]' : '[EMPTY]' });
     console.log('Form validation:', { nameValid: !!name.trim(), emailValid: !!email.trim(), passwordValid: !!password, passwordsMatch: password === confirmPassword });
+    
+    // Clear any existing errors immediately
     setError('');
+    
+    // Force a re-render to clear any visual error states
+    setTimeout(() => {
+      setError('');
+    }, 0);
 
     const result = await signUp(name.trim(), email.trim(), password);
     console.log('SignUp result:', result);
@@ -116,14 +123,6 @@ export default function SignupPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-            {/* Debug info */}
-            <div className="text-xs text-gray-500">
-              Form valid: {isFormValid() ? 'Yes' : 'No'} | 
-              Name: {name ? '✓' : '✗'} | 
-              Email: {email ? '✓' : '✗'} | 
-              Password: {password ? '✓' : '✗'} | 
-              Match: {password === confirmPassword ? '✓' : '✗'}
-            </div>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg" role="alert">
                 <div className="flex">
@@ -153,7 +152,6 @@ export default function SignupPage() {
                   onChange={handleNameChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your full name"
-                  aria-invalid={error ? 'true' : 'false'}
                 />
               </div>
             </div>
@@ -172,7 +170,6 @@ export default function SignupPage() {
                   onChange={handleEmailChange}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your email address"
-                  aria-invalid={error ? 'true' : 'false'}
                 />
               </div>
             </div>
@@ -191,7 +188,6 @@ export default function SignupPage() {
                   onChange={handlePasswordChange}
                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Create a password"
-                  aria-invalid={error ? 'true' : 'false'}
                 />
                 <button
                   type="button"
@@ -227,7 +223,6 @@ export default function SignupPage() {
                   onChange={handleConfirmPasswordChange}
                   className="appearance-none block w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-colors disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Confirm your password"
-                  aria-invalid={error ? 'true' : 'false'}
                 />
                 <button
                   type="button"
