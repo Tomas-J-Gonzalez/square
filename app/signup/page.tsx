@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function SignupPage() {
   const [name, setName] = useState('');
@@ -11,8 +12,8 @@ export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const { signUp, loading } = useAuth();
 
   const isFormValid = () => {
     return name.trim() && email.trim() && password && password === confirmPassword;
@@ -21,38 +22,19 @@ export default function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Signup form submitted:', { name: name.trim(), email: email.trim(), password: password ? '[HIDDEN]' : '[EMPTY]' });
-    setLoading(true);
     setError('');
 
-    try {
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          email: email.trim(),
-          password,
-        }),
-      });
-
-      const data = await response.json();
-      console.log('Signup response:', data);
-
-      if (data.success) {
-        setShowSuccess(true);
-        // Clear form
-        setName('');
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-      } else {
-        setError(data.error || 'Registration failed');
-      }
-    } catch (err) {
-      console.error('Registration error:', err);
-      setError('Network error. Please check your connection and try again.');
-    } finally {
-      setLoading(false);
+    const result = await signUp(name.trim(), email.trim(), password);
+    
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setShowSuccess(true);
+      // Clear form
+      setName('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
     }
   };
 

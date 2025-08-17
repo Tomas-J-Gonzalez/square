@@ -2,43 +2,27 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const { signIn, loading } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Login form submitted:', { email: email.trim(), password: password ? '[HIDDEN]' : '[EMPTY]' });
-    setLoading(true);
     setError('');
 
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim(), password }),
-      });
-
-      const data = await response.json();
-      console.log('Login response:', data);
-
-      if (data.success) {
-        localStorage.setItem('currentUser', JSON.stringify(data.user));
-        console.log('User stored in localStorage, redirecting to dashboard');
-        // Use window.location.href for more reliable navigation
-        window.location.href = '/dashboard';
-      } else {
-        setError(data.error || 'Login failed');
-      }
-    } catch (err) {
-      console.error('Login error:', err);
-      setError('Network error. Please check your connection and try again.');
-    } finally {
-      setLoading(false);
+    const result = await signIn(email.trim(), password);
+    
+    if (result.error) {
+      setError(result.error);
+    } else {
+      console.log('Login successful, redirecting to dashboard');
+      window.location.href = '/dashboard';
     }
   };
 
