@@ -33,7 +33,7 @@ export async function POST(request) {
       return u.replace(/\/$/, '');
     })();
     
-    const logoUrl = `${normalizedBase}/assets/circle-pink.svg`;
+    const logoUrl = `${normalizedBase}/assets/logo-nav.svg`;
 
     const { data, error } = await resend.emails.send({
       from: 'Show Up or Else <noreply@showuporelse.com>',
