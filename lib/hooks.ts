@@ -7,7 +7,7 @@ export function useEvents(userEmail?: string) {
   return useQuery({
     queryKey: ['events', userEmail],
     queryFn: async () => {
-      if (!userEmail) return [];
+      if (!userEmail || !supabase) return [];
       
       const { data, error } = await supabase
         .from('events')
@@ -18,7 +18,7 @@ export function useEvents(userEmail?: string) {
       if (error) throw error;
       return data;
     },
-    enabled: !!userEmail,
+    enabled: !!userEmail && !!supabase,
   });
 }
 
@@ -26,6 +26,8 @@ export function useEvent(eventId: string) {
   return useQuery({
     queryKey: ['event', eventId],
     queryFn: async () => {
+      if (!supabase) throw new Error('Supabase not configured');
+      
       const { data, error } = await supabase
         .from('events')
         .select('*')
@@ -35,7 +37,7 @@ export function useEvent(eventId: string) {
       if (error) throw error;
       return data;
     },
-    enabled: !!eventId,
+    enabled: !!eventId && !!supabase,
   });
 }
 
@@ -44,6 +46,8 @@ export function useCreateEvent() {
   
   return useMutation({
     mutationFn: async (eventData: CreateEventInput) => {
+      if (!supabase) throw new Error('Supabase not configured');
+      
       const { data, error } = await supabase
         .from('events')
         .insert([{
@@ -69,6 +73,8 @@ export function useUpdateEvent() {
   
   return useMutation({
     mutationFn: async ({ id, ...eventData }: { id: string } & Partial<CreateEventInput>) => {
+      if (!supabase) throw new Error('Supabase not configured');
+      
       const { data, error } = await supabase
         .from('events')
         .update(eventData)
@@ -91,6 +97,8 @@ export function useDeleteEvent() {
   
   return useMutation({
     mutationFn: async (eventId: string) => {
+      if (!supabase) throw new Error('Supabase not configured');
+      
       const { error } = await supabase
         .from('events')
         .delete()
@@ -109,6 +117,8 @@ export function useEventRSVPs(eventId: string) {
   return useQuery({
     queryKey: ['rsvps', eventId],
     queryFn: async () => {
+      if (!supabase) throw new Error('Supabase not configured');
+      
       const { data, error } = await supabase
         .from('event_rsvps')
         .select('*')
@@ -118,7 +128,7 @@ export function useEventRSVPs(eventId: string) {
       if (error) throw error;
       return data;
     },
-    enabled: !!eventId,
+    enabled: !!eventId && !!supabase,
   });
 }
 
@@ -127,6 +137,8 @@ export function useRSVP() {
   
   return useMutation({
     mutationFn: async ({ eventId, ...rsvpData }: { eventId: string } & RSVPInput) => {
+      if (!supabase) throw new Error('Supabase not configured');
+      
       // Check if participant already exists
       if (rsvpData.email) {
         const { data: existing } = await supabase

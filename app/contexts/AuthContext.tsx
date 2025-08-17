@@ -32,6 +32,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -60,6 +65,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const fetchUserProfile = async (email: string) => {
+    if (!supabase) return;
+    
     try {
       const { data, error } = await supabase
         .from('users')
@@ -79,6 +86,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, name: string) => {
+    if (!supabase) {
+      return { error: { message: 'Supabase not configured' } };
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -92,6 +102,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
+    if (!supabase) {
+      return { error: { message: 'Supabase not configured' } };
+    }
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -100,10 +113,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!supabase) return;
     await supabase.auth.signOut();
   };
 
   const resetPassword = async (email: string) => {
+    if (!supabase) {
+      return { error: { message: 'Supabase not configured' } };
+    }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
@@ -111,6 +128,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updatePassword = async (password: string) => {
+    if (!supabase) {
+      return { error: { message: 'Supabase not configured' } };
+    }
     const { error } = await supabase.auth.updateUser({
       password,
     });
