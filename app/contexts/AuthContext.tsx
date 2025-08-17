@@ -42,8 +42,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    // If Supabase is not available, just set loading to false
+    // If Supabase is not available, just set loading to false immediately
     if (!supabase) {
+      console.log('Supabase not available, setting loading to false');
       setLoading(false);
       return;
     }
@@ -52,6 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const initializeAuth = async () => {
       try {
+        console.log('Initializing auth...');
         // Get initial session
         const { data: { session }, error } = await supabase.auth.getSession();
         
@@ -89,9 +91,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
+    // Add a timeout to prevent infinite loading
+    const timeoutId = setTimeout(() => {
+      console.log('Auth initialization timeout, setting loading to false');
+      setLoading(false);
+    }, 5000); // 5 second timeout
+
     initializeAuth();
 
     return () => {
+      clearTimeout(timeoutId);
       if (subscription) {
         subscription.unsubscribe();
       }
