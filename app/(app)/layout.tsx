@@ -183,7 +183,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             />
             
             {/* Mobile Menu */}
-            <div className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50 max-h-[calc(100vh-6rem)] overflow-y-auto">
+            <div className="md:hidden fixed top-16 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50 max-h-[calc(100vh-4rem)] overflow-y-auto">
               <div className="px-4 py-6 space-y-4">
                 {/* User Profile Section */}
                 <div className="flex items-center space-x-4 pb-6 border-b border-gray-200">

@@ -36,6 +36,8 @@ export default function IdeasPage() {
   const [error, setError] = useState('');
   const [hasGenerated, setHasGenerated] = useState(false);
   const [generationCount, setGenerationCount] = useState(0);
+  const [locationSuggestions, setLocationSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const MAX_GENERATIONS = 4;
 
   const handleFilterToggle = (filterId: string) => {
@@ -44,6 +46,89 @@ export default function IdeasPage() {
         ? prev.filter(f => f !== filterId)
         : [...prev, filterId]
     );
+  };
+
+  const handleLocationChange = (value: string) => {
+    setLocation(value);
+    
+    if (value.trim().length > 2) {
+      // Generate smart suggestions based on input
+      const suggestions = generateLocationSuggestions(value);
+      setLocationSuggestions(suggestions);
+      setShowSuggestions(true);
+    } else {
+      setLocationSuggestions([]);
+      setShowSuggestions(false);
+    }
+  };
+
+  const generateLocationSuggestions = (input: string): string[] => {
+    const popularLocations = [
+      'Auckland CBD', 'Auckland Central', 'Auckland North Shore', 'Auckland West', 'Auckland South',
+      'Wellington CBD', 'Wellington Waterfront', 'Wellington Central', 'Wellington East',
+      'Christchurch CBD', 'Christchurch Central', 'Christchurch North', 'Christchurch South',
+      'Queenstown', 'Queenstown Central', 'Queenstown Airport', 'Queenstown Hill',
+      'Dunedin', 'Dunedin Central', 'Dunedin North', 'Dunedin South',
+      'Hamilton', 'Hamilton Central', 'Hamilton East', 'Hamilton West',
+      'Tauranga', 'Tauranga Central', 'Tauranga Mount', 'Tauranga Papamoa',
+      'Napier', 'Napier Central', 'Napier Hill', 'Napier Waterfront',
+      'Rotorua', 'Rotorua Central', 'Rotorua Lake', 'Rotorua Thermal',
+      'New Plymouth', 'New Plymouth Central', 'New Plymouth Coastal',
+      'Palmerston North', 'Palmerston North Central', 'Palmerston North University',
+      'Whangarei', 'Whangarei Central', 'Whangarei Heads',
+      'Invercargill', 'Invercargill Central', 'Invercargill South',
+      'Nelson', 'Nelson Central', 'Nelson Tahunanui',
+      'Whanganui', 'Whanganui Central', 'Whanganui River',
+      'Gisborne', 'Gisborne Central', 'Gisborne Beach',
+      'Timaru', 'Timaru Central', 'Timaru Caroline Bay',
+      'Taupo', 'Taupo Central', 'Taupo Lake', 'Taupo Thermal',
+      'Whakatane', 'Whakatane Central', 'Whakatane Beach',
+      'Blenheim', 'Blenheim Central', 'Blenheim Wine',
+      'Oamaru', 'Oamaru Central', 'Oamaru Victorian',
+      'Greymouth', 'Greymouth Central', 'Greymouth Coast',
+      'Hokitika', 'Hokitika Central', 'Hokitika Beach',
+      'Wanaka', 'Wanaka Central', 'Wanaka Lake',
+      'Te Anau', 'Te Anau Central', 'Te Anau Lake',
+      'Picton', 'Picton Central', 'Picton Harbour',
+      'Kaikoura', 'Kaikoura Central', 'Kaikoura Coast',
+      'Franz Josef', 'Franz Josef Glacier', 'Franz Josef Village',
+      'Fox Glacier', 'Fox Glacier Village', 'Fox Glacier Terminal',
+      'Milford Sound', 'Milford Sound Terminal', 'Milford Sound Cruise',
+      'Mount Cook', 'Mount Cook Village', 'Mount Cook National Park',
+      'Lake Tekapo', 'Lake Tekapo Village', 'Lake Tekapo Observatory',
+      'Twizel', 'Twizel Central', 'Twizel Lake',
+      'Omarama', 'Omarama Central', 'Omarama Gliding',
+      'Cromwell', 'Cromwell Central', 'Cromwell Fruit',
+      'Arrowtown', 'Arrowtown Central', 'Arrowtown Historic',
+      'Glenorchy', 'Glenorchy Central', 'Glenorchy Lake',
+      'Te Anau', 'Te Anau Central', 'Te Anau Lake',
+      'Manapouri', 'Manapouri Central', 'Manapouri Lake',
+      'Stewart Island', 'Stewart Island Oban', 'Stewart Island Halfmoon Bay'
+    ];
+
+    const inputLower = input.toLowerCase();
+    const filtered = popularLocations.filter(location => 
+      location.toLowerCase().includes(inputLower)
+    );
+
+    // Sort by relevance (exact matches first, then partial matches)
+    const sorted = filtered.sort((a, b) => {
+      const aLower = a.toLowerCase();
+      const bLower = b.toLowerCase();
+      
+      if (aLower.startsWith(inputLower) && !bLower.startsWith(inputLower)) return -1;
+      if (bLower.startsWith(inputLower) && !aLower.startsWith(inputLower)) return 1;
+      
+      return aLower.localeCompare(bLower);
+    });
+
+    return sorted.slice(0, 8); // Return top 8 suggestions
+  };
+
+  const selectLocation = (selectedLocation: string) => {
+    setLocation(selectedLocation);
+    setShowSuggestions(false);
+    setLocationSuggestions([]);
   };
 
   const generateIdeas = async () => {
@@ -123,28 +208,24 @@ export default function IdeasPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => router.back()}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
-                aria-label="Go back"
-              >
-                <Icon name="arrow-right" size="lg" className="rotate-180" />
-              </button>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900">What are we doing?</h1>
-                <p className="text-sm sm:text-base text-gray-600">Get AI-powered activity ideas for your next adventure</p>
-              </div>
-            </div>
+      {/* Page Header */}
+      <div className="mb-6 sm:mb-8">
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => router.back()}
+            className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+            aria-label="Go back"
+          >
+            <Icon name="arrow-right" size="lg" className="rotate-180" />
+          </button>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">What are we doing?</h1>
+            <p className="text-sm sm:text-base text-gray-600">Get AI-powered activity ideas for your next adventure</p>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Left Panel - Input & Filters */}
           <div className="lg:col-span-1">
@@ -164,11 +245,39 @@ export default function IdeasPage() {
                     type="text"
                     id="location"
                     value={location}
-                    onChange={(e) => setLocation(e.target.value)}
+                    onChange={(e) => handleLocationChange(e.target.value)}
+                    onFocus={() => {
+                      if (locationSuggestions.length > 0) {
+                        setShowSuggestions(true);
+                      }
+                    }}
+                    onBlur={() => {
+                      // Delay hiding suggestions to allow clicking on them
+                      setTimeout(() => setShowSuggestions(false), 200);
+                    }}
                     placeholder="e.g., Auckland CBD, Wellington Waterfront, Queenstown"
                     className="w-full pl-10 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
                     aria-describedby="location-help"
+                    autoComplete="off"
                   />
+                  
+                  {/* Location Suggestions Dropdown */}
+                  {showSuggestions && locationSuggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-60 overflow-y-auto">
+                      {locationSuggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => selectLocation(suggestion)}
+                          className="w-full px-4 py-3 text-left hover:bg-pink-50 focus:bg-pink-50 focus:outline-none transition-colors first:rounded-t-xl last:rounded-b-xl"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Icon name="map-pin" size="sm" className="text-gray-400 flex-shrink-0" />
+                            <span className="text-gray-700">{suggestion}</span>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <p id="location-help" className="mt-2 text-xs text-gray-500">
                   Enter a location to get personalized recommendations
@@ -179,7 +288,7 @@ export default function IdeasPage() {
                     {['Auckland CBD', 'Wellington', 'Christchurch', 'Queenstown', 'Dunedin', 'Hamilton', 'Tauranga', 'Napier'].map((suggestion) => (
                       <button
                         key={suggestion}
-                        onClick={() => setLocation(suggestion)}
+                        onClick={() => selectLocation(suggestion)}
                         className="text-xs bg-gray-100 hover:bg-pink-100 text-gray-700 hover:text-pink-700 px-3 py-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-1"
                         aria-label={`Select ${suggestion} as location`}
                       >
