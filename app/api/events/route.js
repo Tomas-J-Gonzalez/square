@@ -218,7 +218,6 @@ async function createEvent(body) {
     }
 
     const insertData = {
-      id: `event_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       title: eventData.title,
       date: eventData.date,
       time: eventData.time,
@@ -227,7 +226,6 @@ async function createEvent(body) {
       event_details: eventData.eventDetails || null,
       decision_mode: eventData.decisionMode,
       punishment: eventData.punishment,
-      punishment_severity: eventData.punishmentSeverity || 5,
       invited_by: eventData.invited_by,
       status: 'active',
       access: eventData.access || 'private',

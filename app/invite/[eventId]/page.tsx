@@ -296,10 +296,10 @@ export default function InvitePage() {
     const link = document.createElement('a');
     link.href = url;
     
-    // Create a safe filename with proper extension
+    // Create a safe filename with proper iCal extension
     const safeTitle = event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
     const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-    link.download = `${safeTitle}_${timestamp}.calendar.ics`;
+    link.download = `${safeTitle}_${timestamp}.ics`;
     
     document.body.appendChild(link);
     link.click();

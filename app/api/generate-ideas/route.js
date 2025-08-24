@@ -92,6 +92,15 @@ async function getNearbyPlaces(coordinates, filters) {
   const places = [];
   const radius = 5000; // 5km radius
   
+  // Inappropriate venue keywords to filter out
+  const inappropriateKeywords = [
+    'strip', 'stripper', 'brothel', 'escort', 'adult', 'sex', 'massage parlour',
+    'gentlemen', 'gentlemens', 'adult entertainment', 'adult club', 'strip club',
+    'calendar girls', 'spearmint rhino', 'mens club', 'mens bar', 'adult bar',
+    'adult venue', 'adult establishment', 'adult service', 'adult massage',
+    'adult entertainment', 'adult club', 'adult bar', 'adult venue'
+  ];
+  
   // Map our filters to Google Places types
   const placeTypes = {
     restaurant: ['restaurant', 'food'],
@@ -115,9 +124,27 @@ async function getNearbyPlaces(coordinates, filters) {
         const data = await response.json();
         
         if (data.results) {
-          // Get detailed information for each place
+          // Filter out inappropriate venues
+          const filteredResults = data.results.filter(place => {
+            const placeName = place.name.toLowerCase();
+            const placeTypes = place.types || [];
+            
+            // Check if place name contains inappropriate keywords
+            const hasInappropriateName = inappropriateKeywords.some(keyword => 
+              placeName.includes(keyword.toLowerCase())
+            );
+            
+            // Check if place types indicate adult entertainment
+            const hasInappropriateTypes = placeTypes.some(type => 
+              type.includes('adult') || type.includes('strip') || type.includes('brothel')
+            );
+            
+            return !hasInappropriateName && !hasInappropriateTypes;
+          });
+          
+          // Get detailed information for each filtered place
           const detailedPlaces = await Promise.all(
-            data.results.slice(0, 3).map(async (place) => {
+            filteredResults.slice(0, 3).map(async (place) => {
               const details = await getPlaceDetails(place.place_id);
               return {
                 ...place,

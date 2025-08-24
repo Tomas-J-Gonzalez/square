@@ -30,8 +30,8 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               </Link>
             </div>
             
-            {/* Center Navigation Links */}
-            <nav className="flex items-center space-x-8">
+            {/* Center Navigation Links - Hidden for landing page */}
+            {/* <nav className="flex items-center space-x-8">
               <Link 
                 href="#features" 
                 className="text-sm font-medium text-gray-700 hover:text-pink-600 transition-colors duration-200"
@@ -56,7 +56,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               >
                 Privacy
               </Link>
-            </nav>
+            </nav> */}
 
             {/* Right side - Login and Sign Up */}
             <div className="flex items-center space-x-4">
@@ -107,8 +107,8 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
       {mobileMenuOpen && (
         <div className="md:hidden bg-white/95 backdrop-blur-sm border-b border-gray-200/50 shadow-lg">
           <div className="px-4 py-6 space-y-4">
-            {/* Mobile Navigation Links */}
-            <div className="space-y-3">
+            {/* Mobile Navigation Links - Hidden for landing page */}
+            {/* <div className="space-y-3">
               <Link 
                 href="#features" 
                 className="block text-sm font-medium text-gray-700 hover:text-pink-600 transition-colors duration-200 py-2"
@@ -137,7 +137,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               >
                 Privacy
               </Link>
-            </div>
+            </div> */}
             
             {/* Mobile Action Buttons */}
             <div className="pt-4 border-t border-gray-200/50 space-y-3">
