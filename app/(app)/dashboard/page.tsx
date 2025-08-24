@@ -92,7 +92,7 @@ export default function DashboardPage() {
         {events.length > 0 && (
           <Card href={`/dashboard/event/${events[0].id}`}>
             <CardIcon backgroundColor="#ec4899">
-              <Icon name="users" size="lg" />
+              <Icon name="calendar" size="lg" />
             </CardIcon>
             <CardTitle>My Events</CardTitle>
             <CardDescription>
@@ -105,28 +105,28 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        {/* What are we doing? Card */}
+        {/* Past Events Card */}
+        <Card href="/dashboard/past-events">
+          <CardIcon backgroundColor="#ec4899">
+            <Icon name="clock" size="lg" />
+          </CardIcon>
+          <CardTitle>Past Events</CardTitle>
+          <CardDescription>View completed events</CardDescription>
+          <CardAction>
+            View Past Events
+            <Icon name="arrow-right" size="sm" className="card-action-icon" />
+          </CardAction>
+        </Card>
+
+        {/* What are we doing? Card - Moved to last position */}
         <Card href="/dashboard/ideas">
-          <CardIcon backgroundColor="#8B5CF6">
+          <CardIcon backgroundColor="#ec4899">
             <Icon name="lightbulb" size="lg" />
           </CardIcon>
           <CardTitle>What are we doing?</CardTitle>
           <CardDescription>Get AI-powered activity ideas</CardDescription>
           <CardAction>
             Generate Ideas
-            <Icon name="arrow-right" size="sm" className="card-action-icon" />
-          </CardAction>
-        </Card>
-
-        {/* Past Events Card */}
-        <Card href="/dashboard/past-events">
-          <CardIcon backgroundColor="#ec4899">
-            <Icon name="calendar" size="lg" />
-          </CardIcon>
-          <CardTitle>Past Events</CardTitle>
-          <CardDescription>View completed events</CardDescription>
-          <CardAction>
-            View Past Events
             <Icon name="arrow-right" size="sm" className="card-action-icon" />
           </CardAction>
         </Card>

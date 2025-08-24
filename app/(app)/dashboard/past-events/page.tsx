@@ -72,9 +72,19 @@ export default function PastEventsPage() {
   };
 
   const getFilteredEvents = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
     switch (activeTab) {
       case 'hosted':
-        return events.filter(event => event.invited_by === user?.email && event.status === 'active');
+        // Show only past events that were hosted by the user (not current/future events)
+        return events.filter(event => {
+          const eventDate = new Date(event.date);
+          const eventDateTime = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+          return event.invited_by === user?.email && 
+                 event.status === 'active' && 
+                 eventDateTime < today;
+        });
       case 'cancelled':
         return events.filter(event => event.invited_by === user?.email && event.status === 'cancelled');
       case 'completed':
@@ -85,9 +95,19 @@ export default function PastEventsPage() {
   };
 
   const getTabCount = (tab: EventTab) => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
     switch (tab) {
       case 'hosted':
-        return events.filter(event => event.invited_by === user?.email && event.status === 'active').length;
+        // Count only past events that were hosted by the user
+        return events.filter(event => {
+          const eventDate = new Date(event.date);
+          const eventDateTime = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+          return event.invited_by === user?.email && 
+                 event.status === 'active' && 
+                 eventDateTime < today;
+        }).length;
       case 'cancelled':
         return events.filter(event => event.invited_by === user?.email && event.status === 'cancelled').length;
       case 'completed':

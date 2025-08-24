@@ -206,172 +206,293 @@ export default function InvitePage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">You're Invited!</h1>
-          <p className="text-gray-600">Hosted by {event.host_name}</p>
-        </div>
+  const generateICal = () => {
+    const eventDate = new Date(event.date + 'T' + event.time);
+    const endDate = new Date(eventDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
+    
+    const icalContent = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Show Up or Else//Event//EN',
+      'BEGIN:VEVENT',
+      `UID:${event.id}@showuporelse.com`,
+      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      `DTSTART:${eventDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      `DTEND:${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      `SUMMARY:${event.title}`,
+      `DESCRIPTION:${event.event_details || 'Event invitation from Show Up or Else'}`,
+      `LOCATION:${event.location}`,
+      `ORGANIZER;CN=${event.host_name}:mailto:${event.invited_by}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
 
-        {/* Event Details */}
-        <div className="bg-white shadow rounded-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">{event.title}</h2>
-          
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <Icon name="calendar" size="md" className="text-gray-400 mr-3" />
-              <div>
-                <p className="font-medium text-gray-900">{formatDate(event.date)}</p>
-                <p className="text-gray-600">{formatTime(event.time)}</p>
-              </div>
+    const blob = new Blob([icalContent], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-gradient-to-br from-pink-100/20 to-purple-100/20 opacity-50"></div>
+      
+      <div className="relative z-10 py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header with Logo */}
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-6">
+              <img 
+                src="/assets/circle-pink.svg" 
+                alt="Show up or Else" 
+                className="h-16 w-16"
+              />
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-3">
+              You're Invited!
+            </h1>
+            <p className="text-lg text-gray-600">
+              Hosted by <span className="font-semibold text-pink-600">{event.host_name}</span>
+            </p>
+          </div>
+
+          {/* Event Details Card */}
+          <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 mb-8 border border-white/20">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-gray-900">{event.title}</h2>
+              <button
+                onClick={generateICal}
+                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                title="Add to Calendar"
+              >
+                <Icon name="calendar-download" size="sm" className="mr-2" />
+                Add to Calendar
+              </button>
             </div>
             
-            <div className="flex items-center">
-              <Icon name="map-pin" size="md" className="text-gray-400 mr-3" />
-              <div>
-                <p className="font-medium text-gray-900">{event.location}</p>
-                <p className="text-gray-600 capitalize">{event.event_type} event</p>
+            <div className="grid md:grid-cols-2 gap-6 mb-6">
+              <div className="flex items-center p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl">
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                  <Icon name="calendar" size="lg" className="text-pink-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{formatDate(event.date)}</p>
+                  <p className="text-gray-600">{formatTime(event.time)}</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl">
+                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                  <Icon name="map-pin" size="lg" className="text-pink-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{event.location}</p>
+                  <p className="text-gray-600 capitalize">{event.event_type} event</p>
+                </div>
               </div>
             </div>
 
             {event.event_details && (
-              <div>
-                <p className="text-gray-900">{event.event_details}</p>
+              <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+                <h4 className="font-semibold text-gray-900 mb-2">Event Details</h4>
+                <p className="text-gray-700 leading-relaxed">{event.event_details}</p>
               </div>
             )}
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h4 className="font-medium text-yellow-800 mb-2">Punishment for Flakers</h4>
-              <p className="text-yellow-700">{event.punishment}</p>
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6">
+              <div className="flex items-center mb-3">
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center mr-3">
+                  <Icon name="star" size="sm" className="text-amber-600" />
+                </div>
+                <h4 className="font-semibold text-amber-800">Punishment for Flakers</h4>
+              </div>
+              <p className="text-amber-700 leading-relaxed">{event.punishment}</p>
             </div>
           </div>
-        </div>
 
-        {/* RSVP Form */}
-        <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-6">RSVP</h3>
-          
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded mb-6">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="form-group">
-              <label htmlFor="name" className="form-label">
-                Your Name <span className="text-red-500" aria-label="required">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                required
-                value={formData.name}
-                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="form-input"
-                placeholder="Enter your full name"
-                aria-describedby="name-help"
-                disabled={submitting}
-              />
-              <p id="name-help" className="mt-1 text-xs text-gray-500">
-                Enter your name as you'd like it to appear on the guest list
-              </p>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
-                Your Email <span className="text-gray-500 text-xs">(Optional)</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="form-input"
-                placeholder="Enter your email address (optional)"
-                aria-describedby="email-help"
-                disabled={submitting}
-              />
-              <p id="email-help" className="mt-1 text-xs text-gray-500">
-                Optional: We'll use this to send you event updates
-              </p>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">
-                Will you attend? <span className="text-red-500" aria-label="required">*</span>
-              </label>
-              <div className="space-y-3" role="radiogroup" aria-describedby="attendance-help">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="willAttend"
-                    value="true"
-                    checked={formData.willAttend}
-                    onChange={() => setFormData(prev => ({ ...prev, willAttend: true }))}
-                    className="mr-3"
-                  />
-                  <div className="flex items-center">
-                    <Icon name="check" size="sm" className="text-green-600 mr-2" />
-                    <span className="font-medium text-green-700">Yes, I'll be there!</span>
-                  </div>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="willAttend"
-                    value="false"
-                    checked={!formData.willAttend}
-                    onChange={() => setFormData(prev => ({ ...prev, willAttend: false }))}
-                    className="mr-3"
-                  />
-                  <div className="flex items-center">
-                    <Icon name="x" size="sm" className="text-red-600 mr-2" />
-                    <span className="font-medium text-red-700">Sorry, I can't make it</span>
-                  </div>
-                </label>
+          {/* RSVP Form */}
+          <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 border border-white/20">
+            <div className="flex items-center mb-6">
+              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+                <Icon name="check" size="lg" className="text-pink-600" />
               </div>
-              <p id="attendance-help" className="mt-1 text-xs text-gray-500">
-                Let the host know if you can make it to the event
-              </p>
+              <h3 className="text-2xl font-bold text-gray-900">RSVP</h3>
             </div>
+            
+            {error && (
+              <div className="bg-red-50/80 border border-red-200 text-red-700 px-6 py-4 rounded-xl backdrop-blur-sm mb-6">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center mr-3">
+                    <Icon name="x" size="sm" className="text-red-600" />
+                  </div>
+                  <p className="font-semibold">{error}</p>
+                </div>
+              </div>
+            )}
 
-            <div className="form-group">
-              <label htmlFor="message" className="form-label">Message (Optional)</label>
-              <textarea
-                id="message"
-                value={formData.message}
-                onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                className="form-input"
-                rows={3}
-                placeholder="Add a personal message or reason..."
-                aria-describedby="message-help"
-                disabled={submitting}
-              />
-              <p id="message-help" className="mt-1 text-xs text-gray-500">
-                Optional: Add a personal note or reason for your response
-              </p>
-            </div>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
+                  Your Name <span className="text-red-500" aria-label="required">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    id="name"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500"
+                    placeholder="Enter your full name"
+                    disabled={submitting}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  Enter your name as you'd like it to appear on the guest list
+                </p>
+              </div>
 
-            <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => router.push('/')}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                loading={submitting}
-                disabled={!formData.name}
-              >
-                Submit RSVP
-              </Button>
-            </div>
-          </form>
+              <div className="space-y-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
+                  Your Email <span className="text-gray-500 text-xs">(Optional)</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                  </div>
+                  <input
+                    type="email"
+                    id="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                    className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500"
+                    placeholder="Enter your email address (optional)"
+                    disabled={submitting}
+                  />
+                </div>
+                <p className="text-xs text-gray-500">
+                  Optional: We'll use this to send you event updates
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Will you attend? <span className="text-red-500" aria-label="required">*</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="radiogroup">
+                  <label className="relative">
+                    <input
+                      type="radio"
+                      name="willAttend"
+                      value="true"
+                      checked={formData.willAttend}
+                      onChange={() => setFormData(prev => ({ ...prev, willAttend: true }))}
+                      className="sr-only"
+                    />
+                    <div className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                      formData.willAttend 
+                        ? 'border-green-500 bg-green-50 shadow-lg' 
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}>
+                      <div className="flex items-center">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 ${
+                          formData.willAttend ? 'border-green-500 bg-green-500' : 'border-gray-300'
+                        }`}>
+                          {formData.willAttend && (
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                          )}
+                        </div>
+                        <div className="flex items-center">
+                          <Icon name="check" size="sm" className="text-green-600 mr-2" />
+                          <span className="font-semibold text-green-700">Yes, I'll be there!</span>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                  
+                  <label className="relative">
+                    <input
+                      type="radio"
+                      name="willAttend"
+                      value="false"
+                      checked={!formData.willAttend}
+                      onChange={() => setFormData(prev => ({ ...prev, willAttend: false }))}
+                      className="sr-only"
+                    />
+                    <div className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                      !formData.willAttend 
+                        ? 'border-red-500 bg-red-50 shadow-lg' 
+                        : 'border-gray-200 bg-white hover:border-gray-300'
+                    }`}>
+                      <div className="flex items-center">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center mr-3 ${
+                          !formData.willAttend ? 'border-red-500 bg-red-500' : 'border-gray-300'
+                        }`}>
+                          {!formData.willAttend && (
+                            <div className="w-2 h-2 bg-white rounded-full"></div>
+                          )}
+                        </div>
+                        <div className="flex items-center">
+                          <Icon name="x" size="sm" className="text-red-600 mr-2" />
+                          <span className="font-semibold text-red-700">Sorry, I can't make it</span>
+                        </div>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
+                  Message <span className="text-gray-500 text-xs">(Optional)</span>
+                </label>
+                <textarea
+                  id="message"
+                  value={formData.message}
+                  onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                  className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500"
+                  rows={3}
+                  placeholder="Add a personal message or reason..."
+                  disabled={submitting}
+                />
+                <p className="text-xs text-gray-500">
+                  Optional: Add a personal note or reason for your response
+                </p>
+              </div>
+
+              <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => router.push('/')}
+                  className="w-full sm:w-auto"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  loading={submitting}
+                  disabled={!formData.name}
+                  className="w-full sm:w-auto"
+                >
+                  Submit RSVP
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
 
