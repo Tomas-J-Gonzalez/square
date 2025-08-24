@@ -25,7 +25,7 @@ export default async function handler(req, res) {
 
     if (process.env.RESEND_API_KEY) {
       // Use a text-based logo instead of SVG for better email client compatibility
-      const logoText = "Show Up or Else";
+      // const logoText = "Show Up or Else"; // Removed unused variable
       await resend.emails.send({
         from: 'Show Up or Else <noreply@showuporelse.com>',
         to: email,

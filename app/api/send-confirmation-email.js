@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     const confirmationUrl = `${normalizedBase}/confirm-email?token=${encodeURIComponent(token)}`;
     
     // Use a text-based logo instead of SVG for better email client compatibility
-    const logoText = "Show Up or Else";
+    // const logoText = "Show Up or Else"; // Removed unused variable
 
     // Note: Tokens are now stored in Supabase during user registration
     // This endpoint is called by the registration API to send the email

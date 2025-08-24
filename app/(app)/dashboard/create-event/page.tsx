@@ -16,6 +16,8 @@ interface EventFormData {
   punishment: string;
   customPunishment: string;
   punishmentSeverity: number;
+  access: 'public' | 'private';
+  pageVisibility: 'public' | 'private';
 }
 
 const PUNISHMENT_OPTIONS = [
@@ -43,7 +45,9 @@ export default function CreateEventPage() {
     eventDetails: '',
     punishment: '',
     customPunishment: '',
-    punishmentSeverity: 5
+    punishmentSeverity: 5,
+    access: 'private',
+    pageVisibility: 'private'
   });
 
   // Load pre-filled data from idea generation if available
@@ -132,7 +136,9 @@ export default function CreateEventPage() {
         decisionMode: 'single_person', // Default for now
         punishment: finalPunishment,
         punishmentSeverity: formData.punishmentSeverity,
-        invited_by: user.email
+        invited_by: user.email,
+        access: formData.access,
+        pageVisibility: formData.pageVisibility
       };
 
       const response = await fetch('/api/events', {
@@ -388,6 +394,53 @@ export default function CreateEventPage() {
               <div className="flex justify-between text-xs text-gray-500 mt-1">
                 <span>Very Easy</span>
                 <span>Very Hard</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Access Control Section */}
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-gray-900">Event Access Settings</h2>
+            
+            {/* RSVP Access Control */}
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  id="publicRsvp"
+                  checked={formData.access === 'public'}
+                  onChange={(e) => handleInputChange('access', e.target.checked ? 'public' : 'private')}
+                  className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded mt-1"
+                />
+                <div className="flex-1">
+                  <label htmlFor="publicRsvp" className="text-sm font-medium text-gray-700">
+                    Public Event (anyone with link can RSVP)
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    When unchecked, only invited participants can RSVP to your event.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Event Page Visibility Control */}
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  id="publicPage"
+                  checked={formData.pageVisibility === 'public'}
+                  onChange={(e) => handleInputChange('pageVisibility', e.target.checked ? 'public' : 'private')}
+                  className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded mt-1"
+                />
+                <div className="flex-1">
+                  <label htmlFor="publicPage" className="text-sm font-medium text-gray-700">
+                    Create Public Event Page (anyone with link can view details)
+                  </label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    When unchecked, only invited participants and you can view the event page.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

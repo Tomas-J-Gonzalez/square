@@ -14,7 +14,13 @@ module.exports = {
     'plugin:jsx-a11y/recommended',
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
-  parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
+  parserOptions: { 
+    ecmaVersion: 'latest', 
+    sourceType: 'module',
+    ecmaFeatures: {
+      jsx: true
+    }
+  },
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh', 'jsx-a11y'],
   rules: {
@@ -35,4 +41,23 @@ module.exports = {
     'prefer-const': 'error',
     'no-var': 'error',
   },
+  overrides: [
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      parser: '@typescript-eslint/parser',
+      extends: [
+        'plugin:@typescript-eslint/recommended',
+        'plugin:react/recommended',
+        'plugin:react/jsx-runtime',
+        'plugin:react-hooks/recommended',
+        'plugin:jsx-a11y/recommended',
+      ],
+      plugins: ['@typescript-eslint', 'react-refresh', 'jsx-a11y'],
+      rules: {
+        '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+        '@typescript-eslint/no-explicit-any': 'warn',
+        'no-unused-vars': 'off', // Turn off base rule as it conflicts with TypeScript rule
+      }
+    }
+  ]
 }

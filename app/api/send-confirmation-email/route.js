@@ -26,15 +26,15 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    const rawBase = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || 'localhost:3000';
-    const normalizedBase = (() => {
-      let u = rawBase.trim();
-      if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
-      return u.replace(/\/$/, '');
-    })();
+    // const rawBase = process.env.NEXT_PUBLIC_SITE_URL || process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL || 'localhost:3000'; // Removed unused variable
+    // const normalizedBase = (() => {
+    //   let u = rawBase.trim();
+    //   if (!/^https?:\/\//i.test(u)) u = `https://${u}`;
+    //   return u.replace(/\/$/, '');
+    // })(); // Removed unused variable
     
     // Use a text-based logo instead of SVG for better email client compatibility
-    const logoText = "Show Up or Else";
+    // const logoText = "Show Up or Else"; // Removed unused variable
 
     const { data, error } = await resend.emails.send({
       from: 'Show Up or Else <noreply@showuporelse.com>',

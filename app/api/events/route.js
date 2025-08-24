@@ -29,7 +29,7 @@ export async function POST(request) {
     const body = await request.json();
     console.log('Events API - Request body:', body);
     
-    const { action, eventData, eventId, updates } = body;
+    const { action } = body;
 
     if (!action) {
       console.error('Events API - No action provided');
@@ -55,6 +55,16 @@ export async function POST(request) {
         return await cancelEvent(body);
       case 'completeEvent':
         return await completeEvent(body);
+      case 'validateRsvpAccess':
+        return await validateRsvpAccess(body);
+      case 'generateRsvpToken':
+        return await generateRsvpToken(body);
+      case 'validateEventPageAccess':
+        return await validateEventPageAccess(body);
+      case 'addEventInvitee':
+        return await addEventInvitee(body);
+      case 'getEventInvitees':
+        return await getEventInvitees(body);
       default:
         console.error('Events API - Invalid action:', action);
         return NextResponse.json({ success: false, error: 'Invalid action' }, { status: 400 });
@@ -219,7 +229,9 @@ async function createEvent(body) {
       punishment: eventData.punishment,
       punishment_severity: eventData.punishmentSeverity || 5,
       invited_by: eventData.invited_by,
-      status: 'active'
+      status: 'active',
+      access: eventData.access || 'private',
+      page_visibility: eventData.pageVisibility || 'private'
     };
 
     console.log('Inserting event data:', insertData);
@@ -401,6 +413,154 @@ async function getPastEvents(body) {
     return NextResponse.json({ success: true, events: eventsWithFlakes });
   } catch (error) {
     console.error('Error in getPastEvents:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+// New functions for access control
+
+async function validateRsvpAccess(body) {
+  try {
+    const { eventId, token, email } = body;
+    
+    if (!eventId) {
+      return NextResponse.json({ success: false, error: 'Event ID required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseClient();
+    
+    // Call the database function to validate access
+    const { data, error } = await supabase.rpc('validate_rsvp_access', {
+      event_id_param: eventId,
+      token_param: token || null,
+      email_param: email || null
+    });
+
+    if (error) {
+      console.error('Error validating RSVP access:', error);
+      return NextResponse.json({ success: false, error: 'Failed to validate access' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, hasAccess: data });
+  } catch (error) {
+    console.error('Error in validateRsvpAccess:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+async function generateRsvpToken(body) {
+  try {
+    const { eventId, email } = body;
+    
+    if (!eventId) {
+      return NextResponse.json({ success: false, error: 'Event ID required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseClient();
+    
+    // Call the database function to generate token
+    const { data, error } = await supabase.rpc('generate_rsvp_token', {
+      event_id_param: eventId,
+      email_param: email || null
+    });
+
+    if (error) {
+      console.error('Error generating RSVP token:', error);
+      return NextResponse.json({ success: false, error: 'Failed to generate token' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, token: data });
+  } catch (error) {
+    console.error('Error in generateRsvpToken:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+async function validateEventPageAccess(body) {
+  try {
+    const { eventId, userEmail } = body;
+    
+    if (!eventId) {
+      return NextResponse.json({ success: false, error: 'Event ID required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseClient();
+    
+    // Call the database function to validate page access
+    const { data, error } = await supabase.rpc('validate_event_page_access', {
+      event_id_param: eventId,
+      user_email: userEmail || null
+    });
+
+    if (error) {
+      console.error('Error validating event page access:', error);
+      return NextResponse.json({ success: false, error: 'Failed to validate access' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, hasAccess: data });
+  } catch (error) {
+    console.error('Error in validateEventPageAccess:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+async function addEventInvitee(body) {
+  try {
+    const { eventId, email } = body;
+    
+    if (!eventId || !email) {
+      return NextResponse.json({ success: false, error: 'Event ID and email required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseClient();
+    
+    // Add invitee to the event
+    const { data, error } = await supabase
+      .from('event_invitees')
+      .insert({
+        event_id: eventId,
+        email: email
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding event invitee:', error);
+      return NextResponse.json({ success: false, error: 'Failed to add invitee' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, invitee: data });
+  } catch (error) {
+    console.error('Error in addEventInvitee:', error);
+    return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+async function getEventInvitees(body) {
+  try {
+    const { eventId } = body;
+    
+    if (!eventId) {
+      return NextResponse.json({ success: false, error: 'Event ID required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseClient();
+    
+    // Get all invitees for the event
+    const { data, error } = await supabase
+      .from('event_invitees')
+      .select('*')
+      .eq('event_id', eventId)
+      .order('invited_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching event invitees:', error);
+      return NextResponse.json({ success: false, error: 'Failed to fetch invitees' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, invitees: data || [] });
+  } catch (error) {
+    console.error('Error in getEventInvitees:', error);
     return NextResponse.json({ success: false, error: 'Internal server error' }, { status: 500 });
   }
 }

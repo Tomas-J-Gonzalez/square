@@ -18,7 +18,7 @@ export async function GET() {
     const supabase = createClient(supabaseUrl, supabaseKey);
     
     // Test database connection by trying to count users
-    const { data, error, count } = await supabase
+    const { error, count } = await supabase
       .from('users')
       .select('*', { count: 'exact', head: true });
 

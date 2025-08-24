@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     const site = process.env.NEXT_PUBLIC_SITE_URL || `https://${process.env.VERCEL_URL}` || 'http://localhost:3000';
     // Use a text-based logo instead of SVG for better email client compatibility
-    const logoText = "Show Up or Else";
+    // const logoText = "Show Up or Else"; // Removed unused variable
 
     let subject, htmlContent;
     

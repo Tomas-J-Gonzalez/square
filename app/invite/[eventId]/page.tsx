@@ -32,6 +32,9 @@ export default function InvitePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [accessDenied, setAccessDenied] = useState(false);
+  const [rsvpToken, setRsvpToken] = useState<string | null>(null);
+  const [showCalendarOptions, setShowCalendarOptions] = useState(false);
   const successModal = useModal();
   const [formData, setFormData] = useState({
     name: '',
@@ -92,6 +95,11 @@ export default function InvitePage() {
 
   const fetchEvent = async () => {
     try {
+      // Get URL parameters for token
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      setRsvpToken(token);
+
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -100,7 +108,27 @@ export default function InvitePage() {
 
       const data = await response.json();
       if (data.success) {
-        setEvent(data.event);
+        const eventData = data.event;
+        setEvent(eventData);
+
+        // Validate page access for private events
+        if (eventData.page_visibility === 'private') {
+          const accessResponse = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              action: 'validateEventPageAccess', 
+              eventId,
+              userEmail: formData.email || null
+            }),
+          });
+
+          const accessData = await accessResponse.json();
+          if (!accessData.success || !accessData.hasAccess) {
+            setAccessDenied(true);
+            setError('You don\'t have access to this event. Please contact the host for an invitation.');
+          }
+        }
       } else {
         setError(data.error || 'Event not found');
       }
@@ -122,7 +150,8 @@ export default function InvitePage() {
         body: JSON.stringify({
           action: 'rsvp',
           eventId,
-          rsvpData: formData
+          rsvpData: formData,
+          token: rsvpToken
         }),
       });
 
@@ -134,6 +163,9 @@ export default function InvitePage() {
           router.push('/');
         }, 2000);
       } else {
+        if (data.accessDenied) {
+          setAccessDenied(true);
+        }
         setError(data.error || 'Failed to submit RSVP');
       }
     } catch (error) {
@@ -206,7 +238,22 @@ export default function InvitePage() {
     );
   }
 
-  const [showCalendarOptions, setShowCalendarOptions] = useState(false);
+  if (accessDenied) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Icon name="lock" size="xl" className="mx-auto text-red-400 mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Access Denied</h3>
+          <p className="text-gray-600 mb-6">
+            This event is invite-only. Please contact the host for an invitation.
+          </p>
+          <Button onClick={() => router.push('/')}>
+            Go Home
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const generateICal = (format: 'gmail' | 'outlook' = 'gmail') => {
     const eventDate = new Date(event.date + 'T' + event.time);

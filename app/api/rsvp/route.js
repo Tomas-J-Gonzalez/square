@@ -171,13 +171,33 @@ async function getParticipants(body) {
 
 async function rsvp(body) {
   try {
-    const { eventId, rsvpData } = body;
+    const { eventId, rsvpData, token } = body;
     
     if (!eventId || !rsvpData) {
       return NextResponse.json({ success: false, error: 'Event ID and RSVP data required' }, { status: 400 });
     }
 
     const supabase = getSupabaseClient();
+    
+    // Validate RSVP access for private events
+    const { data: accessValidation, error: accessError } = await supabase.rpc('validate_rsvp_access', {
+      event_id_param: eventId,
+      token_param: token || null,
+      email_param: rsvpData.email || null
+    });
+
+    if (accessError) {
+      console.error('Error validating RSVP access:', accessError);
+      return NextResponse.json({ success: false, error: 'Failed to validate access' }, { status: 500 });
+    }
+
+    if (!accessValidation) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'This event is invite-only. Please contact the host for an invitation.',
+        accessDenied: true
+      }, { status: 403 });
+    }
     
     // If email is provided, check if participant already exists for this event
     let existingParticipant = null;
