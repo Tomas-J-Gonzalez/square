@@ -29,7 +29,7 @@ export async function POST(request) {
     const body = await request.json();
     console.log('RSVP API - Request body:', body);
     
-    const { action, eventId, participantData, participantId } = body;
+    const { action } = body;
 
     if (!action) {
       console.error('RSVP API - No action provided');

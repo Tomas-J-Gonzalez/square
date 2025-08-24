@@ -65,7 +65,7 @@ export default async function handler(req, res) {
                   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                     <tr>
                       <td align="center" style="padding-bottom: 20px;">
-                        <img src="${logoUrl}" alt="Show Up or Else Logo" width="80" height="80" style="display: block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 0;" />
+                        <img src="${process.env.NEXT_PUBLIC_SITE_URL}/assets/circle-pink.svg" alt="Show Up or Else Logo" width="80" height="80" style="display: block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 0;" />
                       </td>
                     </tr>
                     <tr>
@@ -218,7 +218,7 @@ export default async function handler(req, res) {
                   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                     <tr>
                       <td align="center" style="padding-bottom: 20px;">
-                        <img src="${logoUrl}" alt="Show Up or Else Logo" width="80" height="80" style="display: block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 0;" />
+                        <img src="${process.env.NEXT_PUBLIC_SITE_URL}/assets/circle-pink.svg" alt="Show Up or Else Logo" width="80" height="80" style="display: block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 0;" />
                       </td>
                     </tr>
                     <tr>
@@ -371,7 +371,7 @@ export default async function handler(req, res) {
                   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                     <tr>
                       <td align="center" style="padding-bottom: 20px;">
-                        <img src="${logoUrl}" alt="Show Up or Else Logo" width="80" height="80" style="display: block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 0;" />
+                        <img src="${process.env.NEXT_PUBLIC_SITE_URL}/assets/circle-pink.svg" alt="Show Up or Else Logo" width="80" height: 80" style="display: block; width: 80px; height: 80px; border-radius: 12px; background-color: rgba(255, 255, 255, 0.1); padding: 8px; border: 0;" />
                       </td>
                     </tr>
                     <tr>

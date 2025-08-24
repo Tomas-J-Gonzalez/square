@@ -190,11 +190,11 @@ export default function CreateEventPage() {
   };
 
   return (
-    <div className="px-8 sm:px-16 lg:px-32 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="text-left">
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">Create New Event</h1>
-        <p className="text-lg text-gray-600">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">Create New Event</h1>
+        <p className="text-base sm:text-lg text-gray-600">
           Plan your next gathering and set up the rules for participants.
         </p>
       </div>

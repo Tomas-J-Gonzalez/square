@@ -1,9 +1,13 @@
 module.exports = {
   root: true,
-  env: { browser: true, es2020: true },
+  env: { 
+    browser: true, 
+    es2020: true,
+    node: true,
+    commonjs: true
+  },
   extends: [
     'eslint:recommended',
-    '@eslint/js',
     'plugin:react/recommended',
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
@@ -14,10 +18,7 @@ module.exports = {
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh', 'jsx-a11y'],
   rules: {
-    'react-refresh/only-export-components': [
-      'warn',
-      { allowConstantExport: true },
-    ],
+    'react-refresh/only-export-components': 'warn',
     'react/prop-types': 'off', // Using TypeScript-like JSDoc instead
     'react/react-in-jsx-scope': 'off', // Not needed in React 17+
     'jsx-a11y/anchor-is-valid': 'off', // We use Link components

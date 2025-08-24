@@ -169,12 +169,12 @@ export default function PastEventsPage() {
   const filteredEvents = getFilteredEvents();
 
   return (
-    <div className="px-8 sm:px-16 lg:px-32 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-start">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-4 sm:space-y-0">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-3">Past Events</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">Past Events</h1>
+          <p className="text-base sm:text-lg text-gray-600">
             View and manage your event history.
           </p>
         </div>
@@ -203,8 +203,8 @@ export default function PastEventsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+      <div className="border-b border-gray-200 overflow-x-auto">
+        <nav className="-mb-px flex space-x-4 sm:space-x-8 min-w-max">
           {[
             { key: 'hosted' as EventTab, label: 'Events I Hosted', icon: 'calendar' },
             { key: 'cancelled' as EventTab, label: 'Cancelled Events', icon: 'x-circle' },
@@ -213,7 +213,7 @@ export default function PastEventsPage() {
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
+              className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 whitespace-nowrap ${
                 activeTab === tab.key
                   ? 'border-pink-500 text-pink-600'
                   : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -231,8 +231,8 @@ export default function PastEventsPage() {
       {/* Events List */}
       <div className="bg-white shadow overflow-hidden sm:rounded-lg">
         {filteredEvents.length === 0 ? (
-          <div className="px-6 py-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
+            <svg className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <h3 className="mt-2 text-sm font-medium text-gray-900">
@@ -257,17 +257,17 @@ export default function PastEventsPage() {
         ) : (
           <div className="divide-y divide-gray-200">
             {filteredEvents.map((event) => (
-              <div key={event.id} className="px-6 py-4">
-                <div className="flex items-center justify-between">
+              <div key={event.id} className="px-4 sm:px-6 py-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-3 sm:space-y-0">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
                       <div className="w-8 h-8 bg-pink-500 rounded-md flex items-center justify-center">
                         {getStatusIcon(event.status)}
                       </div>
                     </div>
-                    <div className="ml-4">
-                      <div className="flex items-center space-x-2">
-                        <h4 className="text-lg font-medium text-gray-900">{event.title}</h4>
+                    <div className="ml-4 flex-1 min-w-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-2 space-y-1 sm:space-y-0">
+                        <h4 className="text-base sm:text-lg font-medium text-gray-900 truncate">{event.title}</h4>
                         {getStatusBadge(event.status)}
                       </div>
                       <p className="text-sm text-gray-500">

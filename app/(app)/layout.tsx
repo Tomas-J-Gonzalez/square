@@ -164,7 +164,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   </div>
                   
                   {/* Menu Icon */}
-                  <svg className="w-5 h-5 text-gray-500 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className={`w-5 h-5 text-gray-500 ml-2 transition-transform duration-200 ${mobileMenuOpen ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                   </svg>
                 </button>
@@ -183,7 +183,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             />
             
             {/* Mobile Menu */}
-            <div className="md:hidden bg-white border-t border-gray-200 shadow-xl relative z-50">
+            <div className="md:hidden fixed top-16 sm:top-20 left-0 right-0 bg-white border-t border-gray-200 shadow-xl z-50 max-h-[calc(100vh-4rem)] sm:max-h-[calc(100vh-5rem)] overflow-y-auto">
               <div className="px-4 py-6 space-y-4">
                 {/* User Profile Section */}
                 <div className="flex items-center space-x-4 pb-6 border-b border-gray-200">
@@ -254,9 +254,70 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+      <main className="max-w-7xl mx-auto py-4 sm:py-6 px-4 sm:px-6 lg:px-8 pb-20 md:pb-6">
         {children}
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-40">
+        <div className="flex justify-around items-center py-2">
+          <Link
+            href="/dashboard"
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+              pathname === '/dashboard' 
+                ? 'text-pink-600 bg-pink-50' 
+                : 'text-gray-600 hover:text-pink-600'
+            }`}
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+            <span className="text-xs font-medium">Dashboard</span>
+          </Link>
+          
+          <Link
+            href="/dashboard/create-event"
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+              pathname === '/dashboard/create-event' 
+                ? 'text-pink-600 bg-pink-50' 
+                : 'text-gray-600 hover:text-pink-600'
+            }`}
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            <span className="text-xs font-medium">Create</span>
+          </Link>
+          
+          <Link
+            href="/dashboard/ideas"
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+              pathname === '/dashboard/ideas' 
+                ? 'text-pink-600 bg-pink-50' 
+                : 'text-gray-600 hover:text-pink-600'
+            }`}
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <span className="text-xs font-medium">Ideas</span>
+          </Link>
+          
+          <Link
+            href="/dashboard/past-events"
+            className={`flex flex-col items-center py-2 px-3 rounded-lg transition-colors ${
+              pathname === '/dashboard/past-events' 
+                ? 'text-pink-600 bg-pink-50' 
+                : 'text-gray-600 hover:text-pink-600'
+            }`}
+          >
+            <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span className="text-xs font-medium">History</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -63,16 +63,16 @@ export default function DashboardPage() {
   const firstName = user?.name?.split(' ')[0] || 'User';
 
   return (
-    <div className="px-8 sm:px-16 lg:px-32 space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Welcome Section - No Card Background */}
-      <div className="text-left mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">
+      <div className="text-left mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 sm:mb-3">
           Welcome back, {firstName}! 👋
         </h1>
       </div>
 
-      {/* Quick Actions - 4 Cards in One Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Quick Actions - Responsive Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Create Event Card - Only show if no active events */}
         {events.length === 0 && (
           <Card href="/dashboard/create-event">
