@@ -45,15 +45,101 @@ Does not being able to go == flaking, or is flaking just when someone says they'
 fix ugly urls (e.g events page, best practice for nesting and urls naming conventions)
 should dashboard always show as first sub url??? no
 
+Shared photo/video albums post-event.
 
-Escrow-style deposits (people pay a small refundable fee to secure attendance).
+Birthday / anniversary auto-reminders tied to events.
+
+#Escrow-style deposits (people pay a small refundable fee to secure attendance).
 Streaks (friend streaks) - Streaks or progress trackers for attending events (gamify reliability).
 Accountability groups where people set goals together (fitness, study, networking).
 
-Conflict-Free Scheduling
-
+#Conflict-Free Scheduling
 Auto-detect calendar conflicts and suggest alternative dates.
-
 Sync across Google Calendar, Outlook, iCal, etc.
-
 "Smart RSVP" where people vote availability and the app proposes the optimal time.
+
+#AI Summaries & Follow-Ups (prem)
+After an event, attendees get an automatic summary (meeting notes, key decisions, shared photos).
+AI-generated “missed it?” digest for those who didn’t attend.
+
+#Seamless Payments + Splitting
+Group payments for things like dinners, Airbnb, or activities.
+“Everyone pays their share upfront” — reduces the classic “I’ll pay you later” pain.
+
+#Icebreaker prompts for networking events. or meeting new people
+#Set of games for work stand ups etc
+
+#Creative Communities (Linkup 2.0)
+Collab boards for musicians, writers, designers to find jam sessions or co-working days.
+
+
+🚀 Stickiness & Growth Features
+
+Things that make your app not just useful, but habit-forming:
+
+Reputation & Social Proof
+Attendee reliability score (“Tomás has a 92% show-up rate”).
+Event ratings/reviews (“This host is always well-organized”).
+
+Community Layer
+Groups/clubs with recurring events.
+Membership perks (private chat, shared docs, pinned announcements).
+
+Integrations
+Slack/Discord bots for work or gaming groups.
+Spotify for collaborative playlists before an event.
+Notion/Miro for planning group projects.
+
+Smart RSVP + Escrow Deposit
+→ People RSVP and lock in with a tiny refundable payment. No-shows forfeit it.
+Pain solved: flakes + accountability.
+
+Auto-Scheduling Poll + Calendar Sync
+→ Invitees pick times → app auto-chooses the best slot + books everyone’s calendars.
+Pain solved: endless back-and-forth scheduling.
+
+Event + Payment Splitter
+→ Hosting a BBQ? Costs are split automatically across attendees, and payment is handled upfront.
+Pain solved: awkward “who owes what” convos.
+
+Hybrid Event + Auto-Recap
+→ Host in-person but provide a lightweight virtual join option → app generates a summary (photos, notes, action items) for absentees.
+Pain solved: FOMO and wasted info.
+
+Attendee Reputation + Social Proof (friend streaks)
+→ Reliability scores (e.g., “92% show-up rate”) + reviews of hosts/attendees.
+Pain solved: weeding out chronic flakes or finding trustworthy people.
+
+Recurring Groups + Shared Spaces
+→ Clubs, teams, or recurring meetups get a persistent hub with chat, files, pinned notes, and schedules.
+Pain solved: fragmentation across WhatsApp, email, and spreadsheets.
+
+Smart Introductions + Icebreakers
+→ Before an event, the app pairs people with shared interests and provides icebreaker prompts.
+Pain solved: awkward networking / wasted connections.
+
+
+Other 
+Meeting Recap Bot for Slack/Discord (create briefs from Team calls)
+→ Records, transcribes, summarizes meetings → outputs action items.
+Target: Remote teams drowning in calls.
+
+Portfolio Updater
+→ Connects to Dribbble, Behance, LinkedIn → auto-pulls new work into a single page.
+Target: Designers & devs who neglect their portfolios.
+
+
+4. Micro-Pledge Communities 🤝
+
+A tiny SaaS where groups commit to micro-pledges (like “we’ll all post one design a week” or “ship a feature every 10 days”) → failure triggers small penalty (money donated, social accountability).
+
+Why unique? It’s like “Pomodoro meets group accountability” — but hyper-focused on output.
+
+Target: Indie makers, student groups, creatives.
+
+
+10. “Micro-Obituaries” for SaaS Tools 🪦
+
+Track when SaaS tools shut down or change pricing → sends users backups + alternatives before it’s too late.
+Why unique? Nobody likes waking up to “this product is shutting down in 30 days.”
+Target: Indie hackers, SMBs, no-code users.
