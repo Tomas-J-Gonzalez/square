@@ -206,23 +206,40 @@ export default function InvitePage() {
     );
   }
 
-  const generateICal = () => {
+  const [showCalendarOptions, setShowCalendarOptions] = useState(false);
+
+  const generateICal = (format: 'gmail' | 'outlook' = 'gmail') => {
     const eventDate = new Date(event.date + 'T' + event.time);
     const endDate = new Date(eventDate.getTime() + 2 * 60 * 60 * 1000); // 2 hours later
     
+    // Format the date/time according to the calendar type
+    const formatDateTime = (date: Date) => {
+      if (format === 'outlook') {
+        // Outlook prefers local time format
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      } else {
+        // Gmail/Google Calendar format
+        return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+      }
+    };
+
     const icalContent = [
       'BEGIN:VCALENDAR',
       'VERSION:2.0',
       'PRODID:-//Show Up or Else//Event//EN',
+      'CALSCALE:GREGORIAN',
+      'METHOD:PUBLISH',
       'BEGIN:VEVENT',
       `UID:${event.id}@showuporelse.com`,
-      `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
-      `DTSTART:${eventDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
-      `DTEND:${endDate.toISOString().replace(/[-:]/g, '').split('.')[0]}Z`,
+      `DTSTAMP:${formatDateTime(new Date())}`,
+      `DTSTART:${formatDateTime(eventDate)}`,
+      `DTEND:${formatDateTime(endDate)}`,
       `SUMMARY:${event.title}`,
       `DESCRIPTION:${event.event_details || 'Event invitation from Show Up or Else'}`,
       `LOCATION:${event.location}`,
       `ORGANIZER;CN=${event.host_name}:mailto:${event.invited_by}`,
+      'STATUS:CONFIRMED',
+      'SEQUENCE:0',
       'END:VEVENT',
       'END:VCALENDAR'
     ].join('\r\n');
@@ -231,11 +248,18 @@ export default function InvitePage() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.ics`;
+    
+    // Create a safe filename with proper extension
+    const safeTitle = event.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    const timestamp = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    link.download = `${safeTitle}_${timestamp}.calendar.ics`;
+    
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    
+    setShowCalendarOptions(false);
   };
 
   return (
@@ -263,66 +287,109 @@ export default function InvitePage() {
           </div>
 
           {/* Event Details Card */}
-          <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 mb-8 border border-white/20">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-3xl font-bold text-gray-900">{event.title}</h2>
-              <button
-                onClick={generateICal}
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-pink-600 to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
-                title="Add to Calendar"
-              >
-                <Icon name="calendar-download" size="sm" className="mr-2" />
-                Add to Calendar
-              </button>
+          <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 lg:p-12 mb-8 border border-white/20">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8 lg:mb-10">
+              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 lg:mb-0">{event.title}</h2>
+              <div className="relative">
+                <button
+                  onClick={() => setShowCalendarOptions(!showCalendarOptions)}
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-pink-600 to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                  title="Add to Calendar"
+                >
+                  <Icon name="calendar-download" size="sm" className="mr-2" />
+                  Add to Calendar
+                </button>
+                
+                {/* Calendar Options Dropdown */}
+                {showCalendarOptions && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-40"
+                      onClick={() => setShowCalendarOptions(false)}
+                    />
+                    <div className="absolute right-0 top-full mt-2 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 min-w-[200px]">
+                      <button
+                        onClick={() => generateICal('gmail')}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center transition-colors"
+                      >
+                        <svg className="w-5 h-5 mr-3 text-red-500" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>
+                        <div>
+                          <div className="font-semibold text-gray-900">Gmail / Google Calendar</div>
+                          <div className="text-xs text-gray-500">Best for Gmail users</div>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => generateICal('outlook')}
+                        className="w-full px-4 py-3 text-left hover:bg-gray-50 flex items-center transition-colors"
+                      >
+                        <svg className="w-5 h-5 mr-3 text-blue-500" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M21.59 11.59L13.5 4.5 12 6l8.59 8.59L12 23.18l-1.5-1.5 8.09-8.09z"/>
+                        </svg>
+                        <div>
+                          <div className="font-semibold text-gray-900">Outlook / Microsoft</div>
+                          <div className="text-xs text-gray-500">Best for Outlook users</div>
+                        </div>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             
-            <div className="grid md:grid-cols-2 gap-6 mb-6">
-              <div className="flex items-center p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl">
-                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+            <div className="grid md:grid-cols-2 gap-6 lg:gap-8 mb-8 lg:mb-10">
+              <div className="flex items-center p-6 lg:p-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl border border-pink-100">
+                <div className="w-14 h-14 lg:w-16 lg:h-16 bg-pink-100 rounded-full flex items-center justify-center mr-5 lg:mr-6">
                   <Icon name="calendar" size="lg" className="text-pink-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{formatDate(event.date)}</p>
-                  <p className="text-gray-600">{formatTime(event.time)}</p>
+                  <p className="font-semibold text-gray-900 text-lg lg:text-xl">{formatDate(event.date)}</p>
+                  <p className="text-gray-600 text-base lg:text-lg">{formatTime(event.time)}</p>
                 </div>
               </div>
               
-              <div className="flex items-center p-4 bg-gradient-to-r from-pink-50 to-purple-50 rounded-xl">
-                <div className="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+              <div className="flex items-center p-6 lg:p-8 bg-gradient-to-r from-pink-50 to-purple-50 rounded-2xl border border-pink-100">
+                <div className="w-14 h-14 lg:w-16 lg:h-16 bg-pink-100 rounded-full flex items-center justify-center mr-5 lg:mr-6">
                   <Icon name="map-pin" size="lg" className="text-pink-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{event.location}</p>
-                  <p className="text-gray-600 capitalize">{event.event_type} event</p>
+                  <p className="font-semibold text-gray-900 text-lg lg:text-xl">{event.location}</p>
+                  <p className="text-gray-600 text-base lg:text-lg capitalize">{event.event_type} event</p>
                 </div>
               </div>
             </div>
 
             {event.event_details && (
-              <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-                <h4 className="font-semibold text-gray-900 mb-2">Event Details</h4>
-                <p className="text-gray-700 leading-relaxed">{event.event_details}</p>
+              <div className="mb-8 lg:mb-10 p-6 lg:p-8 bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center mr-4">
+                    <Icon name="info" size="sm" className="text-gray-600" />
+                  </div>
+                  <h4 className="font-semibold text-gray-900 text-lg">Event Details</h4>
+                </div>
+                <p className="text-gray-700 leading-relaxed text-base lg:text-lg">{event.event_details}</p>
               </div>
             )}
 
-            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-6">
-              <div className="flex items-center mb-3">
-                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center mr-3">
+            <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-6 lg:p-8">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center mr-4">
                   <Icon name="star" size="sm" className="text-amber-600" />
                 </div>
-                <h4 className="font-semibold text-amber-800">Punishment for Flakers</h4>
+                <h4 className="font-semibold text-amber-800 text-lg">Punishment for Flakers</h4>
               </div>
-              <p className="text-amber-700 leading-relaxed">{event.punishment}</p>
+              <p className="text-amber-700 leading-relaxed text-base lg:text-lg">{event.punishment}</p>
             </div>
           </div>
 
           {/* RSVP Form */}
-          <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 border border-white/20">
-            <div className="flex items-center mb-6">
-              <div className="w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center mr-4">
+          <div className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 lg:p-12 border border-white/20">
+            <div className="flex items-center mb-8 lg:mb-10">
+              <div className="w-12 h-12 lg:w-14 lg:h-14 bg-pink-100 rounded-full flex items-center justify-center mr-5">
                 <Icon name="check" size="lg" className="text-pink-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">RSVP</h3>
+              <h3 className="text-2xl lg:text-3xl font-bold text-gray-900">RSVP</h3>
             </div>
             
             {error && (
@@ -336,13 +403,13 @@ export default function InvitePage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="space-y-3">
                 <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
                   Your Name <span className="text-red-500" aria-label="required">*</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                     </svg>
@@ -353,22 +420,22 @@ export default function InvitePage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                    className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500"
+                    className="block w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500 text-base"
                     placeholder="Enter your full name"
                     disabled={submitting}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-500">
                   Enter your name as you'd like it to appear on the guest list
                 </p>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label htmlFor="email" className="block text-sm font-semibold text-gray-700">
                   Your Email <span className="text-gray-500 text-xs">(Optional)</span>
                 </label>
                 <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                     </svg>
@@ -378,21 +445,21 @@ export default function InvitePage() {
                     id="email"
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                    className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500"
+                    className="block w-full pl-12 pr-4 py-4 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500 text-base"
                     placeholder="Enter your email address (optional)"
                     disabled={submitting}
                   />
                 </div>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-500">
                   Optional: We'll use this to send you event updates
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <label className="block text-sm font-semibold text-gray-700">
                   Will you attend? <span className="text-red-500" aria-label="required">*</span>
                 </label>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4" role="radiogroup">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6" role="radiogroup">
                   <label className="relative">
                     <input
                       type="radio"
@@ -402,7 +469,7 @@ export default function InvitePage() {
                       onChange={() => setFormData(prev => ({ ...prev, willAttend: true }))}
                       className="sr-only"
                     />
-                    <div className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                    <div className={`p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                       formData.willAttend 
                         ? 'border-green-500 bg-green-50 shadow-lg' 
                         : 'border-gray-200 bg-white hover:border-gray-300'
@@ -432,7 +499,7 @@ export default function InvitePage() {
                       onChange={() => setFormData(prev => ({ ...prev, willAttend: false }))}
                       className="sr-only"
                     />
-                    <div className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
+                    <div className={`p-6 border-2 rounded-xl cursor-pointer transition-all duration-200 ${
                       !formData.willAttend 
                         ? 'border-red-500 bg-red-50 shadow-lg' 
                         : 'border-gray-200 bg-white hover:border-gray-300'
@@ -455,7 +522,7 @@ export default function InvitePage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <label htmlFor="message" className="block text-sm font-semibold text-gray-700">
                   Message <span className="text-gray-500 text-xs">(Optional)</span>
                 </label>
@@ -463,17 +530,17 @@ export default function InvitePage() {
                   id="message"
                   value={formData.message}
                   onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                  className="block w-full px-4 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500"
-                  rows={3}
+                  className="block w-full px-4 py-4 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-pink-500 transition-all duration-200 bg-white/50 backdrop-blur-sm disabled:bg-gray-50 disabled:text-gray-500 text-base"
+                  rows={4}
                   placeholder="Add a personal message or reason..."
                   disabled={submitting}
                 />
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-gray-500">
                   Optional: Add a personal note or reason for your response
                 </p>
               </div>
 
-              <div className="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row justify-end space-y-4 sm:space-y-0 sm:space-x-6 pt-8 border-t border-gray-200">
                 <Button
                   type="button"
                   variant="secondary"

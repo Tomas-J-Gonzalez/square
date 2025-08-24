@@ -35,6 +35,8 @@ export default function IdeasPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [hasGenerated, setHasGenerated] = useState(false);
+  const [generationCount, setGenerationCount] = useState(0);
+  const MAX_GENERATIONS = 4;
 
   const handleFilterToggle = (filterId: string) => {
     setSelectedFilters(prev => 
@@ -50,10 +52,16 @@ export default function IdeasPage() {
       return;
     }
 
+    if (generationCount >= MAX_GENERATIONS) {
+      setError(`You've reached the maximum of ${MAX_GENERATIONS} idea generations. Please upgrade your account for unlimited access.`);
+      return;
+    }
+
     setLoading(true);
     setError('');
     setIdeas([]);
     setHasGenerated(true);
+    setGenerationCount(prev => prev + 1);
 
     try {
       const response = await fetch('/api/generate-ideas', {
@@ -68,9 +76,13 @@ export default function IdeasPage() {
         setIdeas(data.ideas);
       } else {
         setError(data.error || 'Failed to generate ideas');
+        // Revert the count if the request failed
+        setGenerationCount(prev => prev - 1);
       }
     } catch (err) {
       setError('Failed to generate ideas. Please try again.');
+      // Revert the count if the request failed
+      setGenerationCount(prev => prev - 1);
     } finally {
       setLoading(false);
     }
@@ -112,13 +124,14 @@ export default function IdeasPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-white/80 backdrop-blur-sm shadow-sm border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <button
                 onClick={() => router.back()}
-                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+                aria-label="Go back"
               >
                 <Icon name="arrow-right" size="lg" className="rotate-180" />
               </button>
@@ -135,7 +148,7 @@ export default function IdeasPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
           {/* Left Panel - Input & Filters */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 lg:sticky lg:top-8">
+            <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-4 sm:p-6 lg:sticky lg:top-24">
               {/* Location Input */}
               <div className="mb-6">
                 <label htmlFor="location" className="block text-sm font-semibold text-gray-700 mb-3">
@@ -153,9 +166,13 @@ export default function IdeasPage() {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     placeholder="e.g., Auckland CBD, Wellington Waterfront, Queenstown"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
+                    className="w-full pl-10 pr-4 py-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                    aria-describedby="location-help"
                   />
                 </div>
+                <p id="location-help" className="mt-2 text-xs text-gray-500">
+                  Enter a location to get personalized recommendations
+                </p>
                 <div className="mt-3">
                   <p className="text-xs text-gray-500 mb-2">Popular locations:</p>
                   <div className="flex flex-wrap gap-1 sm:gap-2">
@@ -163,7 +180,8 @@ export default function IdeasPage() {
                       <button
                         key={suggestion}
                         onClick={() => setLocation(suggestion)}
-                        className="text-xs bg-gray-100 hover:bg-pink-100 text-gray-700 hover:text-pink-700 px-2 py-1 rounded-full transition-colors"
+                        className="text-xs bg-gray-100 hover:bg-pink-100 text-gray-700 hover:text-pink-700 px-3 py-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-1"
+                        aria-label={`Select ${suggestion} as location`}
                       >
                         {suggestion}
                       </button>
@@ -177,18 +195,20 @@ export default function IdeasPage() {
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   What interests you?
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {FILTER_OPTIONS.map((filter) => (
                     <button
                       key={filter.id}
                       onClick={() => handleFilterToggle(filter.id)}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl border transition-all ${
+                      className={`w-full flex items-center space-x-3 px-4 py-4 rounded-xl border transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-1 ${
                         selectedFilters.includes(filter.id)
-                          ? 'bg-pink-50 border-pink-300 text-pink-700 shadow-sm'
-                          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                          ? 'bg-gradient-to-r from-pink-50 to-purple-50 border-pink-300 text-pink-700 shadow-md'
+                          : 'bg-white/70 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:shadow-sm'
                       }`}
+                      aria-pressed={selectedFilters.includes(filter.id)}
+                      aria-label={`${selectedFilters.includes(filter.id) ? 'Deselect' : 'Select'} ${filter.label}`}
                     >
-                      <span className="text-xl">{filter.icon}</span>
+                      <span className="text-2xl">{filter.icon}</span>
                       <span className="font-medium">{filter.label}</span>
                       {selectedFilters.includes(filter.id) && (
                         <Icon name="check" size="sm" className="ml-auto text-pink-600" />
@@ -201,8 +221,9 @@ export default function IdeasPage() {
               {/* Generate Button */}
               <button
                 onClick={generateIdeas}
-                disabled={loading || !location.trim()}
-                className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-pink-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                disabled={loading || !location.trim() || generationCount >= MAX_GENERATIONS}
+                className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-pink-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
+                aria-describedby="generate-help"
               >
                 {loading ? (
                   <div className="flex items-center justify-center space-x-2">
@@ -211,11 +232,35 @@ export default function IdeasPage() {
                   </div>
                 ) : (
                   <div className="flex items-center justify-center space-x-2">
-                    <Icon name="lightbulb" size="md" />
+                    <Icon name="zap" size="md" />
                     <span>Generate Ideas</span>
                   </div>
                 )}
               </button>
+              
+              {/* Generation Counter */}
+              <div className="mt-2 text-center">
+                <p className="text-xs text-gray-500">
+                  {generationCount > 0 ? (
+                    <span>
+                      Used {generationCount} of {MAX_GENERATIONS} generations
+                      {generationCount >= MAX_GENERATIONS && (
+                        <span className="block mt-1 text-red-500 font-medium">
+                          Limit reached - upgrade for unlimited access
+                        </span>
+                      )}
+                    </span>
+                  ) : (
+                    <span>Free tier: {MAX_GENERATIONS} generations per session</span>
+                  )}
+                </p>
+              </div>
+              
+              <p id="generate-help" className="mt-2 text-xs text-gray-500 text-center">
+                {!location.trim() ? 'Enter a location to get started' : 
+                 generationCount >= MAX_GENERATIONS ? 'Upgrade your account for unlimited generations' :
+                 'Click to generate personalized activity ideas'}
+              </p>
 
               {/* Error Message */}
               {error && (
@@ -233,9 +278,9 @@ export default function IdeasPage() {
           <div className="lg:col-span-2">
             {!hasGenerated ? (
               /* Welcome State */
-              <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-12 text-center">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 sm:p-12 text-center">
                 <div className="max-w-md mx-auto">
-                  <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6">
+                  <div className="w-16 h-16 sm:w-24 sm:h-24 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4 sm:mb-6 shadow-lg">
                     <Icon name="lightbulb" size="xl" className="text-white" />
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
@@ -245,19 +290,19 @@ export default function IdeasPage() {
                     Enter a location and select your interests to get personalized activity suggestions powered by AI.
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500">
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-center justify-center space-x-2 p-2 rounded-lg bg-gray-50">
                       <Icon name="map-pin" size="sm" />
                       <span>Location-based</span>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-center justify-center space-x-2 p-2 rounded-lg bg-gray-50">
                       <Icon name="star" size="sm" />
                       <span>Cost estimates</span>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-center justify-center space-x-2 p-2 rounded-lg bg-gray-50">
                       <Icon name="clock" size="sm" />
                       <span>Duration info</span>
                     </div>
-                    <div className="flex items-center justify-center space-x-2">
+                    <div className="flex items-center justify-center space-x-2 p-2 rounded-lg bg-gray-50">
                       <Icon name="users" size="sm" />
                       <span>Group friendly</span>
                     </div>
@@ -267,7 +312,7 @@ export default function IdeasPage() {
             ) : ideas.length > 0 ? (
               /* Results State */
               <div className="space-y-4 sm:space-y-6">
-                <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-4 sm:p-6">
                   <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">
                     Ideas for {location}
                   </h2>
@@ -283,7 +328,7 @@ export default function IdeasPage() {
                   {ideas.map((idea, index) => (
                     <div
                       key={index}
-                      className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-gray-100"
+                      className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg p-4 sm:p-6 hover:shadow-xl transition-all duration-200 transform hover:-translate-y-1 border border-white/20 group"
                     >
                       <div className="flex items-start space-x-3 sm:space-x-4">
                         <div
@@ -335,14 +380,16 @@ export default function IdeasPage() {
                               {idea.isRealPlace && (
                                 <button
                                   onClick={() => handleViewDetails(idea)}
-                                  className="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                                  className="bg-gray-100 text-gray-700 px-3 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-1"
+                                  aria-label={`View details for ${idea.title}`}
                                 >
                                   View Details
                                 </button>
                               )}
                               <button
                                 onClick={() => handleCreateEvent(idea)}
-                                className="bg-pink-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-pink-700 transition-colors"
+                                className="bg-gradient-to-r from-pink-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-pink-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-1"
+                                aria-label={`Create event for ${idea.title}`}
                               >
                                 Create Event
                               </button>
@@ -358,16 +405,26 @@ export default function IdeasPage() {
                 <div className="text-center">
                   <button
                     onClick={generateIdeas}
-                    disabled={loading}
-                    className="bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                    disabled={loading || generationCount >= MAX_GENERATIONS}
+                    className="bg-gradient-to-r from-gray-100 to-gray-200 text-gray-700 px-6 py-3 rounded-xl font-medium hover:from-gray-200 hover:to-gray-300 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed"
+                    aria-label="Generate more activity ideas"
                   >
-                    Generate More Ideas
+                    {generationCount >= MAX_GENERATIONS ? (
+                      <span>Generation Limit Reached</span>
+                    ) : (
+                      <span>Generate More Ideas</span>
+                    )}
                   </button>
+                  {generationCount >= MAX_GENERATIONS && (
+                    <p className="mt-2 text-xs text-red-500">
+                      You've used all {MAX_GENERATIONS} free generations. Upgrade for unlimited access.
+                    </p>
+                  )}
                 </div>
               </div>
             ) : (
               /* Loading or Error State */
-              <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-12 text-center">
+              <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border border-white/20 p-6 sm:p-12 text-center">
                 {loading ? (
                   <div className="space-y-4">
                     <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-pink-600 mx-auto"></div>

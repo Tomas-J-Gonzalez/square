@@ -100,7 +100,9 @@ export default function ProfileDropdown({ userName, userEmail, onLogout }: Profi
             maxWidth: 'calc(100vw - 2rem)',
             minWidth: '12rem',
             right: dropdownPosition === 'right' ? '0' : 'auto',
-            left: dropdownPosition === 'left' ? '0' : 'auto'
+            left: dropdownPosition === 'left' ? '0' : 'auto',
+            maxHeight: 'calc(100vh - 2rem)',
+            overflowY: 'auto'
           }}
         >
           {/* Menu Items */}

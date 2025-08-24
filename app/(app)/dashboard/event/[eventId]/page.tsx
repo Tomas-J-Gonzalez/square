@@ -241,31 +241,33 @@ export default function EventManagementPage() {
   const flakingParticipants = participants.filter(p => !p.will_attend);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">{event.title}</h1>
-              <p className="mt-2 text-gray-600">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{event.title}</h1>
+              <p className="mt-2 text-sm sm:text-base text-gray-600">
                 {formatDate(event.date)} at {formatTime(event.time)} • {event.location}
               </p>
             </div>
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <Button
                 variant="secondary"
                 onClick={() => setShowShareModal(true)}
+                className="flex-1 sm:flex-none"
               >
                 <Icon name="share" size="sm" className="mr-2" />
-                Share
+                <span className="hidden sm:inline">Share</span>
               </Button>
               <Button
                 variant="secondary"
                 onClick={() => setShowAddModal(true)}
+                className="flex-1 sm:flex-none"
               >
                 <Icon name="plus" size="sm" className="mr-2" />
-                Add Participant
+                <span className="hidden sm:inline">Add</span>
               </Button>
             </div>
           </div>
@@ -277,11 +279,11 @@ export default function EventManagementPage() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
           {/* Event Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Event Information */}
-            <div className="bg-white shadow rounded-lg p-6">
+            <div className="bg-white shadow rounded-lg p-4 sm:p-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Event Information</h3>
               <div className="space-y-4">
                 <div>
@@ -303,8 +305,8 @@ export default function EventManagementPage() {
             </div>
 
             {/* Participants */}
-            <div className="bg-white shadow rounded-lg p-6">
-              <div className="flex items-center justify-between mb-4">
+            <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
                 <h3 className="text-lg font-medium text-gray-900">Participants</h3>
                 <span className="text-sm text-gray-500">
                   {attendingParticipants.length} attending, {flakingParticipants.length} flaking
@@ -321,12 +323,12 @@ export default function EventManagementPage() {
                 ) : (
                   <div className="space-y-2">
                     {attendingParticipants.map((participant) => (
-                      <div key={participant.id} className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                        <div>
-                          <p className="font-medium text-gray-900">{participant.name}</p>
-                          <p className="text-sm text-gray-500">{participant.email}</p>
+                      <div key={participant.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-green-50 rounded-lg space-y-2 sm:space-y-0">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 truncate">{participant.name}</p>
+                          <p className="text-sm text-gray-500 truncate">{participant.email}</p>
                           {participant.message && (
-                            <p className="text-sm text-gray-600 mt-1">"{participant.message}"</p>
+                            <p className="text-sm text-gray-600 mt-1 truncate">"{participant.message}"</p>
                           )}
                         </div>
                         <Button
@@ -334,6 +336,7 @@ export default function EventManagementPage() {
                           size="sm"
                           onClick={() => handleRemoveParticipant(participant.id)}
                           disabled={actionLoading}
+                          className="self-end sm:self-auto"
                         >
                           <Icon name="trash" size="sm" />
                         </Button>
