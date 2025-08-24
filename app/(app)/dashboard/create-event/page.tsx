@@ -133,7 +133,6 @@ export default function CreateEventPage() {
         location: formData.location.trim(),
         eventType: formData.eventType,
         eventDetails: formData.eventDetails.trim(),
-        decisionMode: 'single_person', // Default for now
         punishment: finalPunishment,
         invited_by: user.email,
         access: formData.access,

@@ -19,14 +19,12 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
             {/* Logo */}
             <div className="flex items-center">
               <Link href="/" className="flex items-center group">
-                <div className="flex items-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-3 py-1.5 rounded-full shadow-sm group-hover:shadow-md transition-all duration-200">
-                  <img 
-                    src="/assets/circle-pink.svg" 
-                    alt="Show up or Else" 
-                    className="h-5 w-5 mr-2"
-                  />
-                  <span className="font-bold text-sm uppercase tracking-wide">Show Up</span>
-                </div>
+                <img 
+                  src="/assets/circle-pink.svg" 
+                  alt="Show up or Else" 
+                  className="h-6 w-6 mr-2"
+                />
+                <span className="font-bold text-lg text-gray-900 group-hover:text-pink-600 transition-colors duration-200">Show Up</span>
               </Link>
             </div>
             
@@ -68,7 +66,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               </Link>
               <Link 
                 href="/signup" 
-                className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-2.5 rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
+                className="bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-2.5 rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105"
               >
                 Sign Up
               </Link>
@@ -79,14 +77,12 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
           <div className="md:hidden flex items-center justify-between">
             {/* Mobile Logo */}
             <Link href="/" className="flex items-center">
-              <div className="flex items-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-2.5 py-1 rounded-full shadow-sm">
-                <img 
-                  src="/assets/circle-pink.svg" 
-                  alt="Show up or Else" 
-                  className="h-4 w-4 mr-1.5"
-                />
-                <span className="font-bold text-xs uppercase tracking-wide">Show Up</span>
-              </div>
+              <img 
+                src="/assets/circle-pink.svg" 
+                alt="Show up or Else" 
+                className="h-5 w-5 mr-2"
+              />
+              <span className="font-bold text-base text-gray-900">Show Up</span>
             </Link>
 
             {/* Mobile menu button */}
@@ -150,7 +146,7 @@ export default function MarketingLayout({ children }: MarketingLayoutProps) {
               </Link>
               <Link 
                 href="/signup" 
-                className="block w-full text-center bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200"
+                className="block w-full text-center bg-gradient-to-r from-pink-500 to-pink-600 text-white px-6 py-3 rounded-lg font-medium text-sm shadow-sm hover:shadow-md transition-all duration-200"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign Up
